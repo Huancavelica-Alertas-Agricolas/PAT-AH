@@ -13,8 +13,8 @@ jobs:
       # See: https://circleci.com/developer/images/image/cimg/base
       - image: cimg/node:18.20
 
-    # Ejecutar dentro del directorio del frontend para evitar errores de ruta
-    working_directory: /home/circleci/project/Frontend-Huancavelica-Alertas-Agricolas
+    # Ejecutar en la raíz del repositorio; los pasos harán cd al subdirectorio frontend
+    working_directory: /home/circleci/project
 
     # Add steps to the job
     # See: https://circleci.com/docs/guides/orchestrate/jobs-steps/#steps-overview & https://circleci.com/docs/reference/configuration-reference/#steps
@@ -25,7 +25,14 @@ jobs:
       - run:
           name: Verificar directorio frontend
           command: |
-            # Estamos ejecutando en $PWD = working_directory
+            # Movernos al subdirectorio real donde vive el frontend
+            FRONTEND_DIR=Frontend-Huancavelica-Alertas-Agricolas
+            if [ ! -d "$FRONTEND_DIR" ]; then
+              echo "Error: no se encontró $FRONTEND_DIR en $(pwd)"
+              echo "Contenido del repositorio:" && ls -la
+              exit 1
+            fi
+            cd "$FRONTEND_DIR"
             if [ ! -f package.json ]; then
               echo "Error: package.json no existe en $(pwd)"
               echo "Contenido del directorio:" && ls -la
@@ -35,19 +42,23 @@ jobs:
       - run:
           name: Instalar dependencias
           command: |
+            cd Frontend-Huancavelica-Alertas-Agricolas
             # Instalar incluidas las devDependencies (vitest y testing libs)
             npm ci --include=dev
       - run:
           name: Ejecutar tests
           command: |
+            cd Frontend-Huancavelica-Alertas-Agricolas
             npm test
       - run:
           name: Construir aplicación (producción)
           command: |
+            cd Frontend-Huancavelica-Alertas-Agricolas
             npm run build --if-present
       - run:
           name: Empaquetar build en app.jar
           command: |
+            cd Frontend-Huancavelica-Alertas-Agricolas
             OUT_DIR=""
             for d in build dist public; do
               if [ -d "$d" ]; then
