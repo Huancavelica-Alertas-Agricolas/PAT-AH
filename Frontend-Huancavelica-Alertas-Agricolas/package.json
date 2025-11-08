@@ -63,6 +63,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "count:components": "node ./scripts/count-components.mjs",
+    "test": "vitest run"
   }
 }

@@ -8,13 +8,14 @@ import {
   Sprout,
   Share2,
 } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "../ui";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../ui/card";
+  Badge,
+} from "../ui";
 import {
   Dialog,
   DialogContent,
@@ -22,17 +23,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { Badge } from "../ui/badge";
+} from "../ui";
+import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui";
+// Select & Badge ahora provienen de módulos consolidados
 import { useCrops } from "../../hooks/useCrops";
 import { CropType } from "../../types";
 import { useLanguage } from '../../context/LanguageContext';
