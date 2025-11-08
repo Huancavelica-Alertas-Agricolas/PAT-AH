@@ -1,5 +1,5 @@
 import { Home, AlertTriangle, BarChart3, User } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button } from '../ui';
 
 type AppSection = 'dashboard' | 'alerts' | 'reports' | 'profile';
 

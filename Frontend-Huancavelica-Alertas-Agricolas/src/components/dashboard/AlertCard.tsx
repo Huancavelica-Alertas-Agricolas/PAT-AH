@@ -1,6 +1,5 @@
 import { AlertTriangle, Snowflake, CloudRain, Sun, Zap, Wind, Clock, MapPin } from 'lucide-react';
-import { Card, CardContent } from '../ui/card';
-import { Badge } from '../ui/badge';
+import { Card, CardContent, Badge } from '../ui';
 import { Alert, SeverityLevel } from '../../types';
 import { SEVERITY_COLORS, ALERT_TYPES } from '../../utils/constants';
 

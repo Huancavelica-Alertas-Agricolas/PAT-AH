@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Phone, Lock, Wifi, WifiOff } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Checkbox } from '../ui/checkbox';
+import { Button, Input, Label, Checkbox, Card, CardContent, CardDescription, CardHeader, CardTitle, Alert, AlertDescription } from '../ui';
 import { AuthFormData } from '../../types';
 import { PHONE_PATTERN } from '../../utils/constants';
 

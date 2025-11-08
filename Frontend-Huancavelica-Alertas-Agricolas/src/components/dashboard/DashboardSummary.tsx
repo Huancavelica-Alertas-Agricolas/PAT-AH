@@ -1,6 +1,5 @@
 import { Sprout, AlertTriangle, Lightbulb, TrendingUp } from 'lucide-react';
-import { Card, CardContent } from '../ui/card';
-import { Badge } from '../ui/badge';
+import { Card, CardContent, Badge } from '../ui';
 import { useCrops } from '../../hooks/useCrops';
 import { useLanguage } from '../../context/LanguageContext';
 import { useRecommendations } from '../../hooks/useRecommendations';

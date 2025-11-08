@@ -1,11 +1,5 @@
 import { useState } from 'react';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Switch } from '../ui/switch';
-import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Progress } from '../ui/progress';
-import { Alert, AlertDescription } from '../ui/alert';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Progress, Switch, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Alert, AlertDescription } from '../ui';
 import { 
   Wifi, 
   Download, 

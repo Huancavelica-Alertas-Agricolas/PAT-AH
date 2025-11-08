@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLanguage, LANGS, LangKey } from '../../context/LanguageContext';
-import { Button } from '../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui';
 import { Wifi, WifiOff, Globe, Settings } from 'lucide-react';
 
 interface WelcomeScreenProps {
