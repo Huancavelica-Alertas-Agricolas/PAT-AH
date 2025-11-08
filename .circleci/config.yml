@@ -13,40 +13,51 @@ jobs:
       # See: https://circleci.com/developer/images/image/cimg/base
       - image: cimg/node:18.20
 
-    # Ejecutar los pasos dentro del directorio del frontend para evitar ENOENT
-    working_directory: /home/circleci/project/Frontend-Huancavelica-Alertas-Agricolas
+    # Ejecutar en la raíz del repo y hacer cd al frontend específico antes de npm
+    working_directory: /home/circleci/project
 
     # Add steps to the job
     # See: https://circleci.com/docs/guides/orchestrate/jobs-steps/#steps-overview & https://circleci.com/docs/reference/configuration-reference/#steps
     steps:
       # Checkout the code as the first step.
       - checkout
-      # Verificar directorio frontend
+      # Verificar y moverse al directorio frontend
       - run:
-          name: Verificar directorio frontend
+          name: Verificar y moverse al directorio frontend
           command: |
-            FRONTEND_DIR=/home/circleci/project/Frontend-Huancavelica-Alertas-Agricolas
+            FRONTEND_DIR=Frontend-Huancavelica-Alertas-Agricolas
             if [ ! -d "$FRONTEND_DIR" ]; then
-              echo "Error: no se encontró $FRONTEND_DIR"
-              echo "Contenido del repositorio en $(pwd):"
+              echo "Error: no se encontró $FRONTEND_DIR en $(pwd)"
+              echo "Contenido del repositorio:"
               ls -la
               exit 1
             fi
-            echo "Directorio frontend encontrado:"
-            ls -la "$FRONTEND_DIR"
+            cd "$FRONTEND_DIR"
+            if [ ! -f package.json ]; then
+              echo "Error: package.json no existe en $FRONTEND_DIR"
+              ls -la
+              exit 1
+            fi
+            echo "Directorio frontend correcto: $(pwd)"
       - run:
           name: Instalar dependencias
-          command: npm ci
+          command: |
+            cd Frontend-Huancavelica-Alertas-Agricolas
+            npm ci
       - run:
           name: Ejecutar tests
-          command: npm test
+          command: |
+            cd Frontend-Huancavelica-Alertas-Agricolas
+            npm test
       - run:
           name: Construir aplicación (producción)
-          command: npm run build --if-present
+          command: |
+            cd Frontend-Huancavelica-Alertas-Agricolas
+            npm run build --if-present
       - run:
           name: Empaquetar build en app.jar
           command: |
-            # Buscar directorio de salida común (build, dist, public) y empaquetar
+            cd Frontend-Huancavelica-Alertas-Agricolas
             OUT_DIR=""
             for d in build dist public; do
               if [ -d "$d" ]; then
@@ -64,8 +75,10 @@ jobs:
             else
               (cd "$OUT_DIR" && zip -r ../app.zip .) && mv app.zip app.jar
             fi
+            # mover app.jar a la raíz para que store_artifacts lo capture con ruta absoluta
+            mv -f app.jar /home/circleci/project/app.jar
       - store_artifacts:
-          path: app.jar
+          path: /home/circleci/project/app.jar
           destination: frontend/app.jar
 
 # Orchestrate jobs using workflows
