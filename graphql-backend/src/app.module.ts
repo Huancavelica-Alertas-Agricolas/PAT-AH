@@ -3,6 +3,7 @@ import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { RestModule } from './rest/rest.module';
+import { AiModule } from './ai-microservice/ai.module';
 import { PrismaService } from './prisma.service';
 
 @Module({
@@ -12,6 +13,8 @@ import { PrismaService } from './prisma.service';
     UsersModule,
     // Rest compatibility module
     RestModule,
+    // AI Microservice
+    AiModule,
   ],
   providers: [PrismaService],
 })

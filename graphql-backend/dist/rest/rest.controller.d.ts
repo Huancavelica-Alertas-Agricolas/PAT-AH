@@ -13,19 +13,7 @@ export declare class RestController {
     } | {
         success: boolean;
         token: string;
-        user: {
-            id: string;
-            nombre: string | null;
-            email: string | null;
-            telefono: string;
-            password: string;
-            ciudad: string | null;
-            activo: boolean;
-            prefs: string | null;
-            roles: string;
-            createdAt: Date;
-            updatedAt: Date;
-        };
+        user: any;
         message?: undefined;
     }>;
     createUser(body: any): Promise<{
@@ -34,19 +22,7 @@ export declare class RestController {
         user?: undefined;
     } | {
         success: boolean;
-        user: {
-            id: string;
-            nombre: string | null;
-            email: string | null;
-            telefono: string;
-            password: string;
-            ciudad: string | null;
-            activo: boolean;
-            prefs: string | null;
-            roles: string;
-            createdAt: Date;
-            updatedAt: Date;
-        };
+        user: any;
         message?: undefined;
     }>;
 }

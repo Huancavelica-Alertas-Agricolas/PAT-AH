@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const auth_module_1 = require("./auth/auth.module");
 const users_module_1 = require("./users/users.module");
 const rest_module_1 = require("./rest/rest.module");
+const ai_module_1 = require("./ai-microservice/ai.module");
 const prisma_service_1 = require("./prisma.service");
 let AppModule = class AppModule {
 };
@@ -21,7 +22,9 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             rest_module_1.RestModule,
+            ai_module_1.AiModule,
         ],
         providers: [prisma_service_1.PrismaService],
     })
 ], AppModule);
+//# sourceMappingURL=app.module.js.map

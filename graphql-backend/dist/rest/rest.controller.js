@@ -53,3 +53,4 @@ exports.RestController = RestController = __decorate([
     (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], RestController);
+//# sourceMappingURL=rest.controller.js.map

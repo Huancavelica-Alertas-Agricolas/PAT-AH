@@ -31,3 +31,4 @@ async function bootstrap() {
     console.log(`🚀 Server running on http://localhost:${port}/graphql`);
 }
 bootstrap();
+//# sourceMappingURL=main.js.map

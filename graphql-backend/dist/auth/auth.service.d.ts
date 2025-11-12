@@ -4,35 +4,11 @@ export declare class AuthService {
     constructor(usersService: UsersService);
     register(data: any): Promise<{
         token: string;
-        user: {
-            id: string;
-            nombre: string | null;
-            email: string | null;
-            telefono: string;
-            password: string;
-            ciudad: string | null;
-            activo: boolean;
-            prefs: string | null;
-            roles: string;
-            createdAt: Date;
-            updatedAt: Date;
-        };
+        user: any;
     }>;
     login(phone: string, password: string): Promise<{
         token: string;
-        user: {
-            id: string;
-            nombre: string | null;
-            email: string | null;
-            telefono: string;
-            password: string;
-            ciudad: string | null;
-            activo: boolean;
-            prefs: string | null;
-            roles: string;
-            createdAt: Date;
-            updatedAt: Date;
-        };
+        user: any;
     }>;
     signToken(userId: string): string;
 }

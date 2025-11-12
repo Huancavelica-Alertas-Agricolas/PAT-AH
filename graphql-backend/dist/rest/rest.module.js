@@ -20,3 +20,4 @@ exports.RestModule = RestModule = __decorate([
         controllers: [rest_controller_1.RestController],
     })
 ], RestModule);
+//# sourceMappingURL=rest.module.js.map

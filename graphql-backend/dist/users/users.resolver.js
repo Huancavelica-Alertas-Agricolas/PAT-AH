@@ -32,3 +32,4 @@ exports.UsersResolver = UsersResolver = __decorate([
     (0, graphql_1.Resolver)(),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UsersResolver);
+//# sourceMappingURL=users.resolver.js.map

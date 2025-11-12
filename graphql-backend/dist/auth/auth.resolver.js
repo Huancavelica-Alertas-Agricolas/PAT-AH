@@ -50,3 +50,4 @@ exports.AuthResolver = AuthResolver = __decorate([
     (0, graphql_1.Resolver)(),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthResolver);
+//# sourceMappingURL=auth.resolver.js.map
