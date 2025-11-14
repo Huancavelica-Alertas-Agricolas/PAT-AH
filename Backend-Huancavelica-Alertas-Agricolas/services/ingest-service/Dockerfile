@@ -5,12 +5,12 @@ RUN npm ci --legacy-peer-deps --no-audit --no-fund || true
 COPY . .
 RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.prisma || true
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma || true; fi
-RUN if [ -f "package.json" ] && grep -q "build" package.json; then npm run build || true; fi
+# Skip build; runtime uses JS in src/
 
 FROM node:18-slim
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
-COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/src ./src
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 EXPOSE 3020
-CMD ["node","dist/main.js"]
+CMD ["node","src/main.js"]
