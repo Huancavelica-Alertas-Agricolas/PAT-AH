@@ -10,7 +10,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   auth-service:
     build:
@@ -30,7 +30,7 @@ services:
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     ports:
-      - "3002:3002"
+      - "3005:3002"
     depends_on:
       - db
 
@@ -63,6 +63,35 @@ services:
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     command: ["sh","-c","node src/index.js"]
+    depends_on:
+      - db
+
+  alert-service:
+    build:
+      context: ./services/alert-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
+    ports:
+      - "3007:3004"
+    depends_on:
+      - db
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "3008:3003"
+
+  weather-service:
+    build:
+      context: ./services/weather-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
+    ports:
+      - "3006:3002"
     depends_on:
       - db
 

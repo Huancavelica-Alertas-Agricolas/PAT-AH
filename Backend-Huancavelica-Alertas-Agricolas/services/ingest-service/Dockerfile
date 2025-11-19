@@ -1,8 +1,11 @@
+# Builder stage uses repo root as context; copy only service files
 FROM node:18 AS builder
 WORKDIR /usr/src/app
-COPY package*.json ./
+COPY services/ingest-service/package*.json ./
 RUN npm ci --legacy-peer-deps --no-audit --no-fund || true
-COPY . .
+# Copy only the ingest-service sources into the image
+COPY services/ingest-service/. ./
+# Copy shared Prisma schema into local prisma dir and generate client if present
 RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.prisma || true
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma || true; fi
 # Skip build; runtime uses JS in src/
