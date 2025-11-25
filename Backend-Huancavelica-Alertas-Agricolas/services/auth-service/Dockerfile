@@ -1,5 +1,5 @@
 # Builder stage uses repo root as context; copy only service files
-FROM node:18 AS builder
+FROM node:20 AS builder
 WORKDIR /usr/src/app
 COPY services/auth-service/package*.json ./
 RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/* \
@@ -11,7 +11,7 @@ RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.pri
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma; fi
 # No TypeScript build step required (JS runtime in `src/`)
 
-FROM node:18-slim
+FROM node:20-slim
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
  # Ensure OpenSSL is available in runtime for Prisma query engine compatibility
