@@ -2,11 +2,22 @@ FROM node:20 AS builder
 WORKDIR /usr/src/app
 
 # Install dependencies
-COPY package*.json ./
+COPY services/notification-service/package*.json ./
 RUN npm ci --legacy-peer-deps --no-audit --no-fund
 
-# Copy source, build and prepare templates
-COPY . .
+# Prisma client generation (added by patch)
+RUN if [ -f ./prisma/schema.prisma ]; then \
+			npx prisma@5.22.0 generate --schema=./prisma/schema.prisma || true; \
+		elif [ -f /tmp/schema.prisma ]; then \
+			npx prisma@5.22.0 generate --schema=/tmp/schema.prisma || true; \
+		else \
+			echo "[prisma] no schema found, skipping generate"; \
+		fi
+
+# Copy source, build and prepare templates (context is repo root)
+COPY services/notification-service/. ./
+# Ensure shared prisma schema is available for builder generate
+RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.prisma || true
 RUN npm run build && mkdir -p dist/templates && cp -r src/templates/* dist/templates/ || true
 RUN npm prune --production || true
 
