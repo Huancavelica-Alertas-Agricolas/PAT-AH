@@ -52,7 +52,7 @@ services:
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     ports:
-      - "3004:3004"
+      - "3004:3003"
     depends_on:
       - db
 
@@ -73,7 +73,7 @@ services:
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     ports:
-      - "3007:3004"
+      - "3007:3001"
     depends_on:
       - db
 
