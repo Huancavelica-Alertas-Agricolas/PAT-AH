@@ -17,7 +17,7 @@ let WeatherService = WeatherService_1 = class WeatherService {
     constructor() {
         this.logger = new common_1.Logger(WeatherService_1.name);
         this.apiKey = process.env.OPENWEATHER_API_KEY || 'demo_key';
-        this.baseUrl = 'https://api.openweathermap.org/data/2.5';
+        this.baseUrl = process.env.WEATHER_BASE_URL || 'https://api.openweathermap.org/data/2.5';
     }
     /**
      * Obtiene datos meteorológicos actuales

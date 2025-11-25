@@ -1,4 +1,4 @@
-FROM node:18 AS builder
+FROM node:20 AS builder
 WORKDIR /usr/src/app
 # Copy only ai-service package files first (optimize npm install)
 COPY services/ai-service/package*.json ./
@@ -11,13 +11,14 @@ RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.pri
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma; fi
 # No TypeScript build step required (JS runtime in `src/`)
 
-FROM node:18-slim
+FROM node:20-slim
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
 # Copy built app from builder stage
- # Ensure OpenSSL is available in runtime for Prisma query engine compatibility
-RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/*
+# Ensure OpenSSL and diagnostic tools are available in runtime for Prisma query engine compatibility and debugging
+RUN apt-get update -y && apt-get install -y openssl ca-certificates curl iproute2 procps --no-install-recommends && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/src/app/src ./src
 COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/trained-models ./trained-models
 EXPOSE 3003
 CMD ["node","src/main.js"]

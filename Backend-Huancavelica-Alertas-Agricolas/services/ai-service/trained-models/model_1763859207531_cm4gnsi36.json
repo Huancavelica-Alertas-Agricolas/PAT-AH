@@ -1,0 +1,24 @@
+{
+  "id": "model_1763859207531_cm4gnsi36",
+  "name": "test_linear",
+  "type": "linear",
+  "features": [
+    "x"
+  ],
+  "target": "y",
+  "model": {
+    "slope": 2,
+    "intercept": 0,
+    "equation": "y = 2.0000x + 0.0000"
+  },
+  "metadata": {
+    "accuracy": 1,
+    "createdAt": "2025-11-23T00:53:27.532Z",
+    "lastTrained": "2025-11-23T00:53:27.532Z",
+    "trainingMetrics": {
+      "mse": 0,
+      "rmse": 0,
+      "r2": 1
+    }
+  }
+}

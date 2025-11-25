@@ -1,0 +1,24 @@
+{
+  "id": "model_1763859690940_qpkswd7n0",
+  "name": "test_linear_s3v3",
+  "type": "linear",
+  "features": [
+    "x"
+  ],
+  "target": "y",
+  "model": {
+    "slope": 2,
+    "intercept": 0,
+    "equation": "y = 2.0000x + 0.0000"
+  },
+  "metadata": {
+    "accuracy": 1,
+    "createdAt": "2025-11-23T01:01:30.940Z",
+    "lastTrained": "2025-11-23T01:01:30.940Z",
+    "trainingMetrics": {
+      "mse": 0,
+      "rmse": 0,
+      "r2": 1
+    }
+  }
+}

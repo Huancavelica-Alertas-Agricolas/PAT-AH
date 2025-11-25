@@ -54,6 +54,7 @@ const excel_processor_service_1 = require("./services/excel-processor.service");
 const machine_learning_service_1 = require("./services/machine-learning.service");
 const weather_service_1 = require("./services/weather.service");
 const excel_data_dto_1 = require("./dto/excel-data.dto");
+const { PrismaClient } = require('@prisma/client');
 // Configuración de multer para subida de archivos
 const storage = multer.diskStorage({
     destination: './uploads',
@@ -86,6 +87,28 @@ let AiController = class AiController {
         }
         try {
             const excelData = await this.excelService.processExcelFile(file.path);
+
+            // Guardar metadata del dataset en la base de datos (Prisma)
+            // Esto permite trazabilidad de los archivos subidos para entrenamiento
+            try {
+                const prisma = new PrismaClient();
+                await prisma.trainingDataset.create({
+                    data: {
+                        fileName: excelData.fileName || file.originalname,
+                        path: file.path,
+                        columns: excelData.columns,
+                        rowCount: excelData.rowCount,
+                        metadata: { uploadedAt: new Date().toISOString() }
+                    }
+                });
+                await prisma.$disconnect();
+            }
+            catch (prismaErr) {
+                // No bloquear el flujo por error de registro en metadata; sólo loguear
+                // eslint-disable-next-line no-console
+                console.warn('No se pudo guardar metadata del dataset:', prismaErr.message || prismaErr);
+            }
+
             const statistics = await this.excelService.getDataStatistics(excelData);
             const quality = await this.excelService.validateDataQuality(excelData);
             return {

@@ -10,17 +10,11 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
 }));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function (o, v) {
     Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
+}) : function (o, v) {
     o["default"] = v;
 });
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
 var __importStar = (this && this.__importStar) || (function () {
     var ownKeys = function(o) {
         ownKeys = Object.getOwnPropertyNames || function (o) {
@@ -60,6 +54,9 @@ catch (e) {
 const ml_matrix_1 = require("ml-matrix");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const { S3Client, HeadBucketCommand, CreateBucketCommand, PutObjectCommand, ListObjectsV2Command } = require('@aws-sdk/client-s3');
+const { Upload } = require('@aws-sdk/lib-storage');
+const axios = require('axios');
 // Implementación simple de regresión lineal
 class SimpleLinearRegression {
     constructor(x, y) {
@@ -346,12 +343,51 @@ let MachineLearningService = MachineLearningService_1 = class MachineLearningSer
                 loss: 'meanSquaredError',
                 metrics: ['mse']
             });
+            // Crear run en MLflow para logging por-época
+            let mlflowRun = null;
+            try {
+                // crear run con metadatos mínimos
+                const tempModel = { id: 'tmp_' + Date.now(), name: modelName, type: 'neural_network' };
+                mlflowRun = await this.createMlflowRun(tempModel);
+            }
+            catch (e) {
+                this.logger.warn(`No se pudo crear run en MLflow antes del entrenamiento: ${e.message}`);
+                mlflowRun = null;
+            }
+
+            // Preparar callbacks para loggear métricas por época si hay run
+            const callbacks = [];
+            if (mlflowRun && mlflowRun.runId) {
+                const runId = mlflowRun.runId;
+                callbacks.push({
+                    onEpochEnd: async (epoch, logs) => {
+                        try {
+                            const mlflowUrl = process.env.MLFLOW_TRACKING_URI || process.env.MLFLOW_URL || 'http://localhost:5000';
+                            const metrics = [];
+                            for (const k of Object.keys(logs || {})) {
+                                const value = Number(logs[k]);
+                                if (!Number.isNaN(value)) {
+                                    metrics.push({ key: k, value, timestamp: Date.now(), step: epoch });
+                                }
+                            }
+                            if (metrics.length > 0) {
+                                await axios.post(`${process.env.MLFLOW_TRACKING_URI || process.env.MLFLOW_URL || 'http://localhost:5000'}/api/2.0/mlflow/runs/log-batch`, { run_id: runId, metrics });
+                            }
+                        }
+                        catch (err) {
+                            this.logger.warn(`No se pudo loggear métricas epoch ${epoch} en MLflow: ${err.message}`);
+                        }
+                    }
+                });
+            }
+
             // Entrenar modelo
             const history = await model.fit(xs, ys, {
                 epochs: 100,
                 batchSize: 32,
                 validationSplit: 0.2,
-                verbose: 0
+                verbose: 0,
+                callbacks
             });
             // Calcular métricas en el conjunto de entrenamiento
             const predictions = await model.predict(xs);
@@ -424,6 +460,16 @@ let MachineLearningService = MachineLearningService_1 = class MachineLearningSer
             };
             this.models.set(modelId, storedModel);
             await this.saveModel(storedModel);
+            // Si creamos un run temporal al inicio, actualizar tags/params para ese run
+            if (mlflowRun && mlflowRun.runId) {
+                try {
+                    // Subir artifacts y loggear params/metrics en el run existente
+                    await this.registerInMlflow(storedModel, null, { runId: mlflowRun.runId, artifactUri: mlflowRun.artifactUri });
+                }
+                catch (err) {
+                    this.logger.warn(`No se pudo finalizar el registro en MLflow para run ${mlflowRun.runId}: ${err.message}`);
+                }
+            }
             // Limpiar memoria
             xs.dispose();
             ys.dispose();
@@ -584,9 +630,9 @@ let MachineLearningService = MachineLearningService_1 = class MachineLearningSer
             id: model.id,
             name: model.name,
             type: model.type,
-            accuracy: model.metadata.accuracy,
-            createdAt: model.metadata.createdAt,
-            lastTrained: model.metadata.lastTrained,
+            accuracy: (model.metadata && typeof model.metadata.accuracy !== 'undefined') ? model.metadata.accuracy : null,
+            createdAt: (model.metadata && model.metadata.createdAt) ? model.metadata.createdAt : null,
+            lastTrained: (model.metadata && model.metadata.lastTrained) ? model.metadata.lastTrained : null,
             features: model.features,
             target: model.target,
             isActive: true
@@ -774,6 +820,315 @@ let MachineLearningService = MachineLearningService_1 = class MachineLearningSer
                 model.model
         };
         fs.writeFileSync(filePath, JSON.stringify(modelData, null, 2));
+        // Intentar subir artefactos a S3/MinIO y registrar en MLflow (no bloquear si falla)
+        try {
+            // Antes de subir, si es neural_network, crear un archivo marcador con la lista de archivos
+            if (model.type === 'neural_network') {
+                try {
+                    const modelPath = model.model && model.model.path ? model.model.path : path.join(this.modelsDir, `${model.id}_model`);
+                    const walk = (dir) => {
+                        let results = [];
+                        if (!fs.existsSync(dir)) return results;
+                        const list = fs.readdirSync(dir);
+                        list.forEach(function (file) {
+                            const f = path.join(dir, file);
+                            const stat = fs.statSync(f);
+                            if (stat && stat.isDirectory()) {
+                                results = results.concat(walk(f));
+                            }
+                            else {
+                                results.push(path.relative(modelPath, f).replace(/\\/g, '/'));
+                            }
+                        });
+                        return results;
+                    };
+                    const files = walk(modelPath);
+                    const marker = {
+                        modelId: model.id,
+                        createdAt: new Date().toISOString(),
+                        files
+                    };
+                    const markerPath = path.join(this.modelsDir, `${model.id}_files.json`);
+                    fs.writeFileSync(markerPath, JSON.stringify(marker, null, 2));
+                }
+                catch (mkErr) {
+                    this.logger.warn(`No se pudo crear marker de archivos del modelo: ${mkErr.message}`);
+                }
+            }
+            const s3Path = await this.uploadModelArtifacts(model);
+            await this.registerInMlflow(model, s3Path);
+        }
+        catch (err) {
+            this.logger.warn(`No se pudo subir artefactos a S3/registrar en MLflow: ${err.message}`);
+        }
+    }
+
+    // Inicializar cliente S3 (MinIO compatible) usando AWS SDK v3
+    initS3Client() {
+        if (this.s3)
+            return this.s3;
+        const endpoint = process.env.S3_ENDPOINT || process.env.MLFLOW_S3_ENDPOINT_URL || 'http://localhost:9000';
+        const accessKeyId = process.env.AWS_ACCESS_KEY_ID || 'minio';
+        const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY || 'minio123';
+        this.s3 = new S3Client({
+            endpoint,
+            region: process.env.AWS_REGION || 'us-east-1',
+            credentials: { accessKeyId, secretAccessKey },
+            forcePathStyle: true
+        });
+        return this.s3;
+    }
+
+    async ensureBucket(bucket) {
+        const s3 = this.initS3Client();
+        try {
+            await s3.send(new HeadBucketCommand({ Bucket: bucket }));
+        }
+        catch (err) {
+            // Intentar crear bucket si no existe
+            try {
+                await s3.send(new CreateBucketCommand({ Bucket: bucket }));
+            }
+            catch (createErr) {
+                // si falla la creación, volver a lanzar
+                throw createErr;
+            }
+        }
+    }
+
+    // Sube un directorio (o archivo) al bucket bajo el prefijo model.id/
+    // Sube artifacts del modelo a S3. Si se pasa `targetS3Uri` con forma `s3://bucket/prefix/`
+    // sube en esa ubicación (para que MLflow UI los muestre). Si no, usa bucket/prefix por defecto.
+    async uploadModelArtifacts(model, targetS3Uri) {
+        const s3 = this.initS3Client();
+        const defaultBucket = process.env.S3_BUCKET || 'mlflow';
+        await this.ensureBucket(defaultBucket);
+        const modelPath = model.type === 'neural_network' && model.model.path ? model.model.path : path.join(this.modelsDir, `${model.id}_model`);
+        let bucket = defaultBucket;
+        let prefix = `${model.id}`;
+        if (targetS3Uri && targetS3Uri.startsWith('s3://')) {
+            // extraer bucket y prefix de s3://bucket/optional/prefix/
+            const noProto = targetS3Uri.replace('s3://', '');
+            const parts = noProto.split('/');
+            bucket = parts.shift();
+            prefix = parts.join('/');
+            if (prefix.endsWith('/'))
+                prefix = prefix.slice(0, -1);
+        }
+        // Asegurarse de que el bucket exista
+        await this.ensureBucket(bucket);
+        // Si path no existe, subir solo el metadata JSON
+        if (!fs.existsSync(modelPath)) {
+            const metaPath = path.join(this.modelsDir, `${model.id}.json`);
+            const key = prefix ? `${prefix}/${path.basename(metaPath)}` : `${path.basename(metaPath)}`;
+            const uploader = new Upload({ client: s3, params: { Bucket: bucket, Key: key, Body: fs.createReadStream(metaPath) } });
+            await uploader.done();
+            return `s3://${bucket}/${prefix ? prefix + '/' : ''}`;
+        }
+        // Recorrer archivos en directorio y subir con Upload (multipart si es necesario)
+        const walk = (dir) => {
+            let results = [];
+            const list = fs.readdirSync(dir);
+            list.forEach(function (file) {
+                const f = path.join(dir, file);
+                const stat = fs.statSync(f);
+                if (stat && stat.isDirectory()) {
+                    results = results.concat(walk(f));
+                }
+                else {
+                    results.push(f);
+                }
+            });
+            return results;
+        };
+        const files = fs.statSync(modelPath).isDirectory() ? walk(modelPath) : [modelPath];
+        for (const file of files) {
+            const relative = path.relative(modelPath, file).replace(/\\/g, '/');
+            const key = prefix ? `${prefix}/${relative}` : relative;
+            const stream = fs.createReadStream(file);
+            const uploadParams = { Bucket: bucket, Key: key, Body: stream };
+            // Use Upload util for robust upload
+            const uploader = new Upload({ client: s3, params: uploadParams });
+            await uploader.done();
+        }
+        // también subir metadata JSON
+        const metaPath = path.join(this.modelsDir, `${model.id}.json`);
+        if (fs.existsSync(metaPath)) {
+            const metaKey = prefix ? `${prefix}/${path.basename(metaPath)}` : path.basename(metaPath);
+            const uploader = new Upload({ client: s3, params: { Bucket: bucket, Key: metaKey, Body: fs.createReadStream(metaPath) } });
+            await uploader.done();
+        }
+
+        // Optimización: eliminar archivos locales del modelo después de subirlos
+        // Para evitar ocupar espacio en disco en el host de entrenamiento.
+        try {
+            // Borrar el directorio del modelo (si existe)
+            if (fs.existsSync(modelPath)) {
+                fs.rmSync(modelPath, { recursive: true, force: true });
+            }
+            // Borrar marker si existe
+            const markerPath = path.join(this.modelsDir, `${model.id}_files.json`);
+            if (fs.existsSync(markerPath)) {
+                fs.unlinkSync(markerPath);
+            }
+        }
+        catch (cleanupErr) {
+            this.logger.warn(`No se pudo eliminar archivos locales del modelo ${model.id}: ${cleanupErr.message}`);
+        }
+
+        return `s3://${bucket}/${prefix ? prefix + '/' : ''}`;
+    }
+
+    // Registrar experimento y run en MLflow (registro básico: experiment, run, metrics, param artifact path)
+    async registerInMlflow(model, s3Path, existingRun) {
+        const mlflowUrl = process.env.MLFLOW_TRACKING_URI || process.env.MLFLOW_URL || 'http://localhost:5000';
+        const experimentName = process.env.MLFLOW_EXPERIMENT || 'ai-service-experiments';
+        // Obtener o crear experimento
+        let experimentId = null;
+        try {
+            // Prefer POST, pero si falla intentar GET por compatibilidad con diferentes versiones
+            const getResp = await axios.post(`${mlflowUrl}/api/2.0/mlflow/experiments/get-by-name`, { experiment_name: experimentName });
+            if (getResp.data && getResp.data.experiment && getResp.data.experiment.experiment_id)
+                experimentId = getResp.data.experiment.experiment_id;
+        }
+        catch (errPost) {
+            try {
+                const getResp2 = await axios.get(`${mlflowUrl}/api/2.0/mlflow/experiments/get-by-name`, { params: { experiment_name: experimentName } });
+                if (getResp2.data && getResp2.data.experiment && getResp2.data.experiment.experiment_id)
+                    experimentId = getResp2.data.experiment.experiment_id;
+            }
+            catch (errGet) {
+                // crear experimento si no existe
+                try {
+                    const createResp = await axios.post(`${mlflowUrl}/api/2.0/mlflow/experiments/create`, { name: experimentName });
+                    if (createResp.data && createResp.data.experiment_id)
+                        experimentId = createResp.data.experiment_id;
+                }
+                catch (createErr) {
+                    this.logger.warn(`No se pudo obtener/crear experimento MLflow: ${createErr.message}`);
+                    return null;
+                }
+            }
+        }
+        if (!experimentId) {
+            this.logger.warn('Experiment ID no disponible, omitiendo registro en MLflow');
+            return null;
+        }
+        // Crear run (a menos que se pase uno existente)
+        const now = Date.now();
+        let runId = null;
+        let artifactUri = null;
+        if (existingRun && existingRun.runId) {
+            runId = existingRun.runId;
+            artifactUri = existingRun.artifactUri;
+        }
+        else {
+            try {
+                const runResp = await axios.post(`${mlflowUrl}/api/2.0/mlflow/runs/create`, {
+                    experiment_id: experimentId,
+                    start_time: now,
+                    user_id: 'ai-service',
+                    tags: [{ key: 'model_name', value: model.name }, { key: 'model_id', value: model.id }, { key: 'type', value: model.type }]
+                });
+                if (runResp.data && runResp.data.run && runResp.data.run.info) {
+                    runId = runResp.data.run.info.run_id;
+                    artifactUri = runResp.data.run.info.artifact_uri; // normalmente s3://bucket/... when using S3 artifact store
+                }
+            }
+            catch (err) {
+                this.logger.warn(`No se pudo crear run en MLflow: ${err.message}`);
+                return null;
+            }
+        }
+        if (!runId) {
+            this.logger.warn('Run ID no disponible, omitiendo log de métricas');
+            return null;
+        }
+
+        // Si MLflow devolvió un artifact_uri en S3, subir los artifacts directamente allí
+        let effectiveS3Path = s3Path || null;
+        try {
+            if (artifactUri && artifactUri.startsWith('s3://')) {
+                // artifactUri puede ser s3://bucket/.../run-.../
+                effectiveS3Path = artifactUri.endsWith('/') ? artifactUri : artifactUri + '/';
+                await this.uploadModelArtifacts(model, effectiveS3Path);
+            }
+            else {
+                // subir al path por defecto (s3://bucket/<modelId>/)
+                effectiveS3Path = await this.uploadModelArtifacts(model, null);
+            }
+        }
+        catch (err) {
+            this.logger.warn(`Error subiendo artifacts al artifact_uri de MLflow: ${err.message}`);
+        }
+
+        // Log metrics y params
+        try {
+            const metrics = model.metadata && model.metadata.trainingMetrics ? model.metadata.trainingMetrics : {};
+            const metricEntries = Object.keys(metrics).map((k) => ({ key: k, value: Number(metrics[k]) || 0, timestamp: Date.now(), step: 0 }));
+            const params = [
+                { key: 'artifact_s3_path', value: effectiveS3Path || '' },
+                { key: 'model_type', value: model.type }
+            ];
+            await axios.post(`${mlflowUrl}/api/2.0/mlflow/runs/log-batch`, { run_id: runId, metrics: metricEntries, params });
+        }
+        catch (err) {
+            this.logger.warn(`Error al loggear métricas/params en MLflow: ${err.message}`);
+        }
+        return runId;
+    }
+
+    // Crear (o obtener) un run en MLflow y devolver runId + artifactUri
+    async createMlflowRun(model) {
+        const mlflowUrl = process.env.MLFLOW_TRACKING_URI || process.env.MLFLOW_URL || 'http://localhost:5000';
+        const experimentName = process.env.MLFLOW_EXPERIMENT || 'ai-service-experiments';
+        // Obtener o crear experimento
+        let experimentId = null;
+        try {
+            const getResp = await axios.post(`${mlflowUrl}/api/2.0/mlflow/experiments/get-by-name`, { experiment_name: experimentName });
+            if (getResp.data && getResp.data.experiment && getResp.data.experiment.experiment_id)
+                experimentId = getResp.data.experiment.experiment_id;
+        }
+        catch (errPost) {
+            try {
+                const getResp2 = await axios.get(`${mlflowUrl}/api/2.0/mlflow/experiments/get-by-name`, { params: { experiment_name: experimentName } });
+                if (getResp2.data && getResp2.data.experiment && getResp2.data.experiment.experiment_id)
+                    experimentId = getResp2.data.experiment.experiment_id;
+            }
+            catch (errGet) {
+                try {
+                    const createResp = await axios.post(`${mlflowUrl}/api/2.0/mlflow/experiments/create`, { name: experimentName });
+                    if (createResp.data && createResp.data.experiment_id)
+                        experimentId = createResp.data.experiment_id;
+                }
+                catch (createErr) {
+                    this.logger.warn(`No se pudo obtener/crear experimento MLflow: ${createErr.message}`);
+                    return null;
+                }
+            }
+        }
+        if (!experimentId) {
+            this.logger.warn('Experiment ID no disponible, omitiendo creación de run');
+            return null;
+        }
+        // Crear run
+        try {
+            const now = Date.now();
+            const runResp = await axios.post(`${mlflowUrl}/api/2.0/mlflow/runs/create`, {
+                experiment_id: experimentId,
+                start_time: now,
+                user_id: 'ai-service',
+                tags: [{ key: 'model_name', value: model.name }, { key: 'model_id', value: model.id }, { key: 'type', value: model.type }]
+            });
+            if (runResp.data && runResp.data.run && runResp.data.run.info) {
+                return { runId: runResp.data.run.info.run_id, artifactUri: runResp.data.run.info.artifact_uri };
+            }
+        }
+        catch (err) {
+            this.logger.warn(`No se pudo crear run en MLflow: ${err.message}`);
+            return null;
+        }
+        return null;
     }
     loadStoredModels() {
         try {
