@@ -60,6 +60,7 @@ let AuthService = class AuthService {
             return { token, user };
         }
         catch (err) {
+            console.error('Auth.register error:', err && (err.stack || err.message || err));
             // Handle Prisma unique constraint error (P2002) and surface a clear HTTP error
             if ((err === null || err === void 0 ? void 0 : err.code) === 'P2002') {
                 throw new common_1.HttpException('A user with that email or phone already exists', common_1.HttpStatus.CONFLICT);

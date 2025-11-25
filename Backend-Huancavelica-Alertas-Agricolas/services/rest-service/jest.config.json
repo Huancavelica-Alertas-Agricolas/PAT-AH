@@ -1,0 +1,5 @@
+{
+  "testEnvironment": "node",
+  "testMatch": ["**/test/**/*.spec.js"],
+  "verbose": true
+}

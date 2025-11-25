@@ -1,9 +1,9 @@
 # Builder stage uses repo root as context; copy only service files
-FROM node:18 AS builder
+FROM node:20 AS builder
 WORKDIR /usr/src/app
 COPY services/rest-service/package*.json ./
 RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/* \
- && npm ci --legacy-peer-deps --no-audit --no-fund
+ && npm install --legacy-peer-deps --no-audit --no-fund
 # Copy only the rest-service sources into the build context inside the image
 COPY services/rest-service/. ./
 # Copy shared Prisma schema into local prisma dir and generate client
@@ -11,12 +11,12 @@ RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.pri
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma; fi
 # No build step required; runtime uses JS in src/
 
-FROM node:18-slim
+FROM node:20-slim
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
-# Ensure OpenSSL is available in runtime for Prisma query engine compatibility
-RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/*
+# Ensure OpenSSL and diagnostic tools are available in runtime for Prisma query engine compatibility and debugging
+RUN apt-get update -y && apt-get install -y openssl ca-certificates curl iproute2 procps --no-install-recommends && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/src/app/src ./src
 COPY --from=builder /usr/src/app/node_modules ./node_modules
-EXPOSE 3004
+EXPOSE 3003
 CMD ["node","src/main.js"]
