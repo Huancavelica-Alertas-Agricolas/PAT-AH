@@ -28,7 +28,7 @@ export const useAuth = () => {
     // Si estamos online, intentar login contra API Gateway
     try {
       if (typeof window !== 'undefined' && window.navigator?.onLine) {
-        const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000/api';
+        const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3003/api';
         const resp = await axios.post(`${API_BASE}/auth/login`, {
           phone: formData.phone,
           password: formData.password,

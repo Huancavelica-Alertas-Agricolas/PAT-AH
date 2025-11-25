@@ -49,7 +49,7 @@ export const RegistrationForm: React.FC = () => {
     }
 
     // Si estamos online, intentamos crear el usuario en el backend
-    const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000/api';
+    const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3003/api';
     if (typeof window !== 'undefined' && window.navigator?.onLine) {
       try {
         const payload = {
