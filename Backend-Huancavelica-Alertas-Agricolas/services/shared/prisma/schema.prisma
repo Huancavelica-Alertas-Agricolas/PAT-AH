@@ -47,3 +47,14 @@ model Log {
   user User? @relation(fields: [userId], references: [id])
   userId String?
 }
+
+// Metadata for uploaded training datasets (Excel/CSV)
+model TrainingDataset {
+  id        String   @id @default(uuid())
+  fileName  String
+  path      String
+  columns   Json
+  rowCount  Int
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
