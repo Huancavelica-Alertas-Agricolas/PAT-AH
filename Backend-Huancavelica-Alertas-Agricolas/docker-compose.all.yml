@@ -1,0 +1,140 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pat
+      POSTGRES_PASSWORD: pat
+      POSTGRES_DB: pat_ah
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  rest-service:
+    image: juanaldairramirezmendez/rest-service:latest
+    build:
+      context: .
+      dockerfile: services/rest-service/Dockerfile
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://pat:pat@db:5432/pat_ah"
+      NODE_ENV: production
+    ports:
+      - "3003:3003"
+    restart: on-failure
+
+  ai-service:
+    image: juanaldairramirezmendez/ai-service:latest
+    build:
+      context: .
+      dockerfile: services/ai-service/Dockerfile
+    depends_on:
+      - db
+      - rest-service
+    environment:
+      DATABASE_URL: "postgresql://pat:pat@db:5432/pat_ah"
+      NODE_ENV: production
+    ports:
+      - "3004:3004"
+    restart: on-failure
+
+  auth-service:
+    image: juanaldairramirezmendez/auth-service:latest
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://pat:pat@db:5432/pat_ah"
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    restart: on-failure
+
+  users-service:
+    image: juanaldairramirezmendez/users-service:latest
+    build:
+      context: .
+      dockerfile: services/users-service/Dockerfile
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://pat:pat@db:5432/pat_ah"
+      NODE_ENV: production
+    ports:
+      - "3005:3005"
+    restart: on-failure
+
+  weather-service:
+    image: juanaldairramirezmendez/weather-service:latest
+    build:
+      context: .
+      dockerfile: services/weather-service/Dockerfile
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://pat:pat@db:5432/pat_ah"
+      NODE_ENV: production
+    ports:
+      - "3006:3006"
+    restart: on-failure
+
+  alert-service:
+    image: juanaldairramirezmendez/alert-service:latest
+    build:
+      context: .
+      dockerfile: services/alert-service/Dockerfile
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://pat:pat@db:5432/pat_ah"
+      NODE_ENV: production
+    ports:
+      - "3007:3007"
+    restart: on-failure
+
+  notification-service:
+    image: juanaldairramirezmendez/notification-service:latest
+    build:
+      context: .
+      dockerfile: services/notification-service/Dockerfile
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://pat:pat@db:5432/pat_ah"
+      NODE_ENV: production
+    ports:
+      - "3008:3008"
+    restart: on-failure
+
+  ingest-service:
+    image: juanaldairramirezmendez/ingest-service:latest
+    build:
+      context: .
+      dockerfile: services/ingest-service/Dockerfile
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://pat:pat@db:5432/pat_ah"
+      NODE_ENV: production
+    restart: on-failure
+
+  migrate:
+    image: node:20
+    command: sh -c "npm set progress=false && npm i prisma@5 @prisma/client@5 --no-audit --silent && npx prisma migrate deploy --schema=services/shared/prisma/schema.prisma"
+    environment:
+      DATABASE_URL: "postgresql://pat:pat@db:5432/pat_ah"
+    working_dir: /work
+    volumes:
+      - ./:/work
+    depends_on:
+      - db
+    restart: 'no'
+
+volumes:
+  db_data:

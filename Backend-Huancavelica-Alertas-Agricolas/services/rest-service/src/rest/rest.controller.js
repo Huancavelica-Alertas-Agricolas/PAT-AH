@@ -15,15 +15,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("../auth/auth.service");
+const microservices_1 = require("@nestjs/microservices");
+const { firstValueFrom } = require('rxjs');
 let RestController = class RestController {
-    constructor(authService) {
+    constructor(authService, weatherClient) {
         this.authService = authService;
+        this.weatherClient = weatherClient;
     }
     async login(body) {
         const res = await this.authService.login(body.phone, body.password);
         if (!res)
             return { success: false, message: 'Invalid credentials' };
-        return { success: true, token: res.token, user: res.user };
+        return { success: true, token: res.token, user: res.user, timestamp: new Date() };
     }
     async me(req) {
         // Return decoded token payload attached by jwtMiddleware (if present)
@@ -37,6 +40,19 @@ let RestController = class RestController {
         if (!res)
             return { success: false, message: 'Could not create user' };
         return { success: true, user: res.user };
+    }
+
+    async getWeather() {
+        // Request current weather data from the weather microservice via TCP client
+        try {
+            const obs = this.weatherClient.send('get_weather_data', {});
+            const data = await (0, firstValueFrom)(obs);
+            return data;
+        }
+        catch (e) {
+            this.logger && this.logger.error && this.logger.error('Error fetching weather from microservice', e);
+            return { error: 'Weather service unavailable' };
+        }
     }
 };
 exports.RestController = RestController;
@@ -63,8 +79,30 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], RestController.prototype, "createUser", null);
+
+__decorate([
+    (0, common_1.Get)('weather'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], RestController.prototype, "getWeather", null);
+
+// Alias route for compatibility
+RestController.prototype.getWeatherCurrent = async function () {
+    return await this.getWeather();
+};
+
+__decorate([
+    (0, common_1.Get)('weather/current'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], RestController.prototype, "getWeatherCurrent", null);
 exports.RestController = RestController = __decorate([
     (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __param(1, (0, common_1.Inject)('WEATHER_CLIENT')),
+    __metadata("design:paramtypes", [auth_service_1.AuthService, Object])
 ], RestController);
 //# sourceMappingURL=rest.controller.js.map

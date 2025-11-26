@@ -32,3 +32,7 @@ class WeatherController {
 }
 
 module.exports = { WeatherController };
+
+// Register controller and message pattern handlers for microservice transport
+Controller()(WeatherController);
+MessagePattern('get_weather_data')(WeatherController.prototype, 'getWeatherData', Object.getOwnPropertyDescriptor(WeatherController.prototype, 'getWeatherData'));

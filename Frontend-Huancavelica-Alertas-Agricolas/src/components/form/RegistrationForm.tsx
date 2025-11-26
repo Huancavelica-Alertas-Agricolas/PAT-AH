@@ -50,6 +50,8 @@ export const RegistrationForm: React.FC = () => {
 
     // Si estamos online, intentamos crear el usuario en el backend
     const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3003/api';
+    const OFFLINE_DEMO = (import.meta.env.VITE_OFFLINE_DEMO as string) === 'true';
+
     if (typeof window !== 'undefined' && window.navigator?.onLine) {
       try {
         const payload = {
@@ -70,23 +72,43 @@ export const RegistrationForm: React.FC = () => {
         }
         setSubmitError(resp?.data?.message || 'Error al registrar en el servidor');
       } catch (err: any) {
-        console.warn('Registro API falló, guardando demo localmente:', err?.message || err);
-        setSubmitError('Error al conectar con el servidor. Intenta nuevamente o use modo offline.');
+        console.warn('Registro API falló:', err?.message || err);
+        // Si explicitamente activamos modo demo offline (VITE_OFFLINE_DEMO=true), guardamos en localStorage.
+        if (OFFLINE_DEMO) {
+          console.warn('OFFLINE_DEMO=true → guardando credenciales temporalmente en localStorage');
+          try {
+            localStorage.setItem('demoUser', JSON.stringify({ telefono: form.telefono, contraseña: form.contraseña }));
+            setSubmitSuccess(true);
+            setTimeout(() => {
+              setSubmitSuccess(false);
+              window.location.href = '/login';
+            }, 2500);
+            return;
+          } catch (e: any) {
+            // fallthrough to show error
+          }
+        }
+        setSubmitError('Error al conectar con el servidor. Intenta nuevamente o contacte al administrador.');
       } finally {
         setSubmitting(false);
       }
     } else {
-      // DEMO offline: Guarda los datos en localStorage para pruebas locales
-      try {
-        localStorage.setItem('demoUser', JSON.stringify({ telefono: form.telefono, contraseña: form.contraseña }));
-        setSubmitSuccess(true);
-        setTimeout(() => {
-          setSubmitSuccess(false);
-          window.location.href = '/login';
-        }, 2500);
-      } catch (err: any) {
-        setSubmitError('Error al registrar. Intente nuevamente.');
-      } finally {
+      // Offline path: only save demo data if OFFLINE_DEMO is enabled
+      if (OFFLINE_DEMO) {
+        try {
+          localStorage.setItem('demoUser', JSON.stringify({ telefono: form.telefono, contraseña: form.contraseña }));
+          setSubmitSuccess(true);
+          setTimeout(() => {
+            setSubmitSuccess(false);
+            window.location.href = '/login';
+          }, 2500);
+        } catch (err: any) {
+          setSubmitError('Error al registrar. Intente nuevamente.');
+        } finally {
+          setSubmitting(false);
+        }
+      } else {
+        setSubmitError('Sin conexión: no se pudo contactar con el servidor. Intente más tarde.');
         setSubmitting(false);
       }
     }

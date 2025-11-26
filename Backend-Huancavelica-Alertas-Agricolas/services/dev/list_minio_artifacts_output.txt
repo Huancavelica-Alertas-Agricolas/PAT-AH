@@ -1,0 +1,26 @@
+﻿Verificando objetos en s3://mlflow/1/9ccc0fe77622474c93be99a9db6b6c08/artifacts/
+Encontrados 3 objetos (mostrando hasta 200):
+1/9ccc0fe77622474c93be99a9db6b6c08/artifacts/model.json
+1/9ccc0fe77622474c93be99a9db6b6c08/artifacts/model_1763860687249_fcgk35yjq.json
+1/9ccc0fe77622474c93be99a9db6b6c08/artifacts/weights.bin
+
+Comprobaci├│n de archivos:
+- model.json: ENCONTRADO -> 1/9ccc0fe77622474c93be99a9db6b6c08/artifacts/model.json
+- weights.bin: ENCONTRADO -> 1/9ccc0fe77622474c93be99a9db6b6c08/artifacts/weights.bin
+- <modelId>_files.json: NO ENCONTRADO
+Verificando objetos en s3://mlflow/1/409141edf52844ba9c30efc3689ee96d/artifacts/
+Encontrados 3 objetos (mostrando hasta 200):
+1/409141edf52844ba9c30efc3689ee96d/artifacts/model.json
+1/409141edf52844ba9c30efc3689ee96d/artifacts/model_1763860687249_fcgk35yjq.json
+1/409141edf52844ba9c30efc3689ee96d/artifacts/weights.bin
+
+Comprobaci├│n de archivos:
+- model.json: ENCONTRADO -> 1/409141edf52844ba9c30efc3689ee96d/artifacts/model.json
+- weights.bin: ENCONTRADO -> 1/409141edf52844ba9c30efc3689ee96d/artifacts/weights.bin
+- <modelId>_files.json: NO ENCONTRADO
+Verificando objetos en s3://mlflow/1/b5f59f18f1454195949b8671c33d87f5/artifacts/
+No se encontraron objetos para ese run/prefijo. Verifica bucket/endpoint/credenciales.
+Verificando objetos en s3://mlflow/1/239b045926784fecb73d87b0f442e252/artifacts/
+No se encontraron objetos para ese run/prefijo. Verifica bucket/endpoint/credenciales.
+Verificando objetos en s3://mlflow/1/643cdd5a638145cda494e48a0589cbf5/artifacts/
+No se encontraron objetos para ese run/prefijo. Verifica bucket/endpoint/credenciales.

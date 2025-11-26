@@ -10,17 +10,38 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
+// Helper: normalize phone numbers to digits-only and prefer local 9-digit format
+function normalizePhone(input) {
+    if (!input) return '';
+    // keep digits only
+    const digits = input.toString().replace(/\D/g, '');
+    if (digits.length <= 9) return digits;
+    // if it ends with 9 digits, return last 9 digits (strip country code)
+    return digits.slice(-9);
+}
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../shared");
 let UsersService = class UsersService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    // Normalize phone to digits-only and remove Peru country code if present
+    // e.g. '+51904031408' -> '904031408', '51904031408' -> '904031408'
+    // Keep only last 9 digits when longer than 9.
+    
+    
+    
+    
     async create(data) {
+        // Normalize telefono before creating (store consistent format)
+        if (data && data.telefono) {
+            data.telefono = normalizePhone(data.telefono);
+        }
         return this.prisma.user.create({ data });
     }
     async findByPhone(phone) {
-        return this.prisma.user.findUnique({ where: { telefono: phone } });
+        const p = normalizePhone(phone || '');
+        return this.prisma.user.findUnique({ where: { telefono: p } });
     }
     async findAll() {
         return this.prisma.user.findMany();

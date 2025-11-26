@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Alert, AlertType, SeverityLevel } from '../types';
 import axios from 'axios';
 
@@ -62,14 +62,14 @@ export const useAlerts = () => {
     // loadAlerts();
   }, []);
 
-  const filteredAlerts = alerts.filter(alert => {
+  const filteredAlerts = useMemo(() => alerts.filter(alert => {
     if (filters.type && alert.type !== filters.type) return false;
     if (filters.severity && alert.severity !== filters.severity) return false;
     if (filters.showActive !== undefined && alert.isActive !== filters.showActive) return false;
     return true;
-  });
+  }), [alerts, filters]);
 
-  const activeAlerts = alerts.filter(alert => alert.isActive);
+  const activeAlerts = useMemo(() => alerts.filter(alert => alert.isActive), [alerts]);
 
   const getAlertById = (id: string) => alerts.find(alert => alert.id === id);
 

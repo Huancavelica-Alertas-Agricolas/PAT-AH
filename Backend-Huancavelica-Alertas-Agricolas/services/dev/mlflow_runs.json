@@ -1,0 +1,331 @@
+﻿{
+    "runs":  [
+                 {
+                     "info":  {
+                                  "run_uuid":  "9ccc0fe77622474c93be99a9db6b6c08",
+                                  "experiment_id":  "1",
+                                  "run_name":  "worried-vole-424",
+                                  "user_id":  "ai-service",
+                                  "status":  "RUNNING",
+                                  "start_time":  1763860687689,
+                                  "artifact_uri":  "s3://mlflow/1/9ccc0fe77622474c93be99a9db6b6c08/artifacts",
+                                  "lifecycle_stage":  "active",
+                                  "run_id":  "9ccc0fe77622474c93be99a9db6b6c08"
+                              },
+                     "data":  {
+                                  "metrics":  [
+                                                  {
+                                                      "key":  "mse",
+                                                      "value":  0.0718975582889494,
+                                                      "timestamp":  1763860688106,
+                                                      "step":  0
+                                                  },
+                                                  {
+                                                      "key":  "rmse",
+                                                      "value":  0.268137200494354,
+                                                      "timestamp":  1763860688106,
+                                                      "step":  0
+                                                  },
+                                                  {
+                                                      "key":  "r2",
+                                                      "value":  0.9281024417110506,
+                                                      "timestamp":  1763860688106,
+                                                      "step":  0
+                                                  },
+                                                  {
+                                                      "key":  "finalLoss",
+                                                      "value":  0.0003031724481843412,
+                                                      "timestamp":  1763860688106,
+                                                      "step":  0
+                                                  },
+                                                  {
+                                                      "key":  "epochs",
+                                                      "value":  100.0,
+                                                      "timestamp":  1763860688106,
+                                                      "step":  0
+                                                  }
+                                              ],
+                                  "params":  [
+                                                 {
+                                                     "key":  "artifact_s3_path",
+                                                     "value":  "s3://mlflow/1/9ccc0fe77622474c93be99a9db6b6c08/artifacts/"
+                                                 },
+                                                 {
+                                                     "key":  "model_type",
+                                                     "value":  "neural_network"
+                                                 }
+                                             ],
+                                  "tags":  [
+                                               {
+                                                   "key":  "model_name",
+                                                   "value":  "test_nn_epochs_check"
+                                               },
+                                               {
+                                                   "key":  "model_id",
+                                                   "value":  "model_1763860687249_fcgk35yjq"
+                                               },
+                                               {
+                                                   "key":  "type",
+                                                   "value":  "neural_network"
+                                               },
+                                               {
+                                                   "key":  "mlflow.runName",
+                                                   "value":  "worried-vole-424"
+                                               }
+                                           ]
+                              },
+                     "inputs":  {
+
+                                },
+                     "outputs":  {
+
+                                 }
+                 },
+                 {
+                     "info":  {
+                                  "run_uuid":  "409141edf52844ba9c30efc3689ee96d",
+                                  "experiment_id":  "1",
+                                  "run_name":  "honorable-steed-56",
+                                  "user_id":  "ai-service",
+                                  "status":  "RUNNING",
+                                  "start_time":  1763860675534,
+                                  "artifact_uri":  "s3://mlflow/1/409141edf52844ba9c30efc3689ee96d/artifacts",
+                                  "lifecycle_stage":  "active",
+                                  "run_id":  "409141edf52844ba9c30efc3689ee96d"
+                              },
+                     "data":  {
+                                  "metrics":  [
+                                                  {
+                                                      "key":  "val_loss",
+                                                      "value":  0.2025415599346161,
+                                                      "timestamp":  1763860687106,
+                                                      "step":  99
+                                                  },
+                                                  {
+                                                      "key":  "val_mse",
+                                                      "value":  0.2025415599346161,
+                                                      "timestamp":  1763860687106,
+                                                      "step":  99
+                                                  },
+                                                  {
+                                                      "key":  "loss",
+                                                      "value":  0.0003031724481843412,
+                                                      "timestamp":  1763860687106,
+                                                      "step":  99
+                                                  },
+                                                  {
+                                                      "key":  "mse",
+                                                      "value":  0.0003031724481843412,
+                                                      "timestamp":  1763860687106,
+                                                      "step":  99
+                                                  },
+                                                  {
+                                                      "key":  "rmse",
+                                                      "value":  0.268137200494354,
+                                                      "timestamp":  1763860688562,
+                                                      "step":  0
+                                                  },
+                                                  {
+                                                      "key":  "r2",
+                                                      "value":  0.9281024417110506,
+                                                      "timestamp":  1763860688562,
+                                                      "step":  0
+                                                  },
+                                                  {
+                                                      "key":  "finalLoss",
+                                                      "value":  0.0003031724481843412,
+                                                      "timestamp":  1763860688562,
+                                                      "step":  0
+                                                  },
+                                                  {
+                                                      "key":  "epochs",
+                                                      "value":  100.0,
+                                                      "timestamp":  1763860688562,
+                                                      "step":  0
+                                                  }
+                                              ],
+                                  "params":  [
+                                                 {
+                                                     "key":  "artifact_s3_path",
+                                                     "value":  "s3://mlflow/1/409141edf52844ba9c30efc3689ee96d/artifacts/"
+                                                 },
+                                                 {
+                                                     "key":  "model_type",
+                                                     "value":  "neural_network"
+                                                 }
+                                             ],
+                                  "tags":  [
+                                               {
+                                                   "key":  "model_name",
+                                                   "value":  "test_nn_epochs_check"
+                                               },
+                                               {
+                                                   "key":  "model_id",
+                                                   "value":  "tmp_1763860675447"
+                                               },
+                                               {
+                                                   "key":  "type",
+                                                   "value":  "neural_network"
+                                               },
+                                               {
+                                                   "key":  "mlflow.runName",
+                                                   "value":  "honorable-steed-56"
+                                               }
+                                           ]
+                              },
+                     "inputs":  {
+
+                                },
+                     "outputs":  {
+
+                                 }
+                 },
+                 {
+                     "info":  {
+                                  "run_uuid":  "b5f59f18f1454195949b8671c33d87f5",
+                                  "experiment_id":  "1",
+                                  "run_name":  "chill-mink-950",
+                                  "user_id":  "ai-service",
+                                  "status":  "RUNNING",
+                                  "start_time":  1763860624857,
+                                  "artifact_uri":  "s3://mlflow/1/b5f59f18f1454195949b8671c33d87f5/artifacts",
+                                  "lifecycle_stage":  "active",
+                                  "run_id":  "b5f59f18f1454195949b8671c33d87f5"
+                              },
+                     "data":  {
+                                  "tags":  [
+                                               {
+                                                   "key":  "model_name",
+                                                   "value":  "compat-test"
+                                               },
+                                               {
+                                                   "key":  "model_id",
+                                                   "value":  "test"
+                                               },
+                                               {
+                                                   "key":  "type",
+                                                   "value":  "linear"
+                                               },
+                                               {
+                                                   "key":  "mlflow.runName",
+                                                   "value":  "chill-mink-950"
+                                               }
+                                           ]
+                              },
+                     "inputs":  {
+
+                                },
+                     "outputs":  {
+
+                                 }
+                 },
+                 {
+                     "info":  {
+                                  "run_uuid":  "239b045926784fecb73d87b0f442e252",
+                                  "experiment_id":  "1",
+                                  "run_name":  "marvelous-grub-784",
+                                  "user_id":  "ai-service",
+                                  "status":  "RUNNING",
+                                  "start_time":  1763859988218,
+                                  "artifact_uri":  "s3://mlflow/1/239b045926784fecb73d87b0f442e252/artifacts",
+                                  "lifecycle_stage":  "active",
+                                  "run_id":  "239b045926784fecb73d87b0f442e252"
+                              },
+                     "data":  {
+                                  "tags":  [
+                                               {
+                                                   "key":  "model_name",
+                                                   "value":  "test_experiment_run"
+                                               },
+                                               {
+                                                   "key":  "model_id",
+                                                   "value":  "t"
+                                               },
+                                               {
+                                                   "key":  "type",
+                                                   "value":  "test"
+                                               },
+                                               {
+                                                   "key":  "mlflow.runName",
+                                                   "value":  "marvelous-grub-784"
+                                               }
+                                           ]
+                              },
+                     "inputs":  {
+
+                                },
+                     "outputs":  {
+
+                                 }
+                 },
+                 {
+                     "info":  {
+                                  "run_uuid":  "643cdd5a638145cda494e48a0589cbf5",
+                                  "experiment_id":  "1",
+                                  "run_name":  "spiffy-midge-218",
+                                  "user_id":  "ai-service",
+                                  "status":  "RUNNING",
+                                  "start_time":  1763859208710,
+                                  "artifact_uri":  "s3://mlflow/1/643cdd5a638145cda494e48a0589cbf5/artifacts",
+                                  "lifecycle_stage":  "active",
+                                  "run_id":  "643cdd5a638145cda494e48a0589cbf5"
+                              },
+                     "data":  {
+                                  "metrics":  [
+                                                  {
+                                                      "key":  "mse",
+                                                      "value":  0.0,
+                                                      "timestamp":  1763859208796,
+                                                      "step":  0
+                                                  },
+                                                  {
+                                                      "key":  "rmse",
+                                                      "value":  0.0,
+                                                      "timestamp":  1763859208796,
+                                                      "step":  0
+                                                  },
+                                                  {
+                                                      "key":  "r2",
+                                                      "value":  1.0,
+                                                      "timestamp":  1763859208796,
+                                                      "step":  0
+                                                  }
+                                              ],
+                                  "params":  [
+                                                 {
+                                                     "key":  "artifact_s3_path",
+                                                     "value":  "s3://mlflow/model_1763859207531_cm4gnsi36/"
+                                                 },
+                                                 {
+                                                     "key":  "model_type",
+                                                     "value":  "linear"
+                                                 }
+                                             ],
+                                  "tags":  [
+                                               {
+                                                   "key":  "model_name",
+                                                   "value":  "test_linear"
+                                               },
+                                               {
+                                                   "key":  "model_id",
+                                                   "value":  "model_1763859207531_cm4gnsi36"
+                                               },
+                                               {
+                                                   "key":  "type",
+                                                   "value":  "linear"
+                                               },
+                                               {
+                                                   "key":  "mlflow.runName",
+                                                   "value":  "spiffy-midge-218"
+                                               }
+                                           ]
+                              },
+                     "inputs":  {
+
+                                },
+                     "outputs":  {
+
+                                 }
+                 }
+             ]
+}

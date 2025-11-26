@@ -4,6 +4,7 @@
   import App from "./App";
   import { BrowserRouter as Router } from "react-router-dom";
   import { LanguageProvider } from "./context/LanguageContext";
+  import { ToastProvider } from './context/ToastContext';
   import "./index.css";
 
   // Registrar Service Worker de PWA (dinámicamente para no romper los tests)
@@ -13,9 +14,10 @@
     const isPreview = /github\.dev|app\.github\.dev/i.test(hostname);
     // Registrar solo en producción y fuera de previews
     if (!isPreview && import.meta.env.PROD) {
-    const _pwaModule = 'virtual:pwa-register';
-    import(_pwaModule)
-      .then(({ registerSW }) => {
+      // Mantener import dinámico pero suprimir la advertencia de Vite
+      const _pwaModule = 'virtual:pwa-register';
+      import(/* @vite-ignore */ _pwaModule)
+        .then(({ registerSW }) => {
           const updateSW = registerSW({
             onRegistered(r: any) {
               console.log("SW registrado", r);
@@ -48,11 +50,13 @@
   const rootElement = document.getElementById("root");
   if (rootElement) {
     createRoot(rootElement).render(
-      <LanguageProvider>
-        <Router>
-          <App />
-        </Router>
-      </LanguageProvider>
+      <ToastProvider>
+        <LanguageProvider>
+          <Router>
+            <App />
+          </Router>
+        </LanguageProvider>
+      </ToastProvider>
     );
   }
   

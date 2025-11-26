@@ -40,6 +40,8 @@ services:
       dockerfile: services/rest-service/Dockerfile
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
+      WEATHER_HOST: weather-service
+      WEATHER_PORT: '3002'
     ports:
       - "3003:3003"
     depends_on:
@@ -68,8 +70,8 @@ services:
 
   alert-service:
     build:
-      context: ./services/alert-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/alert-service/Dockerfile
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     ports:
@@ -79,15 +81,15 @@ services:
 
   notification-service:
     build:
-      context: ./services/notification-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/notification-service/Dockerfile
     ports:
       - "3008:3003"
 
   weather-service:
     build:
-      context: ./services/weather-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/weather-service/Dockerfile
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     ports:
