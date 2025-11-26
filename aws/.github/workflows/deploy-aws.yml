@@ -1,0 +1,190 @@
+# GitHub Actions workflow for AWS deployment
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  TERRAFORM_VERSION: 1.5.0
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: |
+          Backend-Huancavelica-Alertas-Agricolas/services/*/package-lock.json
+          Frontend-Huancavelica-Alertas-Agricolas/package-lock.json
+    
+    - name: Install Backend Dependencies
+      run: |
+        for service in auth-service users-service rest-service ai-service ingest-service; do
+          cd Backend-Huancavelica-Alertas-Agricolas/services/$service
+          npm ci
+          cd ../../..
+        done
+    
+    - name: Install Frontend Dependencies
+      run: |
+        cd Frontend-Huancavelica-Alertas-Agricolas
+        npm ci
+    
+    - name: Run Backend Tests
+      run: |
+        for service in auth-service users-service rest-service ai-service; do
+          cd Backend-Huancavelica-Alertas-Agricolas/services/$service
+          if [ -f "package.json" ] && grep -q '"test"' package.json; then
+            npm test
+          fi
+          cd ../../..
+        done
+    
+    - name: Run Frontend Tests
+      run: |
+        cd Frontend-Huancavelica-Alertas-Agricolas
+        npm test -- --run
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+    
+    - name: Build and push Docker images
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      run: |
+        services=("auth-service" "users-service" "rest-service" "ai-service" "ingest-service")
+        
+        for service in "${services[@]}"; do
+          echo "Building $service..."
+          
+          docker build \
+            -t $ECR_REGISTRY/pat-ah-$service:latest \
+            -t $ECR_REGISTRY/pat-ah-$service:${{ github.sha }} \
+            -f Backend-Huancavelica-Alertas-Agricolas/services/$service/Dockerfile \
+            Backend-Huancavelica-Alertas-Agricolas
+          
+          echo "Pushing $service..."
+          docker push $ECR_REGISTRY/pat-ah-$service:latest
+          docker push $ECR_REGISTRY/pat-ah-$service:${{ github.sha }}
+        done
+
+  deploy-infrastructure:
+    needs: [test, build-and-push]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
+    
+    - name: Terraform Init
+      working-directory: aws/terraform
+      run: terraform init
+    
+    - name: Terraform Plan
+      working-directory: aws/terraform
+      env:
+        TF_VAR_aws_region: ${{ env.AWS_REGION }}
+        TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+      run: terraform plan
+    
+    - name: Terraform Apply
+      working-directory: aws/terraform
+      env:
+        TF_VAR_aws_region: ${{ env.AWS_REGION }}
+        TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+      run: terraform apply -auto-approve
+    
+    - name: Get Terraform Outputs
+      working-directory: aws/terraform
+      id: terraform-outputs
+      run: |
+        echo "load_balancer_dns=$(terraform output -raw load_balancer_dns)" >> $GITHUB_OUTPUT
+        echo "s3_bucket=$(terraform output -raw s3_bucket_website | sed 's/\.s3-website.*//' | sed 's/http:\/\///')" >> $GITHUB_OUTPUT
+
+  deploy-frontend:
+    needs: deploy-infrastructure
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: Frontend-Huancavelica-Alertas-Agricolas/package-lock.json
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Get Infrastructure Info
+      working-directory: aws/terraform
+      id: infra-info
+      run: |
+        echo "api_url=http://$(terraform output -raw load_balancer_dns)" >> $GITHUB_OUTPUT
+        echo "s3_bucket=$(terraform output -raw s3_bucket_website | sed 's/\.s3-website.*//' | sed 's/http:\/\///')" >> $GITHUB_OUTPUT
+    
+    - name: Build React App
+      working-directory: Frontend-Huancavelica-Alertas-Agricolas
+      env:
+        VITE_API_URL: ${{ steps.infra-info.outputs.api_url }}
+      run: |
+        npm ci
+        npm run build
+    
+    - name: Deploy to S3
+      working-directory: Frontend-Huancavelica-Alertas-Agricolas
+      run: |
+        aws s3 sync dist/ s3://${{ steps.infra-info.outputs.s3_bucket }} --delete
+    
+    - name: Invalidate CloudFront
+      run: |
+        distribution_id=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[0].DomainName=='${{ steps.infra-info.outputs.s3_bucket }}.s3-website-${{ env.AWS_REGION }}.amazonaws.com'].Id" --output text)
+        if [ ! -z "$distribution_id" ]; then
+          aws cloudfront create-invalidation --distribution-id $distribution_id --paths "/*"
+        fi
