@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import { Calendar, Download, FileImage } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Label } from '../ui/label';
+import { Button, Card, CardContent, CardHeader, CardTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Label } from '../ui';
 import { TemperatureChart } from './TemperatureChart';
 import { CropType, Report } from '../../types';
 import { CROP_TYPES, DATE_RANGES } from '../../utils/constants';

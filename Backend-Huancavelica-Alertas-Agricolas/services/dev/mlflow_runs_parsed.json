@@ -1,0 +1,65 @@
+﻿[
+    {
+        "runId":  "9ccc0fe77622474c93be99a9db6b6c08",
+        "start_time":  "2025-11-23 01:18:07",
+        "artifact_uri":  "s3://mlflow/1/9ccc0fe77622474c93be99a9db6b6c08/artifacts",
+        "model_id":  "model_1763860687249_fcgk35yjq",
+        "model_name":  "test_nn_epochs_check",
+        "metrics":  {
+                        "r2":  0.9281024417110506,
+                        "mse":  0.0718975582889494,
+                        "rmse":  0.268137200494354,
+                        "epochs":  100.0,
+                        "finalLoss":  0.0003031724481843412
+                    }
+    },
+    {
+        "runId":  "409141edf52844ba9c30efc3689ee96d",
+        "start_time":  "2025-11-23 01:17:55",
+        "artifact_uri":  "s3://mlflow/1/409141edf52844ba9c30efc3689ee96d/artifacts",
+        "model_id":  "tmp_1763860675447",
+        "model_name":  "test_nn_epochs_check",
+        "metrics":  {
+                        "loss":  0.0003031724481843412,
+                        "r2":  0.9281024417110506,
+                        "mse":  0.0003031724481843412,
+                        "epochs":  100.0,
+                        "finalLoss":  0.0003031724481843412,
+                        "val_mse":  0.2025415599346161,
+                        "val_loss":  0.2025415599346161,
+                        "rmse":  0.268137200494354
+                    }
+    },
+    {
+        "runId":  "b5f59f18f1454195949b8671c33d87f5",
+        "start_time":  "2025-11-23 01:17:04",
+        "artifact_uri":  "s3://mlflow/1/b5f59f18f1454195949b8671c33d87f5/artifacts",
+        "model_id":  "test",
+        "model_name":  "compat-test",
+        "metrics":  {
+
+                    }
+    },
+    {
+        "runId":  "239b045926784fecb73d87b0f442e252",
+        "start_time":  "2025-11-23 01:06:28",
+        "artifact_uri":  "s3://mlflow/1/239b045926784fecb73d87b0f442e252/artifacts",
+        "model_id":  "t",
+        "model_name":  "test_experiment_run",
+        "metrics":  {
+
+                    }
+    },
+    {
+        "runId":  "643cdd5a638145cda494e48a0589cbf5",
+        "start_time":  "2025-11-23 00:53:28",
+        "artifact_uri":  "s3://mlflow/1/643cdd5a638145cda494e48a0589cbf5/artifacts",
+        "model_id":  "model_1763859207531_cm4gnsi36",
+        "model_name":  "test_linear",
+        "metrics":  {
+                        "r2":  1.0,
+                        "mse":  0.0,
+                        "rmse":  0.0
+                    }
+    }
+]

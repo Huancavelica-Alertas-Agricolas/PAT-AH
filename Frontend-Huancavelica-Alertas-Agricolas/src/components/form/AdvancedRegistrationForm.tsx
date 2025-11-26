@@ -54,12 +54,7 @@ const importancia = [
   { value: 'poco-importante', label: 'Poco importante' },
   { value: 'no-importante', label: 'No es importante' },
 ];
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import { Label } from '../ui/label';
-import { Checkbox } from '../ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { Card, CardHeader, CardTitle, CardContent, Input, Label, Checkbox, RadioGroup, RadioGroupItem, Button } from '../ui';
 interface FormData {
   nombre: string;
   dni: string;

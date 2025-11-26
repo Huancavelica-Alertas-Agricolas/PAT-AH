@@ -1,6 +1,6 @@
 
 import { User, LogOut, Bell, Wifi, WifiOff } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button } from '../ui';
 import { useAuth } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
