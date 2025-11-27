@@ -39,13 +39,18 @@ describe('Full E2E flow: register -> AI predict (mocked deps)', () => {
     const MLServiceClass = require('../../../ai-service/src/ai-microservice/services/machine-learning.service').MachineLearningService;
     const WeatherServiceClass = require('../../../ai-service/src/ai-microservice/services/weather.service').WeatherService;
     const ExcelProcessorClass = require('../../../ai-service/src/ai-microservice/services/excel-processor.service').ExcelProcessorService;
+    const UsersClientClass = require('../../src/users/users.client').UsersClient;
 
     const moduleRef = await Test.createTestingModule({
       controllers: [RestController, AiController],
       providers: [
         { provide: AuthServiceClass, useValue: mockAuthService },
+        // Provide a simple mock UsersClient used by RestController
+        { provide: UsersClientClass, useValue: { create: jest.fn(async (u) => ({ user: u })), findAll: jest.fn(async () => []), findByPhone: jest.fn(async () => null) } },
         { provide: MLServiceClass, useValue: mockMLService },
         { provide: WeatherServiceClass, useValue: mockWeatherService },
+        // Provide the WEATHER_CLIENT token expected by RestController
+        { provide: 'WEATHER_CLIENT', useValue: {} },
         { provide: ExcelProcessorClass, useValue: mockExcelService }
       ]
     }).compile();
