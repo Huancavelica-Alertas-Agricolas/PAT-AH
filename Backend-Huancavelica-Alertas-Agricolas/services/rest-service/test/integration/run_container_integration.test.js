@@ -6,6 +6,7 @@ jest.setTimeout(180000);
 
 describe('rest-service container integration', () => {
   const repoRoot = path.resolve(__dirname, '..', '..', '..', '..');
+  const serviceDir = path.resolve(repoRoot, 'services', 'rest-service').replace(/\\/g, '/');
   const runId = Date.now();
   const imageTag = `rest-int:${runId}`;
   const network = `rest-int-net-${runId}`;
@@ -14,8 +15,8 @@ describe('rest-service container integration', () => {
 
   beforeAll(() => {
     // build image (only for this service) — check if already exists
-    const dockerfile = `${repoRoot.replace(/\\/g, '/')}/services/rest-service/Dockerfile`;
-    const buildContext = `${repoRoot.replace(/\\/g, '/')}`;
+    const dockerfile = `${serviceDir}/Dockerfile`;
+    const buildContext = `${serviceDir}`;
     try {
       const existing = execSync(`docker images -q ${imageTag}`).toString().trim();
       if (!existing) {
