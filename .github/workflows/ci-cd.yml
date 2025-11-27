@@ -36,6 +36,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-
 
+      - name: Install dependencies for all services
+        run: |
+          services=(auth-service users-service rest-service ai-service ingest-service)
+          for s in "${services[@]}"; do
+            pkg="Backend-Huancavelica-Alertas-Agricolas/services/$s"
+            if [ -f "$pkg/package.json" ]; then
+              echo "--- Installing dependencies for $s ---"
+              if [ -f "$pkg/package-lock.json" ]; then
+                npm ci --prefix "$pkg" || npm install --prefix "$pkg"
+              else
+                npm install --prefix "$pkg"
+              fi
+            fi
+          done
+
       - name: Run tests per service (if present)
         run: |
           services=(auth-service users-service rest-service ai-service ingest-service)
@@ -43,12 +58,6 @@ jobs:
             pkg="Backend-Huancavelica-Alertas-Agricolas/services/$s"
             if [ -f "$pkg/package.json" ]; then
               echo "--- Running tests for $s ---"
-              # Prefer clean install; if lockfile is out-of-sync, fall back to npm install
-              if [ -f "$pkg/package-lock.json" ]; then
-                npm ci --prefix "$pkg" || npm install --prefix "$pkg"
-              else
-                npm install --prefix "$pkg"
-              fi
               npm run test --prefix "$pkg" --if-present || true
             fi
           done
