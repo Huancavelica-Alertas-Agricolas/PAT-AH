@@ -44,3 +44,8 @@ Backend-Huancavelica-Alertas-Agricolas/scripts/out/
 **/data/
 
 
+# Ignore terraform artifacts
+aws/terraform/.terraform/
+aws/terraform/terraform.tfstate
+aws/terraform/terraform.tfstate.backup
+

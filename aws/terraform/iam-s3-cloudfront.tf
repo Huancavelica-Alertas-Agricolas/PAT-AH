@@ -48,7 +48,7 @@ resource "aws_iam_role" "ecs_task" {
 
 # S3 Bucket for static assets and frontend
 resource "aws_s3_bucket" "frontend" {
-  bucket = "pat-ah-frontend-${random_id.bucket_suffix.hex}"
+  bucket = "pat-ah-frontend-${data.aws_caller_identity.current.account_id}-${random_id.bucket_suffix.hex}"
 
   tags = {
     Name = "pat-ah-frontend"
@@ -58,6 +58,8 @@ resource "aws_s3_bucket" "frontend" {
 resource "random_id" "bucket_suffix" {
   byte_length = 4
 }
+
+data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket_public_access_block" "frontend" {
   bucket = aws_s3_bucket.frontend.id
@@ -104,6 +106,18 @@ resource "aws_cloudfront_distribution" "frontend" {
   origin {
     domain_name = aws_s3_bucket_website_configuration.frontend.website_endpoint
     origin_id   = "S3-${aws_s3_bucket.frontend.bucket}"
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  origin {
+    domain_name = aws_lb.main.dns_name
+    origin_id   = "ALB-${aws_lb.main.name}"
 
     custom_origin_config {
       http_port              = 80
@@ -180,14 +194,9 @@ resource "aws_cloudfront_distribution" "frontend" {
 }
 
 # Add ALB as CloudFront origin
-resource "aws_cloudfront_origin_group" "api" {
-  origin_id = "ALB-${aws_lb.main.name}"
-
-  failover_criteria {
-    status_codes = [403, 404, 500, 502]
-  }
-
-  member {
-    origin_id = aws_lb.main.dns_name
-  }
-}
+// Note: Terraform AWS provider does not support a standalone resource named
+// aws_cloudfront_origin_group in this configuration. The origin(s) for CloudFront
+// are already configured in the distribution above and the ALB is referenced
+// by origin_id there. If origin groups / failover are required, implement
+// them inside the `aws_cloudfront_distribution` configuration according to
+// the provider docs. Removed the unsupported resource block to avoid plan/apply errors.

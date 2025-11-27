@@ -40,8 +40,20 @@ foreach ($service in $SERVICES) {
     
     Write-Host "🔨 Building $service..." -ForegroundColor Blue
     
+    # Resolve paths relative to the script location so the script can be run from any CWD
+    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+    $repoRoot = Resolve-Path (Join-Path $scriptDir "..\..") | Select-Object -ExpandProperty Path
+    $backendPath = Join-Path $repoRoot "Backend-Huancavelica-Alertas-Agricolas"
+
+    if (-not (Test-Path $backendPath)) {
+        Write-Error "Backend path not found: $backendPath"
+        continue
+    }
+
+    $dockerfilePath = Join-Path $backendPath "services\$service\Dockerfile"
+
     # Build the image
-    docker build -t $imageName -f "Backend-Huancavelica-Alertas-Agricolas/services/$service/Dockerfile" "Backend-Huancavelica-Alertas-Agricolas"
+    docker build -t $imageName -f $dockerfilePath $backendPath
     
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Failed to build $service"
