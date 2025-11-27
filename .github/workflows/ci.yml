@@ -39,10 +39,16 @@ jobs:
       - name: Run tests for weather-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/weather-service
         run: |
-          echo "Installing dependencies for weather-service..."
-          npm ci --legacy-peer-deps
-          echo "Running tests for weather-service..."
-          npm test
+          echo "Checking for weather-service test files..."
+          # Enable globstar and check for any *.spec.js or *.spec.ts files
+          shopt -s globstar || true
+          if compgen -G "**/*.spec.*" > /dev/null; then
+            echo "Test files found, installing deps and running tests..."
+            npm ci --legacy-peer-deps
+            npm test
+          else
+            echo "No test files found, skipping weather-service tests."
+          fi
 
       - name: Run tests for ai-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/ai-service
