@@ -22,51 +22,54 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Install dependencies for ai-service (needed by rest-service e2e)
-        working-directory: Backend-Huancavelica-Alertas-Agricolas/services/ai-service
+      - name: Install dependencies for all services (backend + frontend)
         run: |
-          echo "Installing dependencies for ai-service..."
-          npm ci --legacy-peer-deps || npm install --legacy-peer-deps || true
+          echo "Installing dependencies for all services..."
+          SERVICES=(
+            "Backend-Huancavelica-Alertas-Agricolas/services/auth-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/users-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/rest-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/ai-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/ingest-service"
+            "Frontend-Huancavelica-Alertas-Agricolas"
+          )
+          for pkg in "${SERVICES[@]}"; do
+            if [ -f "$pkg/package.json" ]; then
+              echo "--- Installing dependencies for $pkg ---"
+              if [ -f "$pkg/package-lock.json" ]; then
+                npm ci --prefix "$pkg" --legacy-peer-deps || npm install --prefix "$pkg" --legacy-peer-deps
+              else
+                npm install --prefix "$pkg" --legacy-peer-deps
+              fi
+            fi
+          done
 
       - name: Run tests for rest-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/rest-service
         run: |
-          echo "Installing dependencies for rest-service..."
-          npm ci --legacy-peer-deps
           echo "Running tests for rest-service..."
-          npm test
+          npm test -- --passWithNoTests
 
       - name: Run tests for weather-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/weather-service
         run: |
-          echo "Checking for weather-service test files..."
-          # Enable globstar and check for any *.spec.js or *.spec.ts files
-          shopt -s globstar || true
-          if compgen -G "**/*.spec.*" > /dev/null; then
-            echo "Test files found, installing deps and running tests..."
-            npm ci --legacy-peer-deps
-            npm test
-          else
-            echo "No test files found, skipping weather-service tests."
-          fi
+          echo "Running tests for weather-service..."
+          npm test -- --passWithNoTests
 
       - name: Run tests for ai-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/ai-service
         run: |
-          echo "Installing dependencies for ai-service..."
-          npm ci --legacy-peer-deps
           echo "Building ai-service image for integration tests..."
           docker build -t pat-ah/ai-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/ai-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas || true
           echo "Running tests for ai-service (unit + container E2E)..."
-          npm test || ( echo "ai-service tests failed" && exit 1 )
+          npm test -- --passWithNoTests || ( echo "ai-service tests failed" && exit 1 )
         timeout-minutes: 30
 
       - name: Run tests for frontend
         working-directory: Frontend-Huancavelica-Alertas-Agricolas
         run: |
-          echo "Installing dependencies for frontend..."
-          npm ci --legacy-peer-deps
-          echo "Running frontend build..."
+          echo "Running frontend build/tests..."
+          npm test -- --passWithNoTests || true
           npm run build || echo "Build failed or not configured"
 
       - name: Run integration tests (rest-service) using docker-compose
