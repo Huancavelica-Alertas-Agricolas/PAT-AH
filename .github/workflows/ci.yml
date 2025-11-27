@@ -60,8 +60,9 @@ jobs:
       - name: Run tests for ai-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/ai-service
         run: |
-          echo "Building ai-service image for integration tests..."
-          docker build -t pat-ah/ai-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/ai-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas || true
+          echo "Building ai-service image for integration tests (service context)..."
+          # Use the service directory as the docker build context so paths like trained-models exist relative to Dockerfile
+          docker build -t pat-ah/ai-service:ci -f Dockerfile . || true
           echo "Running tests for ai-service (unit + container E2E)..."
           npm test -- --passWithNoTests || ( echo "ai-service tests failed" && exit 1 )
         timeout-minutes: 30
