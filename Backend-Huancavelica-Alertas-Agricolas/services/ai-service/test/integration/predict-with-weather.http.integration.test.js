@@ -33,7 +33,10 @@ async function buildAndRunImage(absServicePath, mockPort) {
   const runId = Date.now();
   const imageTag = `ai-e2e:${runId}`;
   const repoRoot = path.resolve(absServicePath, '..', '..');
-  execSync(`docker build -t ${imageTag} -f ${repoRoot.replace(/\\/g, '/')}/services/ai-service/Dockerfile ${repoRoot.replace(/\\/g, '/')}`, { stdio: 'inherit' });
+  // Use the ai-service folder as docker build context so files like ./trained-models are available
+  const serviceDir = path.resolve(repoRoot, 'services', 'ai-service').replace(/\\/g, '/');
+  const dockerfilePath = `${serviceDir}/Dockerfile`;
+  execSync(`docker build -t ${imageTag} -f ${dockerfilePath} ${serviceDir}`, { stdio: 'inherit' });
   const out = spawn('docker', ['run', '-d', '--name', `ai-e2e-${runId}`, '-p', ':3003', '-e', `WEATHER_BASE_URL=http://host.docker.internal:${mockPort}`, imageTag], { stdio: ['ignore', 'pipe', 'pipe'] });
   let containerId = '';
   out.stdout.on('data', d => { containerId += d.toString(); });

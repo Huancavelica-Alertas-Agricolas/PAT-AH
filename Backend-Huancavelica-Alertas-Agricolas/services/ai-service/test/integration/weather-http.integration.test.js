@@ -63,8 +63,10 @@ async function runContainer(absServicePath, hostPort, mockPort) {
   const runId = Date.now();
   const imageTag = `ai-int-test-image:${runId}`;
   const repoRoot = path.resolve(absServicePath, '..', '..');
-  // Build image (uses Dockerfile in services/ai-service and expects repository root as context)
-  execSync(`docker build -t ${imageTag} -f ${repoRoot.replace(/\\/g, '/')}/services/ai-service/Dockerfile ${repoRoot.replace(/\\/g, '/')}`, { stdio: 'inherit' });
+  // Build image using the ai-service folder as the docker build context so relative paths like ./trained-models resolve correctly
+  const serviceDir = path.resolve(repoRoot, 'services', 'ai-service').replace(/\\/g, '/');
+  const dockerfilePath = `${serviceDir}/Dockerfile`;
+  execSync(`docker build -t ${imageTag} -f ${dockerfilePath} ${serviceDir}`, { stdio: 'inherit' });
   // Run container detached with random host port mapping and environment pointing to mock
   const runArgs = [
     'run', '-d', '--name', `ai-int-test-${runId}`,
