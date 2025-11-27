@@ -4,6 +4,7 @@ const { INestApplication } = require('@nestjs/common');
 
 const { RestController } = require('../src/rest/rest.controller');
 const { AuthService } = require('../src/auth/auth.service');
+const { UsersClient } = require('../src/users/users.client');
 
 describe('RestController (integration)', () => {
   let app;
@@ -15,9 +16,22 @@ describe('RestController (integration)', () => {
       login: jest.fn(async (phone, pass) => ({ token: 't_login', user: { id: 'u2', telefono: phone } }))
     };
 
+    // Simple mocks for injected clients
+    const mockUsersClient = {
+      findAll: jest.fn(async () => []),
+      create: jest.fn(async (data) => ({ id: 'u-mock', ...data }))
+    };
+    const mockWeatherClient = {
+      send: jest.fn(() => ({ subscribe: () => { } }))
+    };
+
     const moduleRef = await Test.createTestingModule({
       controllers: [RestController],
-      providers: [{ provide: AuthService, useValue: mockAuthService }]
+      providers: [
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: UsersClient, useValue: mockUsersClient },
+        { provide: 'WEATHER_CLIENT', useValue: mockWeatherClient }
+      ]
     }).compile();
 
     app = moduleRef.createNestApplication();
