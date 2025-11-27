@@ -29,6 +29,7 @@ jobs:
             "Backend-Huancavelica-Alertas-Agricolas/services/auth-service"
             "Backend-Huancavelica-Alertas-Agricolas/services/users-service"
             "Backend-Huancavelica-Alertas-Agricolas/services/rest-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/weather-service"
             "Backend-Huancavelica-Alertas-Agricolas/services/ai-service"
             "Backend-Huancavelica-Alertas-Agricolas/services/ingest-service"
             "Frontend-Huancavelica-Alertas-Agricolas"
