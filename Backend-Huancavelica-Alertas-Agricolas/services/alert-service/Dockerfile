@@ -2,7 +2,7 @@ FROM node:20 AS builder
 WORKDIR /usr/src/app
 
 # Install dependencies (prefer lockfile when present)
-COPY services/alert-service/package*.json ./
+COPY package*.json ./
 RUN npm ci --legacy-peer-deps --no-audit --no-fund
 
 # Prisma client generation (added by patch)
@@ -15,7 +15,7 @@ RUN if [ -f ./prisma/schema.prisma ]; then \
 		fi
 
 # Copy source and build (context is repo root; copy service files)
-COPY services/alert-service/. ./
+COPY . ./
 # Ensure shared prisma schema is available for builder generate
 RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.prisma || true
 RUN npm run build && npm prune --production || true

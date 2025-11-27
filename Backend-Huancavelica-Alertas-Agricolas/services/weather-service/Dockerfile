@@ -2,11 +2,11 @@ FROM node:20 AS builder
 WORKDIR /usr/src/app
 
 # Install dependencies
-COPY services/weather-service/package*.json ./
+COPY package*.json ./
 RUN npm ci --legacy-peer-deps --no-audit --no-fund
 
 # Copy source and prepare reports dir (context is repo root)
-COPY services/weather-service/. ./
+COPY . ./
 RUN mkdir -p reports
 RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.prisma || true
 RUN npm run build && npm prune --production || true
