@@ -17,7 +17,7 @@ WORKDIR /usr/src/app
 ENV NODE_ENV=production
 # Ensure OpenSSL and diagnostic tools are available in runtime for Prisma query engine compatibility and debugging
 RUN apt-get update -y && apt-get install -y openssl ca-certificates curl iproute2 procps --no-install-recommends && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /usr/src/app/src ./src
-COPY --from=builder /usr/src/app/node_modules ./node_modules
+# Copy everything from builder's app dir into runtime (safer if /src is missing in some contexts)
+COPY --from=builder /usr/src/app/. ./
 EXPOSE 3003
 CMD ["node","src/main.js"]
