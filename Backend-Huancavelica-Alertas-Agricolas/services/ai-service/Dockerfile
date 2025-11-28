@@ -7,6 +7,8 @@ RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install
  && npm ci --legacy-peer-deps --no-audit --no-fund
 # Copy only the ai-service sources into the image (context should be the service folder)
 COPY . ./
+# Ensure trained-models dir exists inside builder image so later COPY from builder won't fail
+RUN mkdir -p /usr/src/app/trained-models
 # Copy shared Prisma schema (if present) into local prisma dir (when building from service context, shared is at ../shared)
 RUN mkdir -p prisma && cp ../shared/prisma/schema.prisma prisma/schema.prisma || true
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma; fi
