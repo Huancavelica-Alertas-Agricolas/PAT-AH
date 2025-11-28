@@ -1,7 +1,0 @@
-
-gha-19743531288.log:267:test (20.x)	Run tests for rest-service	2025-11-27T17:06:21.8663702Z FAIL test/e2e/full.flow.spec.js
-gha-19743531288.log:283:test (20.x)	Run tests for rest-service	2025-11-27T17:06:21.8673998Z     For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
-gha-19743531288.log:781:test (20.x)	Run tests for rest-service	2025-11-27T17:07:13.9289605Z Test Suites: 1 failed, 1 skipped, 3 passed, 4 of 5 total
-gha-19743531288.log:782:test (20.x)	Run tests for rest-service	2025-11-27T17:07:13.9290454Z Tests:       1 failed, 1 skipped, 9 passed, 11 total
-gha-19743531288.log:786:test (20.x)	Run tests for rest-service	2025-11-27T17:07:14.0234708Z ##[error]Process completed with exit code 1.
-

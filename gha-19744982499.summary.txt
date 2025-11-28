@@ -1,3 +1,0 @@
-
-gha-19744982499.log:793:test (20.x)	Run tests for weather-service	2025-11-27T18:19:43.1800436Z ##[error]Process completed with exit code 1.
-
