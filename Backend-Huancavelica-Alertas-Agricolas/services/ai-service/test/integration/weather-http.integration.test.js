@@ -71,6 +71,7 @@ async function runContainer(absServicePath, hostPort, mockPort) {
   const runArgs = [
     'run', '-d', '--name', `ai-int-test-${runId}`,
     '-p', ':3003',
+    '--add-host', 'host.docker.internal:host-gateway',
     '-e', `OPENWEATHER_API_KEY=mockkey`,
     '-e', `WEATHER_BASE_URL=http://host.docker.internal:${mockPort}`,
     imageTag
