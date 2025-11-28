@@ -1,0 +1,19 @@
+
+gha-19749672752.log:163:test (20.x)	Install dependencies for all services (backend + frontend)	2025-11-27T23:12:39.9139183Z npm warn deprecated apollo-server-errors@3.3.1: The `apollo-server-errors` package is part of Apollo Server v2 and v3, which are now end-of-life (as of October 22nd 2023 and October 22nd 2024, respectively). This package's functionality is now found in the `@apollo/server` package. See https://www.apollographql.com/docs/apollo-server/previous-versions/ for more details.
+gha-19749672752.log:194:test (20.x)	Install dependencies for all services (backend + frontend)	2025-11-27T23:12:48.4358210Z npm warn deprecated apollo-server-errors@3.3.1: The `apollo-server-errors` package is part of Apollo Server v2 and v3, which are now end-of-life (as of October 22nd 2023 and October 22nd 2024, respectively). This package's functionality is now found in the `@apollo/server` package. See https://www.apollographql.com/docs/apollo-server/previous-versions/ for more details.
+gha-19749672752.log:723:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.3837439Z #17 ERROR: failed to calculate checksum of ref 25309008-d3b6-4795-9b53-5704e2dd5a06::unsc3xq7pdle5uyrosa04ggs5: "/usr/src/app/src": not found
+gha-19749672752.log:735:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.3849326Z ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref 25309008-d3b6-4795-9b53-5704e2dd5a06::unsc3xq7pdle5uyrosa04ggs5: "/usr/src/app/src": not found
+gha-19749672752.log:737:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.3915580Z     docker images check/build had error, attempting build
+gha-19749672752.log:792:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.6987275Z #16 ERROR: failed to calculate checksum of ref 25309008-d3b6-4795-9b53-5704e2dd5a06::unsc3xq7pdle5uyrosa04ggs5: "/usr/src/app/src": not found
+gha-19749672752.log:804:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.6994168Z ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref 25309008-d3b6-4795-9b53-5704e2dd5a06::unsc3xq7pdle5uyrosa04ggs5: "/usr/src/app/src": not found
+gha-19749672752.log:805:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.7202848Z Error response from daemon: No such container: rest-svc-1764285198946
+gha-19749672752.log:806:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.7332762Z Error response from daemon: No such container: rest-db-1764285198946
+gha-19749672752.log:807:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.7469368Z Error response from daemon: network rest-int-net-1764285198946 not found
+gha-19749672752.log:809:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.7601533Z Error response from daemon: No such image: rest-int:1764285198946
+gha-19749672752.log:810:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.7759439Z FAIL test/integration/run_container_integration.spec.js (27.533 s)
+gha-19749672752.log:816:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.7764386Z     Command failed: docker build -t rest-int:1764285198946 -f /home/runner/work/PAT-AH/PAT-AH/Backend-Huancavelica-Alertas-Agricolas/services/rest-service/Dockerfile /home/runner/work/PAT-AH/PAT-AH/Backend-Huancavelica-Alertas-Agricolas
+gha-19749672752.log:819:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.7767227Z       28 |       console.log('docker images check/build had error, attempting build');
+gha-19749672752.log:828:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.8022432Z Test Suites: 1 failed, 1 skipped, 3 passed, 4 of 5 total
+gha-19749672752.log:829:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.8023174Z Tests:       1 failed, 1 skipped, 9 passed, 11 total
+gha-19749672752.log:833:test (20.x)	Run tests for rest-service	2025-11-27T23:13:45.8194525Z ##[error]Process completed with exit code 1.
+

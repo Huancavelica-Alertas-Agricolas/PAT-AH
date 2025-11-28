@@ -1,0 +1,5 @@
+2025-11-28T00:35:17.8220000Z Requested labels: ubuntu-latest
+2025-11-28T00:35:17.8220000Z Job defined at: JuanAldairRamirezMendez/PAT-AH/.github/workflows/ci.yml@refs/heads/circleci-project-setup
+2025-11-28T00:35:17.8220000Z Waiting for a runner to pick up this job...
+2025-11-28T00:35:18.3320000Z Job is about to start running on the hosted runner: GitHub Actions 1000000091
+2025-11-28T00:35:18.3320000Z Job is waiting for a hosted runner to come online.

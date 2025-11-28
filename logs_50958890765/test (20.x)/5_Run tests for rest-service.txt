@@ -1,0 +1,585 @@
+﻿2025-11-28T00:36:08.4757449Z ##[group]Run echo "Running tests for rest-service..."
+2025-11-28T00:36:08.4758026Z [36;1mecho "Running tests for rest-service..."[0m
+2025-11-28T00:36:08.4758334Z [36;1mnpm test -- --passWithNoTests[0m
+2025-11-28T00:36:08.4797583Z shell: /usr/bin/bash -e {0}
+2025-11-28T00:36:08.4797996Z ##[endgroup]
+2025-11-28T00:36:08.4868494Z Running tests for rest-service...
+2025-11-28T00:36:08.5969321Z 
+2025-11-28T00:36:08.5969687Z > rest-service@0.1.0 test
+2025-11-28T00:36:08.5970299Z > jest --config jest.config.json --passWithNoTests
+2025-11-28T00:36:08.5970561Z 
+2025-11-28T00:36:09.9272985Z   console.log
+2025-11-28T00:36:09.9274335Z     Building image rest-int:1764290169765 using Dockerfile /home/runner/work/PAT-AH/PAT-AH/Backend-Huancavelica-Alertas-Agricolas/services/rest-service/Dockerfile
+2025-11-28T00:36:09.9275367Z 
+2025-11-28T00:36:09.9275786Z       at Object.log (test/integration/run_container_integration.spec.js:23:17)
+2025-11-28T00:36:09.9276263Z 
+2025-11-28T00:36:10.7981554Z PASS test/rest.controller.int.spec.js
+2025-11-28T00:36:10.7983564Z   RestController (integration)
+2025-11-28T00:36:10.7986295Z     ✓ POST /api/users -> create user (49 ms)
+2025-11-28T00:36:10.7987538Z     ✓ POST /api/auth/login -> login user (5 ms)
+2025-11-28T00:36:10.7990031Z     ✓ GET /api/me returns decoded token payload when Authorization header present (7 ms)
+2025-11-28T00:36:10.7991078Z     ✓ GET /api/me with invalid token should be anonymous (4 ms)
+2025-11-28T00:36:10.7991952Z     ✓ GET /api/me with expired token should be anonymous (5 ms)
+2025-11-28T00:36:10.7992370Z 
+2025-11-28T00:36:11.0791238Z PASS test/auth.service.spec.js
+2025-11-28T00:36:11.0791772Z   AuthService (unit)
+2025-11-28T00:36:11.0792844Z     ✓ register: hashes password, creates user and returns token (no password in user) (3 ms)
+2025-11-28T00:36:11.0793843Z     ✓ login: returns token and user when credentials valid (1 ms)
+2025-11-28T00:36:11.0794530Z     ✓ login: returns null when user not found
+2025-11-28T00:36:11.0794839Z 
+2025-11-28T00:36:11.2445757Z   console.warn
+2025-11-28T00:36:11.2446906Z     Could not load @tensorflow/tfjs-node native bindings. Falling back to @tensorflow/tfjs (JS). Performance may be slower.
+2025-11-28T00:36:11.2447661Z 
+2025-11-28T00:36:11.2448227Z       at Object.warn (../ai-service/src/ai-microservice/services/machine-learning.service.ts:12:8)
+2025-11-28T00:36:11.2449465Z       at Object.require (../ai-service/src/ai-microservice/ai.controller.ts:17:1)
+2025-11-28T00:36:11.2450241Z       at Object.require (test/e2e/full.flow.spec.js:5:26)
+2025-11-28T00:36:11.2450669Z 
+2025-11-28T00:36:11.7436265Z PASS test/e2e/full.flow.spec.js
+2025-11-28T00:36:11.7436937Z   Full E2E flow: register -> AI predict (mocked deps)
+2025-11-28T00:36:11.7438085Z     ✓ complete flow: register user then request ai predict-with-weather (40 ms)
+2025-11-28T00:36:11.7438612Z 
+2025-11-28T00:36:12.1317862Z #0 building with "default" instance using docker driver
+2025-11-28T00:36:12.1318294Z 
+2025-11-28T00:36:12.1318538Z #1 [internal] load build definition from Dockerfile
+2025-11-28T00:36:12.1319264Z #1 transferring dockerfile: 1.28kB done
+2025-11-28T00:36:12.1319589Z #1 DONE 0.0s
+2025-11-28T00:36:12.1319730Z 
+2025-11-28T00:36:12.1320004Z #2 [auth] library/node:pull token for registry-1.docker.io
+2025-11-28T00:36:12.1322484Z #2 DONE 0.0s
+2025-11-28T00:36:12.1322698Z 
+2025-11-28T00:36:12.1323098Z #3 [internal] load metadata for docker.io/library/node:20
+2025-11-28T00:36:12.2888066Z #3 ...
+2025-11-28T00:36:12.2888272Z 
+2025-11-28T00:36:12.2888549Z #4 [internal] load metadata for docker.io/library/node:20-slim
+2025-11-28T00:36:12.2888880Z #4 DONE 0.4s
+2025-11-28T00:36:12.4136664Z 
+2025-11-28T00:36:12.4140002Z #3 [internal] load metadata for docker.io/library/node:20
+2025-11-28T00:36:12.4141022Z #3 DONE 0.4s
+2025-11-28T00:36:12.4141523Z 
+2025-11-28T00:36:12.4141834Z #5 [internal] load .dockerignore
+2025-11-28T00:36:12.4142758Z #5 transferring context: 2B done
+2025-11-28T00:36:12.4143144Z #5 DONE 0.0s
+2025-11-28T00:36:12.4143315Z 
+2025-11-28T00:36:12.4144232Z #6 [builder 1/7] FROM docker.io/library/node:20@sha256:66d2eb8b463114d1f416d61dbd5fa9cea83e8fc250feb997338467728a06124b
+2025-11-28T00:36:12.4146407Z #6 resolve docker.io/library/node:20@sha256:66d2eb8b463114d1f416d61dbd5fa9cea83e8fc250feb997338467728a06124b done
+2025-11-28T00:36:12.4147857Z #6 sha256:4232e547f04af7f5c9f6e873d56dd740caae50a20f95146e63082b7fb15de803 2.49kB / 2.49kB done
+2025-11-28T00:36:12.4149372Z #6 sha256:c07ac7d6dbedae7e726ea8286914090dbeaf657bf0a1e154f812909c46c58693 6.75kB / 6.75kB done
+2025-11-28T00:36:12.4150700Z #6 sha256:708274aafe49b02dddc66f97a5c45bb0b8fcf481ce6b43785b11f287fd4e4e1b 0B / 48.48MB 0.1s
+2025-11-28T00:36:12.4152004Z #6 sha256:66d2eb8b463114d1f416d61dbd5fa9cea83e8fc250feb997338467728a06124b 6.41kB / 6.41kB done
+2025-11-28T00:36:12.4153335Z #6 sha256:8cdff261ed5cee6fd4e729e68c2831a0abc6c7c017569ab45dfd2240bcc3712d 0B / 24.03MB 0.1s
+2025-11-28T00:36:12.4154658Z #6 sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05 0B / 64.40MB 0.1s
+2025-11-28T00:36:12.5134536Z #6 sha256:708274aafe49b02dddc66f97a5c45bb0b8fcf481ce6b43785b11f287fd4e4e1b 7.34MB / 48.48MB 0.2s
+2025-11-28T00:36:12.5136258Z #6 sha256:8cdff261ed5cee6fd4e729e68c2831a0abc6c7c017569ab45dfd2240bcc3712d 12.58MB / 24.03MB 0.2s
+2025-11-28T00:36:12.5137818Z #6 sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05 4.19MB / 64.40MB 0.2s
+2025-11-28T00:36:12.6137445Z #6 sha256:708274aafe49b02dddc66f97a5c45bb0b8fcf481ce6b43785b11f287fd4e4e1b 17.55MB / 48.48MB 0.3s
+2025-11-28T00:36:12.6141982Z #6 sha256:8cdff261ed5cee6fd4e729e68c2831a0abc6c7c017569ab45dfd2240bcc3712d 24.03MB / 24.03MB 0.2s done
+2025-11-28T00:36:12.6143278Z #6 sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05 9.44MB / 64.40MB 0.3s
+2025-11-28T00:36:12.6144461Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 0B / 211.46MB 0.3s
+2025-11-28T00:36:12.7613149Z #6 sha256:708274aafe49b02dddc66f97a5c45bb0b8fcf481ce6b43785b11f287fd4e4e1b 30.41MB / 48.48MB 0.4s
+2025-11-28T00:36:12.7614708Z #6 sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05 15.73MB / 64.40MB 0.4s
+2025-11-28T00:36:12.8641016Z #6 sha256:708274aafe49b02dddc66f97a5c45bb0b8fcf481ce6b43785b11f287fd4e4e1b 42.99MB / 48.48MB 0.5s
+2025-11-28T00:36:12.8643280Z #6 sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05 23.07MB / 64.40MB 0.5s
+2025-11-28T00:36:12.8644638Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 20.97MB / 211.46MB 0.5s
+2025-11-28T00:36:12.9970750Z #6 sha256:708274aafe49b02dddc66f97a5c45bb0b8fcf481ce6b43785b11f287fd4e4e1b 48.48MB / 48.48MB 0.5s done
+2025-11-28T00:36:12.9972288Z #6 sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05 31.46MB / 64.40MB 0.6s
+2025-11-28T00:36:12.9973561Z #6 sha256:3f3086dc4794e75936310457d642857d1b103ddecb3c11b4d08aa5765b5b6d5f 0B / 3.33kB 0.6s
+2025-11-28T00:36:12.9974730Z #6 extracting sha256:708274aafe49b02dddc66f97a5c45bb0b8fcf481ce6b43785b11f287fd4e4e1b
+2025-11-28T00:36:13.0967290Z #6 sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05 40.89MB / 64.40MB 0.7s
+2025-11-28T00:36:13.0968785Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 44.04MB / 211.46MB 0.7s
+2025-11-28T00:36:13.0970678Z #6 sha256:3f3086dc4794e75936310457d642857d1b103ddecb3c11b4d08aa5765b5b6d5f 3.33kB / 3.33kB 0.6s done
+2025-11-28T00:36:13.0972254Z #6 sha256:cab17b1d52faa70a441da1bbc6884ba494bb232114491ff4f9125c4dd3922a7f 1.05MB / 48.41MB 0.7s
+2025-11-28T00:36:13.2015988Z #6 sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05 49.28MB / 64.40MB 0.8s
+2025-11-28T00:36:13.2017809Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 55.57MB / 211.46MB 0.8s
+2025-11-28T00:36:13.2020164Z #6 sha256:cab17b1d52faa70a441da1bbc6884ba494bb232114491ff4f9125c4dd3922a7f 7.34MB / 48.41MB 0.8s
+2025-11-28T00:36:13.3020765Z #6 sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05 64.40MB / 64.40MB 0.9s
+2025-11-28T00:36:13.3025529Z #6 sha256:cab17b1d52faa70a441da1bbc6884ba494bb232114491ff4f9125c4dd3922a7f 16.78MB / 48.41MB 0.9s
+2025-11-28T00:36:13.4070306Z #6 sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05 64.40MB / 64.40MB 0.9s done
+2025-11-28T00:36:13.4072730Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 77.59MB / 211.46MB 1.0s
+2025-11-28T00:36:13.4075845Z #6 sha256:cab17b1d52faa70a441da1bbc6884ba494bb232114491ff4f9125c4dd3922a7f 23.07MB / 48.41MB 1.0s
+2025-11-28T00:36:13.4077233Z #6 sha256:7785152ed412f78b7125808272a63f5c86ba9a41a0512ae0e690234c905a077a 1.25MB / 1.25MB 0.9s done
+2025-11-28T00:36:13.4078525Z #6 sha256:895878b2e74c8e0e0a2cd1db585e46390697432b15f4b8ee087814f939115a26 0B / 449B 1.0s
+2025-11-28T00:36:13.5291560Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 101.71MB / 211.46MB 1.2s
+2025-11-28T00:36:13.5293759Z #6 sha256:cab17b1d52faa70a441da1bbc6884ba494bb232114491ff4f9125c4dd3922a7f 39.85MB / 48.41MB 1.2s
+2025-11-28T00:36:13.5296017Z #6 sha256:895878b2e74c8e0e0a2cd1db585e46390697432b15f4b8ee087814f939115a26 449B / 449B 1.0s done
+2025-11-28T00:36:13.6561545Z #6 sha256:cab17b1d52faa70a441da1bbc6884ba494bb232114491ff4f9125c4dd3922a7f 44.04MB / 48.41MB 1.3s
+2025-11-28T00:36:13.7797245Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 124.78MB / 211.46MB 1.4s
+2025-11-28T00:36:13.7798769Z #6 sha256:cab17b1d52faa70a441da1bbc6884ba494bb232114491ff4f9125c4dd3922a7f 48.41MB / 48.41MB 1.4s
+2025-11-28T00:36:13.8794776Z #6 sha256:cab17b1d52faa70a441da1bbc6884ba494bb232114491ff4f9125c4dd3922a7f 48.41MB / 48.41MB 1.4s done
+2025-11-28T00:36:13.9814886Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 145.75MB / 211.46MB 1.6s
+2025-11-28T00:36:14.1887242Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 167.77MB / 211.46MB 1.8s
+2025-11-28T00:36:14.2959218Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 178.72MB / 211.46MB 1.9s
+2025-11-28T00:36:14.4143378Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 198.18MB / 211.46MB 2.1s
+2025-11-28T00:36:14.7080285Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 211.46MB / 211.46MB 2.3s
+2025-11-28T00:36:14.9214506Z #6 sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 211.46MB / 211.46MB 2.5s done
+2025-11-28T00:36:15.1770494Z #6 ...
+2025-11-28T00:36:15.1773149Z 
+2025-11-28T00:36:15.1774077Z #7 [internal] load build context
+2025-11-28T00:36:15.1775092Z #7 transferring context: 175.62MB 2.8s done
+2025-11-28T00:36:15.1775577Z #7 DONE 2.9s
+2025-11-28T00:36:15.3010324Z 
+2025-11-28T00:36:15.3011713Z #6 [builder 1/7] FROM docker.io/library/node:20@sha256:66d2eb8b463114d1f416d61dbd5fa9cea83e8fc250feb997338467728a06124b
+2025-11-28T00:36:16.3074085Z #6 extracting sha256:708274aafe49b02dddc66f97a5c45bb0b8fcf481ce6b43785b11f287fd4e4e1b 3.3s done
+2025-11-28T00:36:16.6026451Z #6 extracting sha256:8cdff261ed5cee6fd4e729e68c2831a0abc6c7c017569ab45dfd2240bcc3712d
+2025-11-28T00:36:18.5025053Z #6 extracting sha256:8cdff261ed5cee6fd4e729e68c2831a0abc6c7c017569ab45dfd2240bcc3712d 1.7s done
+2025-11-28T00:36:18.7424375Z #6 extracting sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05
+2025-11-28T00:36:20.5226613Z #6 ...
+2025-11-28T00:36:20.5227080Z 
+2025-11-28T00:36:20.5228066Z #8 [stage-1 1/4] FROM docker.io/library/node:20-slim@sha256:fbb357f69d05c97333855b0846e4ef65462409728312df3c9ff12c941741c0a5
+2025-11-28T00:36:20.5232040Z #8 resolve docker.io/library/node:20-slim@sha256:fbb357f69d05c97333855b0846e4ef65462409728312df3c9ff12c941741c0a5 done
+2025-11-28T00:36:20.5233531Z #8 sha256:2438320b4ccbd33ac7604379feb463eb5663acc8da2e8b1b6922748b6f37d40f 6.87kB / 6.87kB done
+2025-11-28T00:36:20.5234630Z #8 sha256:fbb357f69d05c97333855b0846e4ef65462409728312df3c9ff12c941741c0a5 6.49kB / 6.49kB done
+2025-11-28T00:36:20.5235779Z #8 sha256:4067c96fe6907b2879ee0405b943943084466749c1f0bd16158a7a4794ac85a1 1.93kB / 1.93kB done
+2025-11-28T00:36:20.5237230Z #8 sha256:8e44f01296e3a6fdc31a671bee1c2259c5d5ee8b49f29aec42b5d2af15600296 28.23MB / 28.23MB 1.4s done
+2025-11-28T00:36:20.5239506Z #8 sha256:667488fa52209fbc392b2a49e68f3c46df0c44d8b917f2453da1e5fac360c23e 3.31kB / 3.31kB 1.5s done
+2025-11-28T00:36:20.5240778Z #8 sha256:e96ce70b461ab9fac01418f8ac4e109475e7792d8b9d50a4e43db49543cc1d53 40.99MB / 40.99MB 2.0s done
+2025-11-28T00:36:20.5242092Z #8 sha256:6c2b787b4c4591781a78ed49926828fe9c8ab50228f8ccf38a6ab8ac9a22ac80 1.71MB / 1.71MB 1.6s done
+2025-11-28T00:36:20.5243287Z #8 extracting sha256:8e44f01296e3a6fdc31a671bee1c2259c5d5ee8b49f29aec42b5d2af15600296 2.1s done
+2025-11-28T00:36:20.5244332Z #8 sha256:aa42edbc26fe12272cc806bf99cf4d5d6b2a2cf09f4b6f5492eff9604be18e84 448B / 448B 1.6s done
+2025-11-28T00:36:20.5245489Z #8 extracting sha256:667488fa52209fbc392b2a49e68f3c46df0c44d8b917f2453da1e5fac360c23e done
+2025-11-28T00:36:20.5246808Z #8 extracting sha256:e96ce70b461ab9fac01418f8ac4e109475e7792d8b9d50a4e43db49543cc1d53 1.3s done
+2025-11-28T00:36:20.5247897Z #8 extracting sha256:6c2b787b4c4591781a78ed49926828fe9c8ab50228f8ccf38a6ab8ac9a22ac80 0.0s done
+2025-11-28T00:36:20.5248849Z #8 extracting sha256:aa42edbc26fe12272cc806bf99cf4d5d6b2a2cf09f4b6f5492eff9604be18e84 done
+2025-11-28T00:36:20.5249723Z #8 DONE 8.1s
+2025-11-28T00:36:20.5249920Z 
+2025-11-28T00:36:20.5250177Z #9 [stage-1 2/4] WORKDIR /usr/src/app
+2025-11-28T00:36:20.5250493Z #9 DONE 0.0s
+2025-11-28T00:36:20.5250671Z 
+2025-11-28T00:36:20.5251179Z #6 [builder 1/7] FROM docker.io/library/node:20@sha256:66d2eb8b463114d1f416d61dbd5fa9cea83e8fc250feb997338467728a06124b
+2025-11-28T00:36:20.5251885Z #6 ...
+2025-11-28T00:36:20.5252018Z 
+2025-11-28T00:36:20.5252774Z #10 [stage-1 3/4] RUN apt-get update -y && apt-get install -y openssl ca-certificates curl iproute2 procps --no-install-recommends && rm -rf /var/lib/apt/lists/*
+2025-11-28T00:36:20.6357673Z #10 0.185 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+2025-11-28T00:36:20.7680104Z #10 0.204 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+2025-11-28T00:36:20.7682738Z #10 0.209 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+2025-11-28T00:36:20.7684159Z #10 0.275 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8791 kB]
+2025-11-28T00:36:20.9014556Z #10 0.340 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+2025-11-28T00:36:20.9015879Z #10 0.399 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [288 kB]
+2025-11-28T00:36:21.8034241Z #10 1.266 Fetched 9341 kB in 1s (8539 kB/s)
+2025-11-28T00:36:22.3523181Z #10 1.266 Reading package lists...
+2025-11-28T00:36:22.9337216Z #10 1.841 Reading package lists...
+2025-11-28T00:36:23.0350880Z #10 2.411 Building dependency tree...
+2025-11-28T00:36:23.0351587Z #10 2.520 Reading state information...
+2025-11-28T00:36:23.1379938Z #10 2.626 The following additional packages will be installed:
+2025-11-28T00:36:23.1381492Z #10 2.626   libbpf1 libbrotli1 libbsd0 libcap2-bin libcurl4 libelf1 libgssapi-krb5-2
+2025-11-28T00:36:23.1385039Z #10 2.626   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-2.5-0 libmnl0
+2025-11-28T00:36:23.1387913Z #10 2.626   libncursesw6 libnghttp2-14 libproc2-0 libpsl5 librtmp1 libsasl2-2
+2025-11-28T00:36:23.1389207Z #10 2.626   libsasl2-modules-db libssh2-1 libssl3 libtirpc-common libtirpc3 libxtables12
+2025-11-28T00:36:23.1389957Z #10 2.627 Suggested packages:
+2025-11-28T00:36:23.1390537Z #10 2.627   iproute2-doc python3:any krb5-doc krb5-user
+2025-11-28T00:36:23.1391104Z #10 2.627 Recommended packages:
+2025-11-28T00:36:23.1391859Z #10 2.627   libatm1 libpam-cap krb5-locales libldap-common libgpm2 publicsuffix
+2025-11-28T00:36:23.1392574Z #10 2.627   libsasl2-modules psmisc
+2025-11-28T00:36:23.3428002Z #10 2.796 The following NEW packages will be installed:
+2025-11-28T00:36:23.3429193Z #10 2.796   ca-certificates curl iproute2 libbpf1 libbrotli1 libbsd0 libcap2-bin
+2025-11-28T00:36:23.3434849Z #10 2.796   libcurl4 libelf1 libgssapi-krb5-2 libk5crypto3 libkeyutils1 libkrb5-3
+2025-11-28T00:36:23.3436531Z #10 2.797   libkrb5support0 libldap-2.5-0 libmnl0 libncursesw6 libnghttp2-14 libproc2-0
+2025-11-28T00:36:23.3440551Z #10 2.797   libpsl5 librtmp1 libsasl2-2 libsasl2-modules-db libssh2-1 libssl3
+2025-11-28T00:36:23.3441489Z #10 2.797   libtirpc-common libtirpc3 libxtables12 openssl procps
+2025-11-28T00:36:23.3442351Z #10 2.828 0 upgraded, 30 newly installed, 0 to remove and 0 not upgraded.
+2025-11-28T00:36:23.3443017Z #10 2.828 Need to get 8390 kB of archives.
+2025-11-28T00:36:23.3443767Z #10 2.828 After this operation, 23.3 MB of additional disk space will be used.
+2025-11-28T00:36:23.3444850Z #10 2.828 Get:1 http://deb.debian.org/debian bookworm/main amd64 libelf1 amd64 0.188-2.1 [174 kB]
+2025-11-28T00:36:23.3446937Z #10 2.845 Get:2 http://deb.debian.org/debian bookworm/main amd64 libbpf1 amd64 1:1.1.2-0+deb12u1 [145 kB]
+2025-11-28T00:36:23.3449191Z #10 2.847 Get:3 http://deb.debian.org/debian bookworm/main amd64 libbsd0 amd64 0.11.7-2 [117 kB]
+2025-11-28T00:36:23.3450731Z #10 2.851 Get:4 http://deb.debian.org/debian bookworm/main amd64 libmnl0 amd64 1.0.4-3 [12.5 kB]
+2025-11-28T00:36:23.3453422Z #10 2.852 Get:5 http://deb.debian.org/debian bookworm/main amd64 libkrb5support0 amd64 1.20.1-2+deb12u4 [33.2 kB]
+2025-11-28T00:36:23.3456417Z #10 2.852 Get:6 http://deb.debian.org/debian bookworm/main amd64 libk5crypto3 amd64 1.20.1-2+deb12u4 [79.8 kB]
+2025-11-28T00:36:23.3457944Z #10 2.853 Get:7 http://deb.debian.org/debian bookworm/main amd64 libkeyutils1 amd64 1.6.3-2 [8808 B]
+2025-11-28T00:36:23.3459613Z #10 2.853 Get:8 http://deb.debian.org/debian-security bookworm-security/main amd64 libssl3 amd64 3.0.17-1~deb12u3 [2028 kB]
+2025-11-28T00:36:23.3461045Z #10 2.868 Get:9 http://deb.debian.org/debian bookworm/main amd64 libkrb5-3 amd64 1.20.1-2+deb12u4 [334 kB]
+2025-11-28T00:36:23.3462442Z #10 2.870 Get:10 http://deb.debian.org/debian bookworm/main amd64 libgssapi-krb5-2 amd64 1.20.1-2+deb12u4 [135 kB]
+2025-11-28T00:36:23.3463817Z #10 2.871 Get:11 http://deb.debian.org/debian bookworm/main amd64 libtirpc-common all 1.3.3+ds-1 [14.0 kB]
+2025-11-28T00:36:23.3465907Z #10 2.871 Get:12 http://deb.debian.org/debian bookworm/main amd64 libtirpc3 amd64 1.3.3+ds-1 [85.2 kB]
+2025-11-28T00:36:23.3467166Z #10 2.872 Get:13 http://deb.debian.org/debian bookworm/main amd64 libxtables12 amd64 1.8.9-2 [30.8 kB]
+2025-11-28T00:36:23.3468501Z #10 2.873 Get:14 http://deb.debian.org/debian bookworm/main amd64 libcap2-bin amd64 1:2.66-4+deb12u2 [34.9 kB]
+2025-11-28T00:36:23.3469917Z #10 2.874 Get:15 http://deb.debian.org/debian bookworm/main amd64 iproute2 amd64 6.1.0-3 [1046 kB]
+2025-11-28T00:36:23.3471155Z #10 2.878 Get:16 http://deb.debian.org/debian bookworm/main amd64 libncursesw6 amd64 6.4-4 [134 kB]
+2025-11-28T00:36:23.3472467Z #10 2.880 Get:17 http://deb.debian.org/debian bookworm/main amd64 libproc2-0 amd64 2:4.0.2-3 [62.8 kB]
+2025-11-28T00:36:23.3473639Z #10 2.881 Get:18 http://deb.debian.org/debian bookworm/main amd64 procps amd64 2:4.0.2-3 [709 kB]
+2025-11-28T00:36:23.3475045Z #10 2.888 Get:19 http://deb.debian.org/debian-security bookworm-security/main amd64 openssl amd64 3.0.17-1~deb12u3 [1434 kB]
+2025-11-28T00:36:23.3478371Z #10 2.892 Get:20 http://deb.debian.org/debian bookworm/main amd64 ca-certificates all 20230311+deb12u1 [155 kB]
+2025-11-28T00:36:23.4777771Z #10 2.895 Get:21 http://deb.debian.org/debian bookworm/main amd64 libbrotli1 amd64 1.0.9-2+b6 [275 kB]
+2025-11-28T00:36:23.4779466Z #10 2.895 Get:22 http://deb.debian.org/debian bookworm/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg-10 [20.3 kB]
+2025-11-28T00:36:23.4780865Z #10 2.895 Get:23 http://deb.debian.org/debian bookworm/main amd64 libsasl2-2 amd64 2.1.28+dfsg-10 [59.7 kB]
+2025-11-28T00:36:23.4783314Z #10 2.895 Get:24 http://deb.debian.org/debian bookworm/main amd64 libldap-2.5-0 amd64 2.5.13+dfsg-5 [183 kB]
+2025-11-28T00:36:23.4784371Z #10 2.896 Get:25 http://deb.debian.org/debian bookworm/main amd64 libnghttp2-14 amd64 1.52.0-1+deb12u2 [73.0 kB]
+2025-11-28T00:36:23.4785463Z #10 2.897 Get:26 http://deb.debian.org/debian bookworm/main amd64 libpsl5 amd64 0.21.2-1 [58.7 kB]
+2025-11-28T00:36:23.4787064Z #10 2.897 Get:27 http://deb.debian.org/debian bookworm/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2+b2 [60.8 kB]
+2025-11-28T00:36:23.4787817Z #10 2.898 Get:28 http://deb.debian.org/debian bookworm/main amd64 libssh2-1 amd64 1.10.0-3+b1 [179 kB]
+2025-11-28T00:36:23.4788804Z #10 2.902 Get:29 http://deb.debian.org/debian bookworm/main amd64 libcurl4 amd64 7.88.1-10+deb12u14 [392 kB]
+2025-11-28T00:36:23.4790067Z #10 2.928 Get:30 http://deb.debian.org/debian bookworm/main amd64 curl amd64 7.88.1-10+deb12u14 [316 kB]
+2025-11-28T00:36:23.5893680Z #10 3.052 debconf: delaying package configuration, since apt-utils is not installed
+2025-11-28T00:36:23.5894875Z #10 3.075 Fetched 8390 kB in 0s (66.0 MB/s)
+2025-11-28T00:36:23.5898353Z #10 3.097 Selecting previously unselected package libelf1:amd64.
+2025-11-28T00:36:23.5899173Z #10 3.097 (Reading database ... 
+2025-11-28T00:36:23.5899604Z (Reading database ... 5%
+2025-11-28T00:36:23.5899987Z (Reading database ... 10%
+2025-11-28T00:36:23.5900414Z (Reading database ... 15%
+2025-11-28T00:36:23.5900817Z (Reading database ... 20%
+2025-11-28T00:36:23.5901206Z (Reading database ... 25%
+2025-11-28T00:36:23.5901555Z (Reading database ... 30%
+2025-11-28T00:36:23.5901938Z (Reading database ... 35%
+2025-11-28T00:36:23.5902309Z (Reading database ... 40%
+2025-11-28T00:36:23.5902686Z (Reading database ... 45%
+2025-11-28T00:36:23.5903084Z (Reading database ... 50%
+2025-11-28T00:36:23.5903467Z (Reading database ... 55%
+2025-11-28T00:36:23.5903853Z (Reading database ... 60%
+2025-11-28T00:36:23.5904258Z (Reading database ... 65%
+2025-11-28T00:36:23.5904625Z (Reading database ... 70%
+2025-11-28T00:36:23.5905001Z (Reading database ... 75%
+2025-11-28T00:36:23.5905382Z (Reading database ... 80%
+2025-11-28T00:36:23.5905753Z (Reading database ... 85%
+2025-11-28T00:36:23.5906139Z (Reading database ... 90%
+2025-11-28T00:36:23.5906514Z (Reading database ... 95%
+2025-11-28T00:36:23.5906901Z (Reading database ... 100%
+2025-11-28T00:36:23.5907573Z (Reading database ... 6095 files and directories currently installed.)
+2025-11-28T00:36:23.5908432Z #10 3.103 Preparing to unpack .../00-libelf1_0.188-2.1_amd64.deb ...
+2025-11-28T00:36:23.5909408Z #10 3.105 Unpacking libelf1:amd64 (0.188-2.1) ...
+2025-11-28T00:36:23.5910112Z #10 3.138 Selecting previously unselected package libbpf1:amd64.
+2025-11-28T00:36:23.6898758Z #10 3.141 Preparing to unpack .../01-libbpf1_1%3a1.1.2-0+deb12u1_amd64.deb ...
+2025-11-28T00:36:23.6905251Z #10 3.141 Unpacking libbpf1:amd64 (1:1.1.2-0+deb12u1) ...
+2025-11-28T00:36:23.6906475Z #10 3.168 Selecting previously unselected package libbsd0:amd64.
+2025-11-28T00:36:23.6907077Z #10 3.169 Preparing to unpack .../02-libbsd0_0.11.7-2_amd64.deb ...
+2025-11-28T00:36:23.6907480Z #10 3.171 Unpacking libbsd0:amd64 (0.11.7-2) ...
+2025-11-28T00:36:23.6907889Z #10 3.196 Selecting previously unselected package libmnl0:amd64.
+2025-11-28T00:36:23.6908323Z #10 3.197 Preparing to unpack .../03-libmnl0_1.0.4-3_amd64.deb ...
+2025-11-28T00:36:23.6908700Z #10 3.199 Unpacking libmnl0:amd64 (1.0.4-3) ...
+2025-11-28T00:36:23.6909608Z #10 3.217 Selecting previously unselected package libkrb5support0:amd64.
+2025-11-28T00:36:23.6910483Z #10 3.218 Preparing to unpack .../04-libkrb5support0_1.20.1-2+deb12u4_amd64.deb ...
+2025-11-28T00:36:23.6911360Z #10 3.219 Unpacking libkrb5support0:amd64 (1.20.1-2+deb12u4) ...
+2025-11-28T00:36:23.6912133Z #10 3.239 Selecting previously unselected package libk5crypto3:amd64.
+2025-11-28T00:36:23.8119194Z #10 3.240 Preparing to unpack .../05-libk5crypto3_1.20.1-2+deb12u4_amd64.deb ...
+2025-11-28T00:36:23.8123210Z #10 3.241 Unpacking libk5crypto3:amd64 (1.20.1-2+deb12u4) ...
+2025-11-28T00:36:23.8126444Z #10 3.263 Selecting previously unselected package libkeyutils1:amd64.
+2025-11-28T00:36:23.8129464Z #10 3.265 Preparing to unpack .../06-libkeyutils1_1.6.3-2_amd64.deb ...
+2025-11-28T00:36:23.8130215Z #10 3.266 Unpacking libkeyutils1:amd64 (1.6.3-2) ...
+2025-11-28T00:36:23.8130927Z #10 3.286 Selecting previously unselected package libssl3:amd64.
+2025-11-28T00:36:23.8132270Z #10 3.287 Preparing to unpack .../07-libssl3_3.0.17-1~deb12u3_amd64.deb ...
+2025-11-28T00:36:23.8134632Z #10 3.289 Unpacking libssl3:amd64 (3.0.17-1~deb12u3) ...
+2025-11-28T00:36:23.9190215Z #10 3.438 Selecting previously unselected package libkrb5-3:amd64.
+2025-11-28T00:36:23.9193377Z #10 3.439 Preparing to unpack .../08-libkrb5-3_1.20.1-2+deb12u4_amd64.deb ...
+2025-11-28T00:36:23.9194191Z #10 3.440 Unpacking libkrb5-3:amd64 (1.20.1-2+deb12u4) ...
+2025-11-28T00:36:24.0262121Z #10 3.486 Selecting previously unselected package libgssapi-krb5-2:amd64.
+2025-11-28T00:36:24.0265409Z #10 3.488 Preparing to unpack .../09-libgssapi-krb5-2_1.20.1-2+deb12u4_amd64.deb ...
+2025-11-28T00:36:24.0266939Z #10 3.489 Unpacking libgssapi-krb5-2:amd64 (1.20.1-2+deb12u4) ...
+2025-11-28T00:36:24.0267757Z #10 3.515 Selecting previously unselected package libtirpc-common.
+2025-11-28T00:36:24.0268610Z #10 3.516 Preparing to unpack .../10-libtirpc-common_1.3.3+ds-1_all.deb ...
+2025-11-28T00:36:24.0269528Z #10 3.517 Unpacking libtirpc-common (1.3.3+ds-1) ...
+2025-11-28T00:36:24.0271168Z #10 3.536 Selecting previously unselected package libtirpc3:amd64.
+2025-11-28T00:36:24.0271999Z #10 3.537 Preparing to unpack .../11-libtirpc3_1.3.3+ds-1_amd64.deb ...
+2025-11-28T00:36:24.0272723Z #10 3.538 Unpacking libtirpc3:amd64 (1.3.3+ds-1) ...
+2025-11-28T00:36:24.0273471Z #10 3.563 Selecting previously unselected package libxtables12:amd64.
+2025-11-28T00:36:24.0274291Z #10 3.564 Preparing to unpack .../12-libxtables12_1.8.9-2_amd64.deb ...
+2025-11-28T00:36:24.0274983Z #10 3.565 Unpacking libxtables12:amd64 (1.8.9-2) ...
+2025-11-28T00:36:24.1294434Z #10 3.584 Selecting previously unselected package libcap2-bin.
+2025-11-28T00:36:24.1301522Z #10 3.585 Preparing to unpack .../13-libcap2-bin_1%3a2.66-4+deb12u2_amd64.deb ...
+2025-11-28T00:36:24.1302340Z #10 3.587 Unpacking libcap2-bin (1:2.66-4+deb12u2) ...
+2025-11-28T00:36:24.1303026Z #10 3.613 Selecting previously unselected package iproute2.
+2025-11-28T00:36:24.1303780Z #10 3.614 Preparing to unpack .../14-iproute2_6.1.0-3_amd64.deb ...
+2025-11-28T00:36:24.1304456Z #10 3.616 Unpacking iproute2 (6.1.0-3) ...
+2025-11-28T00:36:24.2325980Z #10 3.713 Selecting previously unselected package libncursesw6:amd64.
+2025-11-28T00:36:24.2329902Z #10 3.714 Preparing to unpack .../15-libncursesw6_6.4-4_amd64.deb ...
+2025-11-28T00:36:24.2332187Z #10 3.716 Unpacking libncursesw6:amd64 (6.4-4) ...
+2025-11-28T00:36:24.2333872Z #10 3.744 Selecting previously unselected package libproc2-0:amd64.
+2025-11-28T00:36:24.2335209Z #10 3.746 Preparing to unpack .../16-libproc2-0_2%3a4.0.2-3_amd64.deb ...
+2025-11-28T00:36:24.2335933Z #10 3.747 Unpacking libproc2-0:amd64 (2:4.0.2-3) ...
+2025-11-28T00:36:24.2336562Z #10 3.770 Selecting previously unselected package procps.
+2025-11-28T00:36:24.2337314Z #10 3.772 Preparing to unpack .../17-procps_2%3a4.0.2-3_amd64.deb ...
+2025-11-28T00:36:24.3377625Z #10 3.782 Unpacking procps (2:4.0.2-3) ...
+2025-11-28T00:36:24.3378431Z #10 3.850 Selecting previously unselected package openssl.
+2025-11-28T00:36:24.3380682Z #10 3.852 Preparing to unpack .../18-openssl_3.0.17-1~deb12u3_amd64.deb ...
+2025-11-28T00:36:24.3382077Z #10 3.853 Unpacking openssl (3.0.17-1~deb12u3) ...
+2025-11-28T00:36:24.4401431Z #10 3.969 Selecting previously unselected package ca-certificates.
+2025-11-28T00:36:24.4403805Z #10 3.970 Preparing to unpack .../19-ca-certificates_20230311+deb12u1_all.deb ...
+2025-11-28T00:36:24.4404676Z #10 3.972 Unpacking ca-certificates (20230311+deb12u1) ...
+2025-11-28T00:36:24.5444426Z #10 4.025 Selecting previously unselected package libbrotli1:amd64.
+2025-11-28T00:36:24.5447958Z #10 4.026 Preparing to unpack .../20-libbrotli1_1.0.9-2+b6_amd64.deb ...
+2025-11-28T00:36:24.5449289Z #10 4.028 Unpacking libbrotli1:amd64 (1.0.9-2+b6) ...
+2025-11-28T00:36:24.5450345Z #10 4.067 Selecting previously unselected package libsasl2-modules-db:amd64.
+2025-11-28T00:36:24.5451303Z #10 4.068 Preparing to unpack .../21-libsasl2-modules-db_2.1.28+dfsg-10_amd64.deb ...
+2025-11-28T00:36:24.5452148Z #10 4.070 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg-10) ...
+2025-11-28T00:36:24.5453576Z #10 4.093 Selecting previously unselected package libsasl2-2:amd64.
+2025-11-28T00:36:24.6449684Z #10 4.095 Preparing to unpack .../22-libsasl2-2_2.1.28+dfsg-10_amd64.deb ...
+2025-11-28T00:36:24.6450575Z #10 4.098 Unpacking libsasl2-2:amd64 (2.1.28+dfsg-10) ...
+2025-11-28T00:36:24.6451361Z #10 4.122 Selecting previously unselected package libldap-2.5-0:amd64.
+2025-11-28T00:36:24.6452874Z #10 4.123 Preparing to unpack .../23-libldap-2.5-0_2.5.13+dfsg-5_amd64.deb ...
+2025-11-28T00:36:24.6453669Z #10 4.124 Unpacking libldap-2.5-0:amd64 (2.5.13+dfsg-5) ...
+2025-11-28T00:36:24.6454509Z #10 4.160 Selecting previously unselected package libnghttp2-14:amd64.
+2025-11-28T00:36:24.6455421Z #10 4.161 Preparing to unpack .../24-libnghttp2-14_1.52.0-1+deb12u2_amd64.deb ...
+2025-11-28T00:36:24.6458097Z #10 4.163 Unpacking libnghttp2-14:amd64 (1.52.0-1+deb12u2) ...
+2025-11-28T00:36:24.6459499Z #10 4.191 Selecting previously unselected package libpsl5:amd64.
+2025-11-28T00:36:24.6460351Z #10 4.192 Preparing to unpack .../25-libpsl5_0.21.2-1_amd64.deb ...
+2025-11-28T00:36:24.6461020Z #10 4.194 Unpacking libpsl5:amd64 (0.21.2-1) ...
+2025-11-28T00:36:24.7541536Z #10 4.218 Selecting previously unselected package librtmp1:amd64.
+2025-11-28T00:36:24.7542936Z #10 4.220 Preparing to unpack .../26-librtmp1_2.4+20151223.gitfa8646d.1-2+b2_amd64.deb ...
+2025-11-28T00:36:24.7544207Z #10 4.221 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+2025-11-28T00:36:24.7545334Z #10 4.247 Selecting previously unselected package libssh2-1:amd64.
+2025-11-28T00:36:24.7547478Z #10 4.248 Preparing to unpack .../27-libssh2-1_1.10.0-3+b1_amd64.deb ...
+2025-11-28T00:36:24.7548195Z #10 4.249 Unpacking libssh2-1:amd64 (1.10.0-3+b1) ...
+2025-11-28T00:36:24.7548917Z #10 4.282 Selecting previously unselected package libcurl4:amd64.
+2025-11-28T00:36:24.7549924Z #10 4.284 Preparing to unpack .../28-libcurl4_7.88.1-10+deb12u14_amd64.deb ...
+2025-11-28T00:36:24.7550707Z #10 4.285 Unpacking libcurl4:amd64 (7.88.1-10+deb12u14) ...
+2025-11-28T00:36:24.8564706Z #10 4.326 Selecting previously unselected package curl.
+2025-11-28T00:36:24.8565660Z #10 4.328 Preparing to unpack .../29-curl_7.88.1-10+deb12u14_amd64.deb ...
+2025-11-28T00:36:24.8566441Z #10 4.330 Unpacking curl (7.88.1-10+deb12u14) ...
+2025-11-28T00:36:24.8567064Z #10 4.375 Setting up libkeyutils1:amd64 (1.6.3-2) ...
+2025-11-28T00:36:24.8567723Z #10 4.379 Setting up libpsl5:amd64 (0.21.2-1) ...
+2025-11-28T00:36:24.8568353Z #10 4.384 Setting up libtirpc-common (1.3.3+ds-1) ...
+2025-11-28T00:36:24.8569195Z #10 4.390 Setting up libbrotli1:amd64 (1.0.9-2+b6) ...
+2025-11-28T00:36:24.8569890Z #10 4.394 Setting up libssl3:amd64 (3.0.17-1~deb12u3) ...
+2025-11-28T00:36:24.8570587Z #10 4.398 Setting up libnghttp2-14:amd64 (1.52.0-1+deb12u2) ...
+2025-11-28T00:36:24.8571350Z #10 4.401 Setting up libkrb5support0:amd64 (1.20.1-2+deb12u4) ...
+2025-11-28T00:36:24.8572061Z #10 4.405 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg-10) ...
+2025-11-28T00:36:25.0069243Z #10 4.409 Setting up libcap2-bin (1:2.66-4+deb12u2) ...
+2025-11-28T00:36:25.0070173Z #10 4.412 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+2025-11-28T00:36:25.0071787Z #10 4.416 Setting up libproc2-0:amd64 (2:4.0.2-3) ...
+2025-11-28T00:36:25.0072768Z #10 4.421 Setting up libmnl0:amd64 (1.0.4-3) ...
+2025-11-28T00:36:25.0073399Z #10 4.424 Setting up libncursesw6:amd64 (6.4-4) ...
+2025-11-28T00:36:25.0074123Z #10 4.427 Setting up libk5crypto3:amd64 (1.20.1-2+deb12u4) ...
+2025-11-28T00:36:25.0074827Z #10 4.430 Setting up libxtables12:amd64 (1.8.9-2) ...
+2025-11-28T00:36:25.0075492Z #10 4.434 Setting up libsasl2-2:amd64 (2.1.28+dfsg-10) ...
+2025-11-28T00:36:25.0076121Z #10 4.438 Setting up procps (2:4.0.2-3) ...
+2025-11-28T00:36:25.0076747Z #10 4.462 Setting up libssh2-1:amd64 (1.10.0-3+b1) ...
+2025-11-28T00:36:25.0077416Z #10 4.465 Setting up libkrb5-3:amd64 (1.20.1-2+deb12u4) ...
+2025-11-28T00:36:25.0078099Z #10 4.469 Setting up openssl (3.0.17-1~deb12u3) ...
+2025-11-28T00:36:25.0079595Z #10 4.474 Setting up libbsd0:amd64 (0.11.7-2) ...
+2025-11-28T00:36:25.0080234Z #10 4.477 Setting up libelf1:amd64 (0.188-2.1) ...
+2025-11-28T00:36:25.0080912Z #10 4.481 Setting up libbpf1:amd64 (1:1.1.2-0+deb12u1) ...
+2025-11-28T00:36:25.0081822Z #10 4.485 Setting up libldap-2.5-0:amd64 (2.5.13+dfsg-5) ...
+2025-11-28T00:36:25.0083310Z #10 4.489 Setting up ca-certificates (20230311+deb12u1) ...
+2025-11-28T00:36:25.1175634Z #10 4.580 debconf: unable to initialize frontend: Dialog
+2025-11-28T00:36:25.1176625Z #10 4.580 debconf: (TERM is not set, so the dialog frontend is not usable.)
+2025-11-28T00:36:25.1177386Z #10 4.580 debconf: falling back to frontend: Readline
+2025-11-28T00:36:25.1178104Z #10 4.580 debconf: unable to initialize frontend: Readline
+2025-11-28T00:36:25.1181850Z #10 4.581 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.36.0 /usr/local/share/perl/5.36.0 /usr/lib/x86_64-linux-gnu/perl5/5.36 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.36 /usr/share/perl/5.36 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+2025-11-28T00:36:25.1184836Z #10 4.581 debconf: falling back to frontend: Teletype
+2025-11-28T00:36:25.5362144Z #10 5.045 Updating certificates in /etc/ssl/certs...
+2025-11-28T00:36:26.2852469Z #10 5.719 142 added, 0 removed; done.
+2025-11-28T00:36:26.2853460Z #10 5.737 Setting up libgssapi-krb5-2:amd64 (1.20.1-2+deb12u4) ...
+2025-11-28T00:36:26.2854251Z #10 5.741 Setting up libcurl4:amd64 (7.88.1-10+deb12u14) ...
+2025-11-28T00:36:26.2854909Z #10 5.744 Setting up curl (7.88.1-10+deb12u14) ...
+2025-11-28T00:36:26.2855536Z #10 5.748 Setting up libtirpc3:amd64 (1.3.3+ds-1) ...
+2025-11-28T00:36:26.2856138Z #10 5.753 Setting up iproute2 (6.1.0-3) ...
+2025-11-28T00:36:26.4109820Z #10 5.847 debconf: unable to initialize frontend: Dialog
+2025-11-28T00:36:26.4111686Z #10 5.847 debconf: (TERM is not set, so the dialog frontend is not usable.)
+2025-11-28T00:36:26.4112411Z #10 5.847 debconf: falling back to frontend: Readline
+2025-11-28T00:36:26.4112908Z #10 5.848 debconf: unable to initialize frontend: Readline
+2025-11-28T00:36:26.4115722Z #10 5.848 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.36.0 /usr/local/share/perl/5.36.0 /usr/lib/x86_64-linux-gnu/perl5/5.36 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.36 /usr/share/perl/5.36 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+2025-11-28T00:36:26.4117993Z #10 5.848 debconf: falling back to frontend: Teletype
+2025-11-28T00:36:26.4118752Z #10 5.873 Processing triggers for libc-bin (2.36-9+deb12u13) ...
+2025-11-28T00:36:26.4120156Z #10 5.886 Processing triggers for ca-certificates (20230311+deb12u1) ...
+2025-11-28T00:36:26.4120783Z #10 5.891 Updating certificates in /etc/ssl/certs...
+2025-11-28T00:36:26.8771581Z #10 6.403 0 added, 0 removed; done.
+2025-11-28T00:36:26.8772275Z #10 6.403 Running hooks in /etc/ca-certificates/update.d...
+2025-11-28T00:36:26.8772771Z #10 6.405 done.
+2025-11-28T00:36:28.2078260Z #10 DONE 7.8s
+2025-11-28T00:36:28.2078589Z 
+2025-11-28T00:36:28.2079794Z #6 [builder 1/7] FROM docker.io/library/node:20@sha256:66d2eb8b463114d1f416d61dbd5fa9cea83e8fc250feb997338467728a06124b
+2025-11-28T00:36:28.2081015Z #6 extracting sha256:078b2eece9b24f617524f986db4dd04f977e3e7d6fe15a9088a584147bc6ba05 2.5s done
+2025-11-28T00:36:28.2082162Z #6 extracting sha256:a1208d53eb0667932469017a5ef3960e5ed2aea9143d62b983abe2f8593eeb9a 5.9s done
+2025-11-28T00:36:28.3560527Z #6 extracting sha256:3f3086dc4794e75936310457d642857d1b103ddecb3c11b4d08aa5765b5b6d5f done
+2025-11-28T00:36:28.3561845Z #6 extracting sha256:cab17b1d52faa70a441da1bbc6884ba494bb232114491ff4f9125c4dd3922a7f 0.1s
+2025-11-28T00:36:30.1170495Z #6 extracting sha256:cab17b1d52faa70a441da1bbc6884ba494bb232114491ff4f9125c4dd3922a7f 1.7s done
+2025-11-28T00:36:30.1851299Z #6 extracting sha256:7785152ed412f78b7125808272a63f5c86ba9a41a0512ae0e690234c905a077a
+2025-11-28T00:36:30.3611228Z #6 extracting sha256:7785152ed412f78b7125808272a63f5c86ba9a41a0512ae0e690234c905a077a 0.0s done
+2025-11-28T00:36:30.3613745Z #6 extracting sha256:895878b2e74c8e0e0a2cd1db585e46390697432b15f4b8ee087814f939115a26 done
+2025-11-28T00:36:30.3615679Z #6 DONE 17.9s
+2025-11-28T00:36:30.3615893Z 
+2025-11-28T00:36:30.3616133Z #11 [builder 2/7] WORKDIR /usr/src/app
+2025-11-28T00:36:30.3616553Z #11 DONE 0.0s
+2025-11-28T00:36:30.3616737Z 
+2025-11-28T00:36:30.3617043Z #12 [builder 3/7] COPY package*.json ./
+2025-11-28T00:36:30.3617498Z #12 DONE 0.1s
+2025-11-28T00:36:30.5125497Z 
+2025-11-28T00:36:30.5127035Z #13 [builder 4/7] RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/*  && npm install --legacy-peer-deps --no-audit --no-fund
+2025-11-28T00:36:30.5146836Z #13 0.153 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+2025-11-28T00:36:30.6525942Z #13 0.170 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+2025-11-28T00:36:30.6527371Z #13 0.176 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+2025-11-28T00:36:30.6528478Z #13 0.234 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8791 kB]
+2025-11-28T00:36:30.6529698Z #13 0.291 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+2025-11-28T00:36:30.8516893Z #13 0.339 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [288 kB]
+2025-11-28T00:36:31.3978831Z #13 1.036 Fetched 9341 kB in 1s (10.4 MB/s)
+2025-11-28T00:36:31.7672965Z #13 1.036 Reading package lists...
+2025-11-28T00:36:32.1530727Z #13 1.421 Reading package lists...
+2025-11-28T00:36:32.3552257Z #13 1.801 Building dependency tree...
+2025-11-28T00:36:32.3553494Z #13 1.887 Reading state information...
+2025-11-28T00:36:32.3554143Z #13 1.993 openssl is already the newest version (3.0.17-1~deb12u3).
+2025-11-28T00:36:32.3554861Z #13 1.993 openssl set to manually installed.
+2025-11-28T00:36:32.3555489Z #13 1.993 ca-certificates is already the newest version (20230311+deb12u1).
+2025-11-28T00:36:32.3556007Z #13 1.993 0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+2025-11-28T00:36:34.4025841Z #13 4.041 npm warn deprecated supertest@6.3.4: Please upgrade to supertest v7.1.3+, see release notes at https://github.com/forwardemail/supertest/releases/tag/v7.1.3 - maintenance is supported by Forward Email @ https://forwardemail.net
+2025-11-28T00:36:34.6333724Z #13 4.271 npm warn deprecated lodash.omit@4.5.0: This package is deprecated. Use destructuring assignment syntax instead.
+2025-11-28T00:36:34.9328263Z #13 4.571 npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2025-11-28T00:36:35.1058792Z #13 4.744 npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+2025-11-28T00:36:35.4123362Z #13 5.050 npm warn deprecated superagent@8.1.2: Please upgrade to superagent v10.2.2+, see release notes at https://github.com/forwardemail/superagent/releases/tag/v10.2.2 - maintenance is supported by Forward Email @ https://forwardemail.net
+2025-11-28T00:36:35.6026144Z #13 5.240 npm warn deprecated subscriptions-transport-ws@0.11.0: The `subscriptions-transport-ws` package is no longer maintained. We recommend you use `graphql-ws` instead. For help migrating Apollo software to `graphql-ws`, see https://www.apollographql.com/docs/apollo-server/data/subscriptions/#switching-from-subscriptions-transport-ws    For general help using `graphql-ws`, see https://github.com/enisdenjo/graphql-ws/blob/master/README.md
+2025-11-28T00:36:36.0982746Z #13 5.736 npm warn deprecated @apollo/server-gateway-interface@1.1.1: @apollo/server-gateway-interface v1 is part of Apollo Server v4, which is deprecated and will transition to end-of-life on January 26, 2026. As long as you are already using a non-EOL version of Node.js, upgrading to v2 should take only a few minutes. See https://www.apollographql.com/docs/apollo-server/previous-versions for details.
+2025-11-28T00:36:36.2561468Z #13 5.743 npm warn deprecated @apollo/server-plugin-landing-page-graphql-playground@4.0.0: The use of GraphQL Playground in Apollo Server was supported in previous versions, but this is no longer the case as of December 31, 2022. This package exists for v4 migration purposes only. We do not intend to resolve security issues or other bugs with this package if they arise, so please migrate away from this to [Apollo Server's default Explorer](https://www.apollographql.com/docs/apollo-server/api/plugin/landing-pages) as soon as possible.
+2025-11-28T00:36:37.0438455Z #13 6.682 npm warn deprecated @apollo/server@4.12.2: Apollo Server v4 is deprecated and will transition to end-of-life on January 26, 2026. As long as you are already using a non-EOL version of Node.js, upgrading to v5 should take only a few minutes. See https://www.apollographql.com/docs/apollo-server/previous-versions for details.
+2025-11-28T00:36:38.5847375Z #13 8.222 
+2025-11-28T00:36:38.5847862Z #13 8.222 added 550 packages in 6s
+2025-11-28T00:36:38.7352731Z #13 8.223 npm notice
+2025-11-28T00:36:38.7353469Z #13 8.223 npm notice New major version of npm available! 10.8.2 -> 11.6.4
+2025-11-28T00:36:38.7354139Z #13 8.223 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.4
+2025-11-28T00:36:38.7354736Z #13 8.223 npm notice To update run: npm install -g npm@11.6.4
+2025-11-28T00:36:38.7355105Z #13 8.223 npm notice
+2025-11-28T00:36:38.7963136Z #13 DONE 8.4s
+2025-11-28T00:36:38.9473404Z 
+2025-11-28T00:36:38.9473923Z #14 [builder 5/7] COPY . ./
+2025-11-28T00:36:42.3215581Z #14 DONE 3.5s
+2025-11-28T00:36:42.4338832Z 
+2025-11-28T00:36:42.4340192Z #15 [builder 6/7] RUN mkdir -p prisma && cp ../shared/prisma/schema.prisma prisma/schema.prisma || true
+2025-11-28T00:36:42.4341519Z #15 0.112 cp: cannot stat '../shared/prisma/schema.prisma': No such file or directory
+2025-11-28T00:36:42.6043295Z #15 DONE 0.1s
+2025-11-28T00:36:42.6043572Z 
+2025-11-28T00:36:42.6044354Z #16 [builder 7/7] RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma; fi
+2025-11-28T00:36:43.2610132Z #16 0.808 Prisma schema loaded from prisma/schema.prisma
+2025-11-28T00:36:43.5568815Z #16 1.104 
+2025-11-28T00:36:43.5570409Z #16 1.104 ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 79ms
+2025-11-28T00:36:43.5571105Z #16 1.104 
+2025-11-28T00:36:43.5571895Z #16 1.104 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+2025-11-28T00:36:43.5572621Z #16 1.104 
+2025-11-28T00:36:43.5573740Z #16 1.104 Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+2025-11-28T00:36:43.5574656Z #16 1.104 
+2025-11-28T00:36:43.7725346Z #16 DONE 1.3s
+2025-11-28T00:36:44.7294592Z 
+2025-11-28T00:36:44.7295514Z #17 [stage-1 4/4] COPY --from=builder /usr/src/app/. ./
+2025-11-28T00:36:46.7993012Z #17 DONE 2.1s
+2025-11-28T00:36:46.9510228Z 
+2025-11-28T00:36:46.9513176Z #18 exporting to image
+2025-11-28T00:36:46.9514508Z #18 exporting layers
+2025-11-28T00:36:49.1209868Z #18 exporting layers 2.3s done
+2025-11-28T00:36:49.1405405Z #18 writing image sha256:6cd832a46b116c05d1d85de25c2d8c56592fa0db370aef75ccb76190fd7001ad done
+2025-11-28T00:36:49.1406444Z #18 naming to docker.io/library/rest-int:1764290169765 done
+2025-11-28T00:36:49.1406959Z #18 DONE 2.3s
+2025-11-28T00:36:54.6467002Z Unable to find image 'postgres:15' locally
+2025-11-28T00:36:54.6468000Z 15: Pulling from library/postgres
+2025-11-28T00:36:54.6469335Z 0e4bc2bd6656: Pulling fs layer
+2025-11-28T00:36:54.6469985Z e213bd2560e2: Pulling fs layer
+2025-11-28T00:36:54.6470622Z 9fcd228516aa: Pulling fs layer
+2025-11-28T00:36:54.6471087Z 2e6036390374: Pulling fs layer
+2025-11-28T00:36:54.6471907Z 5a19b1f63ace: Pulling fs layer
+2025-11-28T00:36:54.6472569Z dd23ed782cae: Pulling fs layer
+2025-11-28T00:36:54.6472960Z b10108f2d223: Pulling fs layer
+2025-11-28T00:36:54.6473346Z 4eb4a683c389: Pulling fs layer
+2025-11-28T00:36:54.6473766Z b475dc4bba47: Pulling fs layer
+2025-11-28T00:36:54.6474177Z 2c64a0db539b: Pulling fs layer
+2025-11-28T00:36:54.6474588Z 6e6c09f9e058: Pulling fs layer
+2025-11-28T00:36:54.6474986Z 304e9b7c93e6: Pulling fs layer
+2025-11-28T00:36:54.6475401Z 95bcad39f7ff: Pulling fs layer
+2025-11-28T00:36:54.6475817Z fa51353b2c9b: Pulling fs layer
+2025-11-28T00:36:54.6476173Z dd23ed782cae: Waiting
+2025-11-28T00:36:54.6476500Z b10108f2d223: Waiting
+2025-11-28T00:36:54.6476843Z 4eb4a683c389: Waiting
+2025-11-28T00:36:54.6477282Z b475dc4bba47: Waiting
+2025-11-28T00:36:54.6477660Z 2c64a0db539b: Waiting
+2025-11-28T00:36:54.6501103Z 6e6c09f9e058: Waiting
+2025-11-28T00:36:54.6501505Z 304e9b7c93e6: Waiting
+2025-11-28T00:36:54.6501870Z 95bcad39f7ff: Waiting
+2025-11-28T00:36:54.6502220Z fa51353b2c9b: Waiting
+2025-11-28T00:36:54.6502593Z 5a19b1f63ace: Waiting
+2025-11-28T00:36:54.6502913Z 2e6036390374: Waiting
+2025-11-28T00:36:54.6503321Z e213bd2560e2: Verifying Checksum
+2025-11-28T00:36:54.6503770Z e213bd2560e2: Download complete
+2025-11-28T00:36:54.6504045Z 9fcd228516aa: Verifying Checksum
+2025-11-28T00:36:54.6504315Z 9fcd228516aa: Download complete
+2025-11-28T00:36:54.6504577Z 2e6036390374: Verifying Checksum
+2025-11-28T00:36:54.6504833Z 2e6036390374: Download complete
+2025-11-28T00:36:54.6505105Z 0e4bc2bd6656: Verifying Checksum
+2025-11-28T00:36:54.6505362Z 0e4bc2bd6656: Download complete
+2025-11-28T00:36:54.6505616Z dd23ed782cae: Verifying Checksum
+2025-11-28T00:36:54.6505872Z dd23ed782cae: Download complete
+2025-11-28T00:36:54.6506115Z b10108f2d223: Download complete
+2025-11-28T00:36:54.6506560Z 4eb4a683c389: Verifying Checksum
+2025-11-28T00:36:54.6507017Z 4eb4a683c389: Download complete
+2025-11-28T00:36:54.6507460Z 2c64a0db539b: Verifying Checksum
+2025-11-28T00:36:54.6507725Z 2c64a0db539b: Download complete
+2025-11-28T00:36:54.6507985Z 5a19b1f63ace: Verifying Checksum
+2025-11-28T00:36:54.6508239Z 5a19b1f63ace: Download complete
+2025-11-28T00:36:54.6508490Z 6e6c09f9e058: Verifying Checksum
+2025-11-28T00:36:54.6508758Z 6e6c09f9e058: Download complete
+2025-11-28T00:36:54.6509260Z 304e9b7c93e6: Verifying Checksum
+2025-11-28T00:36:54.6509529Z 304e9b7c93e6: Download complete
+2025-11-28T00:36:54.6509962Z 95bcad39f7ff: Download complete
+2025-11-28T00:36:54.6510424Z fa51353b2c9b: Verifying Checksum
+2025-11-28T00:36:54.6510875Z fa51353b2c9b: Download complete
+2025-11-28T00:36:54.6511283Z 0e4bc2bd6656: Pull complete
+2025-11-28T00:36:54.6511618Z e213bd2560e2: Pull complete
+2025-11-28T00:36:54.6511842Z 9fcd228516aa: Pull complete
+2025-11-28T00:36:54.6512063Z 2e6036390374: Pull complete
+2025-11-28T00:36:54.6512278Z 5a19b1f63ace: Pull complete
+2025-11-28T00:36:54.6512498Z dd23ed782cae: Pull complete
+2025-11-28T00:36:54.6512706Z b10108f2d223: Pull complete
+2025-11-28T00:36:54.6512922Z 4eb4a683c389: Pull complete
+2025-11-28T00:36:54.6513176Z b475dc4bba47: Download complete
+2025-11-28T00:36:54.6513399Z b475dc4bba47: Pull complete
+2025-11-28T00:36:54.6513620Z 2c64a0db539b: Pull complete
+2025-11-28T00:36:54.6513827Z 6e6c09f9e058: Pull complete
+2025-11-28T00:36:54.6514114Z 304e9b7c93e6: Pull complete
+2025-11-28T00:36:54.6514495Z 95bcad39f7ff: Pull complete
+2025-11-28T00:36:54.6514965Z fa51353b2c9b: Pull complete
+2025-11-28T00:36:54.6515801Z Digest: sha256:24d6c206bba8c0440bceb24a8d4bf642f60bf7aea94887051ea5761d29c22323
+2025-11-28T00:36:54.6516660Z Status: Downloaded newer image for postgres:15
+2025-11-28T00:36:55.3163697Z   console.log
+2025-11-28T00:36:55.3164304Z     Applying Prisma migrations to rest-db-1764290169765
+2025-11-28T00:36:55.3164676Z 
+2025-11-28T00:36:55.3165095Z       at Object.log (test/integration/run_container_integration.spec.js:48:15)
+2025-11-28T00:36:55.3165575Z 
+2025-11-28T00:36:55.3290105Z Unable to find image 'node:20' locally
+2025-11-28T00:36:55.5090259Z 20: Pulling from library/node
+2025-11-28T00:36:55.5722283Z 708274aafe49: Already exists
+2025-11-28T00:36:55.5736096Z 8cdff261ed5c: Already exists
+2025-11-28T00:36:55.5750375Z 078b2eece9b2: Already exists
+2025-11-28T00:36:55.5762539Z a1208d53eb06: Already exists
+2025-11-28T00:36:55.5777451Z 3f3086dc4794: Already exists
+2025-11-28T00:36:55.5789561Z cab17b1d52fa: Already exists
+2025-11-28T00:36:55.5803161Z 7785152ed412: Already exists
+2025-11-28T00:36:55.5814319Z 895878b2e74c: Already exists
+2025-11-28T00:36:55.6559593Z Digest: sha256:66d2eb8b463114d1f416d61dbd5fa9cea83e8fc250feb997338467728a06124b
+2025-11-28T00:36:55.6569549Z Status: Downloaded newer image for node:20
+2025-11-28T00:36:55.8213409Z Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+2025-11-28T00:36:55.8404607Z Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+2025-11-28T00:36:55.8468470Z Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+2025-11-28T00:36:55.9028471Z Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8791 kB]
+2025-11-28T00:36:55.9632791Z Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+2025-11-28T00:36:56.0044457Z Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [288 kB]
+2025-11-28T00:36:56.7151017Z Fetched 9341 kB in 1s (10.2 MB/s)
+2025-11-28T00:36:57.0835812Z Reading package lists...
+2025-11-28T00:36:57.4674291Z Reading package lists...
+2025-11-28T00:36:57.5602703Z Building dependency tree...
+2025-11-28T00:36:57.5603609Z Reading state information...
+2025-11-28T00:36:57.6646463Z openssl is already the newest version (3.0.17-1~deb12u3).
+2025-11-28T00:36:57.6647123Z openssl set to manually installed.
+2025-11-28T00:36:57.6647795Z ca-certificates is already the newest version (20230311+deb12u1).
+2025-11-28T00:36:57.6648597Z 0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+2025-11-28T00:37:03.4161210Z Prisma schema loaded from services/shared/prisma/schema.prisma
+2025-11-28T00:37:03.4191589Z Datasource "db": PostgreSQL database "pat_ah", schema "public" at "rest-db-1764290169765:5432"
+2025-11-28T00:37:03.4809343Z 
+2025-11-28T00:37:03.4810131Z 1 migration found in prisma/migrations
+2025-11-28T00:37:03.4810511Z 
+2025-11-28T00:37:03.5216288Z Applying migration `20251122_add_training_dataset`
+2025-11-28T00:37:03.5285003Z 
+2025-11-28T00:37:03.5294444Z The following migration(s) have been applied:
+2025-11-28T00:37:03.5294892Z 
+2025-11-28T00:37:03.5297334Z migrations/
+2025-11-28T00:37:03.5298271Z   └─ 20251122_add_training_dataset/
+2025-11-28T00:37:03.5298792Z     └─ migration.sql
+2025-11-28T00:37:03.5299328Z       
+2025-11-28T00:37:03.5299790Z All migrations have been successfully applied.
+2025-11-28T00:37:03.6704125Z   console.log
+2025-11-28T00:37:03.6704840Z     Copying SQL to container and creating User table on rest-db-1764290169765
+2025-11-28T00:37:03.6705334Z 
+2025-11-28T00:37:03.6705768Z       at Object.log (test/integration/run_container_integration.spec.js:73:13)
+2025-11-28T00:37:03.6706277Z 
+2025-11-28T00:37:03.7637713Z CREATE EXTENSION
+2025-11-28T00:37:03.7639479Z psql:/tmp/_create_user.sql:1: NOTICE:  extension "uuid-ossp" already exists, skipping
+2025-11-28T00:37:03.7694871Z CREATE TABLE
+2025-11-28T00:37:05.6896809Z PASS test/integration/run_container_integration.spec.js (56.585 s)
+2025-11-28T00:37:05.6897579Z   rest-service container integration
+2025-11-28T00:37:05.6898408Z     ✓ POST /api/users persists user (1282 ms)
+2025-11-28T00:37:05.6898729Z 
+2025-11-28T00:37:05.7112084Z Test Suites: 1 skipped, 4 passed, 4 of 5 total
+2025-11-28T00:37:05.7112855Z Tests:       1 skipped, 10 passed, 11 total
+2025-11-28T00:37:05.7113354Z Snapshots:   0 total
+2025-11-28T00:37:05.7113717Z Time:        56.728 s
+2025-11-28T00:37:05.7114187Z Ran all test suites.

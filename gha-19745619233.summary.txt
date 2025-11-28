@@ -1,0 +1,5 @@
+
+gha-19745619233.log:163:test (20.x)	Install dependencies for all services (backend + frontend)	2025-11-27T18:53:57.4064894Z npm warn deprecated apollo-server-errors@3.3.1: The `apollo-server-errors` package is part of Apollo Server v2 and v3, which are now end-of-life (as of October 22nd 2023 and October 22nd 2024, respectively). This package's functionality is now found in the `@apollo/server` package. See https://www.apollographql.com/docs/apollo-server/previous-versions/ for more details.
+gha-19745619233.log:193:test (20.x)	Install dependencies for all services (backend + frontend)	2025-11-27T18:54:05.8000160Z npm warn deprecated apollo-server-errors@3.3.1: The `apollo-server-errors` package is part of Apollo Server v2 and v3, which are now end-of-life (as of October 22nd 2023 and October 22nd 2024, respectively). This package's functionality is now found in the `@apollo/server` package. See https://www.apollographql.com/docs/apollo-server/previous-versions/ for more details.
+gha-19745619233.log:885:test (20.x)	Run tests for weather-service	2025-11-27T18:55:22.2510698Z ##[error]Process completed with exit code 127.
+

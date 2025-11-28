@@ -78,6 +78,20 @@ jobs:
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/rest-service
         run: |
           echo "Starting docker-compose test stack..."
+          # Ensure docker compose command is available on ubuntu runners
+          echo "Ensuring docker-compose is installed (plugin + compatibility)..."
+          sudo apt-get update -y
+          sudo apt-get install -y docker-compose-plugin || true
+          # Create compatibility symlink if binary available as CLI plugin
+          if [ -f /usr/libexec/docker/cli-plugins/docker-compose ]; then
+            sudo ln -sf /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose || true
+          fi
+          # Fallback: try python/pip installation (less preferred)
+          if ! command -v docker-compose >/dev/null 2>&1; then
+            echo "docker-compose not found, trying pip install..."
+            python3 -m pip install --user docker-compose || true
+            export PATH="$HOME/.local/bin:$PATH"
+          fi
           docker-compose -f docker-compose.test.yml up -d
           echo "Running integration commands inside runner..."
           docker-compose -f docker-compose.test.yml run --rm runner sh -c "npm ci --legacy-peer-deps; npx prisma generate; npx prisma db push; npm test -- test/integration/user.integration.spec.js --runInBand"
