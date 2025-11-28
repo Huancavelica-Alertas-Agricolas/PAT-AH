@@ -1,23 +1,25 @@
 FROM node:20 AS builder
 WORKDIR /usr/src/app
 
-# Install dependencies (prefer lockfile when present)
-COPY package*.json ./
+# Copy only the alert-service package files and source into the builder
+# (the compose build context is repo root, so copy service subfolder explicitly)
+COPY services/alert-service/package*.json ./
+COPY services/alert-service/ ./
+
+# Copy shared prisma schema if present so prisma generate can run
+COPY services/shared/prisma/schema.prisma ./prisma/schema.prisma
+
+# Install dependencies and build inside the service folder
 RUN npm ci --legacy-peer-deps --no-audit --no-fund
 
-# Prisma client generation (added by patch)
+# Prisma client generation (if schema present)
 RUN if [ -f ./prisma/schema.prisma ]; then \
-			npx prisma@5.22.0 generate --schema=./prisma/schema.prisma || true; \
-		elif [ -f /tmp/schema.prisma ]; then \
-			npx prisma@5.22.0 generate --schema=/tmp/schema.prisma || true; \
-		else \
-			echo "[prisma] no schema found, skipping generate"; \
-		fi
+      npx prisma@5.22.0 generate --schema=./prisma/schema.prisma || true; \
+    else \
+      echo "[prisma] no schema found, skipping generate"; \
+    fi
 
-# Copy source and build (context is repo root; copy service files)
-COPY . ./
-# Ensure shared prisma schema is available for builder generate
-RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.prisma || true
+# Build the service
 RUN npm run build && npm prune --production || true
 
 FROM node:20-slim
