@@ -34,7 +34,6 @@ resource "aws_security_group" "rds" {
 resource "aws_db_instance" "main" {
   identifier     = "pat-ah-database"
   engine         = "postgres"
-  engine_version = "15.4"
   instance_class = "db.t3.micro"
   
   allocated_storage     = 20

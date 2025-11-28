@@ -1,13 +1,16 @@
 FROM node:20 AS builder
+# Use service folder as build context: copy package files from current context
 WORKDIR /usr/src/app
 # Copy only ai-service package files first (optimize npm install)
-COPY services/ai-service/package*.json ./
+COPY package*.json ./
 RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/* \
  && npm ci --legacy-peer-deps --no-audit --no-fund
-# Copy only the ai-service sources into the image
-COPY services/ai-service/. ./
-# Copy shared Prisma schema (if present) into local prisma dir
-RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.prisma || true
+# Copy only the ai-service sources into the image (context should be the service folder)
+COPY . ./
+# Ensure trained-models dir exists inside builder image so later COPY from builder won't fail
+RUN mkdir -p /usr/src/app/trained-models
+# Copy shared Prisma schema (if present) into local prisma dir (when building from service context, shared is at ../shared)
+RUN mkdir -p prisma && cp ../shared/prisma/schema.prisma prisma/schema.prisma || true
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma; fi
 # No TypeScript build step required (JS runtime in `src/`)
 

@@ -29,6 +29,10 @@ Backend-Huancavelica-Alertas-Agricolas/services/**/trained-models/
 Backend-Huancavelica-Alertas-Agricolas/services/**/trained-models/**
 **/trained-models/
 
+# Allow committing a placeholder so Docker builds include empty trained-models folders for CI
+!Backend-Huancavelica-Alertas-Agricolas/services/ai-service/trained-models/.gitkeep
+!Backend-Huancavelica-Alertas-Agricolas/services/ai-service/trained-models/**
+
 # MLflow / MinIO / DB artifacts
 **/mlflow.db
 **/weights.bin
@@ -43,4 +47,9 @@ Backend-Huancavelica-Alertas-Agricolas/scripts/out/
 # Docker / compose local data
 **/data/
 
+
+# Ignore terraform artifacts
+aws/terraform/.terraform/
+aws/terraform/terraform.tfstate
+aws/terraform/terraform.tfstate.backup
 

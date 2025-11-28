@@ -14,8 +14,9 @@ describe('rest-service container integration', () => {
 
   beforeAll(() => {
     // build image (only for this service) — check if already exists
-    const dockerfile = `${repoRoot.replace(/\\/g, '/')}/services/rest-service/Dockerfile`;
-    const buildContext = `${repoRoot.replace(/\\/g, '/')}`;
+      const dockerfile = `${repoRoot.replace(/\\/g, '/')}/services/rest-service/Dockerfile`;
+      // Use the service folder as the docker build context to avoid copying the whole repo
+      const buildContext = `${repoRoot.replace(/\\/g, '/')}/services/rest-service`;
     try {
       const existing = execSync(`docker images -q ${imageTag}`).toString().trim();
       if (!existing) {

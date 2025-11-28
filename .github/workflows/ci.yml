@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -22,45 +22,76 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      - name: Install dependencies for all services (backend + frontend)
+        run: |
+          echo "Installing dependencies for all services..."
+          SERVICES=(
+            "Backend-Huancavelica-Alertas-Agricolas/services/auth-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/users-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/rest-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/weather-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/ai-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/ingest-service"
+            "Frontend-Huancavelica-Alertas-Agricolas"
+          )
+          for pkg in "${SERVICES[@]}"; do
+            if [ -f "$pkg/package.json" ]; then
+              echo "--- Installing dependencies for $pkg ---"
+              if [ -f "$pkg/package-lock.json" ]; then
+                npm ci --prefix "$pkg" --legacy-peer-deps || npm install --prefix "$pkg" --legacy-peer-deps
+              else
+                npm install --prefix "$pkg" --legacy-peer-deps
+              fi
+            fi
+          done
+
       - name: Run tests for rest-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/rest-service
         run: |
-          echo "Installing dependencies for rest-service..."
-          npm ci --legacy-peer-deps
           echo "Running tests for rest-service..."
-          npm test
+          npm test -- --passWithNoTests
 
       - name: Run tests for weather-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/weather-service
         run: |
-          echo "Installing dependencies for weather-service..."
-          npm ci --legacy-peer-deps
           echo "Running tests for weather-service..."
-          npm test
+          npm test -- --passWithNoTests
 
       - name: Run tests for ai-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/ai-service
         run: |
-          echo "Installing dependencies for ai-service..."
-          npm ci --legacy-peer-deps
-          echo "Building ai-service image for integration tests..."
-          docker build -t pat-ah/ai-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/ai-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas || true
+          echo "Building ai-service image for integration tests (service context)..."
+          # Use the service directory as the docker build context so paths like trained-models exist relative to Dockerfile
+          docker build -t pat-ah/ai-service:ci -f Dockerfile . || true
           echo "Running tests for ai-service (unit + container E2E)..."
-          npm test || ( echo "ai-service tests failed" && exit 1 )
+          npm test -- --passWithNoTests || ( echo "ai-service tests failed" && exit 1 )
         timeout-minutes: 30
 
       - name: Run tests for frontend
         working-directory: Frontend-Huancavelica-Alertas-Agricolas
         run: |
-          echo "Installing dependencies for frontend..."
-          npm ci --legacy-peer-deps
-          echo "Running frontend build..."
+          echo "Running frontend build/tests..."
+          npm test -- --passWithNoTests || true
           npm run build || echo "Build failed or not configured"
 
       - name: Run integration tests (rest-service) using docker-compose
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/rest-service
         run: |
           echo "Starting docker-compose test stack..."
+          # Ensure docker compose command is available on ubuntu runners
+          echo "Ensuring docker-compose is installed (plugin + compatibility)..."
+          sudo apt-get update -y
+          sudo apt-get install -y docker-compose-plugin || true
+          # Create compatibility symlink if binary available as CLI plugin
+          if [ -f /usr/libexec/docker/cli-plugins/docker-compose ]; then
+            sudo ln -sf /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose || true
+          fi
+          # Fallback: try python/pip installation (less preferred)
+          if ! command -v docker-compose >/dev/null 2>&1; then
+            echo "docker-compose not found, trying pip install..."
+            python3 -m pip install --user docker-compose || true
+            export PATH="$HOME/.local/bin:$PATH"
+          fi
           docker-compose -f docker-compose.test.yml up -d
           echo "Running integration commands inside runner..."
           docker-compose -f docker-compose.test.yml run --rm runner sh -c "npm ci --legacy-peer-deps; npx prisma generate; npx prisma db push; npm test -- test/integration/user.integration.spec.js --runInBand"

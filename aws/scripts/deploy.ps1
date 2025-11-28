@@ -10,8 +10,8 @@ param(
 )
 
 if (-not $DBPassword -and ($Apply -or $Plan)) {
-    $DBPassword = Read-Host "Enter database password" -AsSecureString
-    $DBPassword = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($DBPassword))
+    $securePwd = Read-Host "Enter database password" -AsSecureString
+    $DBPassword = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePwd))
 }
 
 $TERRAFORM_DIR = "aws/terraform"

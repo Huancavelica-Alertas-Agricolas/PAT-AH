@@ -15,11 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("../auth/auth.service");
+const users_client_1 = require("../users/users.client");
 const microservices_1 = require("@nestjs/microservices");
 const { firstValueFrom } = require('rxjs');
 let RestController = class RestController {
-    constructor(authService, weatherClient) {
+    constructor(authService, usersClient, weatherClient) {
         this.authService = authService;
+        this.usersClient = usersClient;
         this.weatherClient = weatherClient;
     }
     async login(body) {
@@ -40,6 +42,18 @@ let RestController = class RestController {
         if (!res)
             return { success: false, message: 'Could not create user' };
         return { success: true, user: res.user };
+    }
+
+    async listUsers() {
+        // Proxy to users microservice client; return empty array on error
+        try {
+            const users = await this.usersClient.findAll();
+            return users;
+        }
+        catch (e) {
+            this.logger && this.logger.error && this.logger.error('Error listing users', e);
+            return [];
+        }
     }
 
     async getWeather() {
@@ -81,6 +95,14 @@ __decorate([
 ], RestController.prototype, "createUser", null);
 
 __decorate([
+    (0, common_1.Get)('users'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], RestController.prototype, "listUsers", null);
+
+__decorate([
     (0, common_1.Get)('weather'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __metadata("design:type", Function),
@@ -102,7 +124,7 @@ __decorate([
 ], RestController.prototype, "getWeatherCurrent", null);
 exports.RestController = RestController = __decorate([
     (0, common_1.Controller)(),
-    __param(1, (0, common_1.Inject)('WEATHER_CLIENT')),
-    __metadata("design:paramtypes", [auth_service_1.AuthService, Object])
+    __param(2, (0, common_1.Inject)('WEATHER_CLIENT')),
+    __metadata("design:paramtypes", [auth_service_1.AuthService, users_client_1.UsersClient, Object])
 ], RestController);
 //# sourceMappingURL=rest.controller.js.map

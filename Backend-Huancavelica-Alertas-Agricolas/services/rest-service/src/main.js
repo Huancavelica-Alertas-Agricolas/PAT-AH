@@ -13,7 +13,9 @@ async function bootstrap() {
                 'http://localhost:3000',
                 'http://127.0.0.1:3000',
                 'http://localhost:5173',
-                'http://127.0.0.1:5173'
+                'http://127.0.0.1:5173',
+                'http://pat-ah-frontend-876253813400-b67b5fbe.s3-website-us-east-1.amazonaws.com',
+                'https://d3juc86eqmpfpd.cloudfront.net'
             ],
             methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
             allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
