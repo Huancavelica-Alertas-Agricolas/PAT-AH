@@ -31,6 +31,7 @@ Backend-Huancavelica-Alertas-Agricolas/services/**/trained-models/**
 
 # Allow committing a placeholder so Docker builds include empty trained-models folders for CI
 !Backend-Huancavelica-Alertas-Agricolas/services/ai-service/trained-models/.gitkeep
+!Backend-Huancavelica-Alertas-Agricolas/services/ai-service/trained-models/**
 
 # MLflow / MinIO / DB artifacts
 **/mlflow.db

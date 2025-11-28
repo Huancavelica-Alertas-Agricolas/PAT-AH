@@ -23,6 +23,7 @@
  trained-models/
 # Allow committing a placeholder file for CI
 !services/ai-service/trained-models/.gitkeep
+!services/ai-service/trained-models/**
  # Temporary
  *.tmp
  *.swp
