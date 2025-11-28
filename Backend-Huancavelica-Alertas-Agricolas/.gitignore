@@ -21,6 +21,8 @@
  # Uploaded or trained models
  uploads/
  trained-models/
+# Allow committing a placeholder file for CI
+!services/ai-service/trained-models/.gitkeep
  # Temporary
  *.tmp
  *.swp
