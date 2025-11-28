@@ -2,10 +2,14 @@ import { RefreshCw, Thermometer, Droplets, Wind, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, Button } from '../ui';
 import { useWeather } from '../../hooks/useWeather';
 import { useLanguage } from '../../context/LanguageContext';
+import { useState } from 'react';
+import { useToast } from '../../context/ToastContext';
 
 export const WeatherWidget = () => {
   const { language } = useLanguage();
   const { weatherData, isLoading, lastUpdated, refreshWeather } = useWeather();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const toast = useToast();
 
   const formatTime = (date: Date | null) => {
     if (!date) return '';
@@ -25,12 +29,32 @@ export const WeatherWidget = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={refreshWeather}
-            disabled={isLoading}
+            onClick={async () => {
+              if (isLoading || isRefreshing) return;
+              let id: string | undefined;
+              try {
+                setIsRefreshing(true);
+                id = toast.show({ message: language === 'en' ? 'Updating...' : 'Actualizando...', type: 'info', duration: 0 });
+                await refreshWeather();
+                if (id) {
+                  toast.update(id, { message: language === 'en' ? 'Updated' : 'Actualizado', type: 'success', duration: 2000 });
+                }
+              } catch (e) {
+                if (id) {
+                  toast.update(id, { message: language === 'en' ? 'Error updating' : 'Error al actualizar', type: 'error', duration: 4000 });
+                } else {
+                  toast.show({ message: language === 'en' ? 'Error updating' : 'Error al actualizar', type: 'error', duration: 4000 });
+                }
+              } finally {
+                setIsRefreshing(false);
+              }
+            }}
+            disabled={isLoading || isRefreshing}
             className="min-h-[44px] min-w-[44px] p-2"
             aria-label={language === 'qu' ? 'Clima kawsaykuna' : language === 'en' ? 'Update weather data' : 'Actualizar datos climáticos'}
+            aria-busy={isRefreshing}
           >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`inline-block h-4 w-4 ${isRefreshing ? 'animate-spin debug-spin' : ''}`} />
           </Button>
         </div>
         {lastUpdated && (
@@ -43,7 +67,7 @@ export const WeatherWidget = () => {
       <CardContent className="space-y-4">
         {isLoading && !weatherData ? (
           <div className="flex items-center justify-center py-8">
-            <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+            <RefreshCw className="inline-block h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         ) : weatherData ? (
           <>

@@ -20,3 +20,36 @@ prisma/dev.db
 *.zip
 *.tar
 
+# Backend runtime / local data
+Backend-Huancavelica-Alertas-Agricolas/services/dev/data/
+Backend-Huancavelica-Alertas-Agricolas/services/**/data/
+
+# Trained models, model weights and ML artifacts
+Backend-Huancavelica-Alertas-Agricolas/services/**/trained-models/
+Backend-Huancavelica-Alertas-Agricolas/services/**/trained-models/**
+**/trained-models/
+
+# Allow committing a placeholder so Docker builds include empty trained-models folders for CI
+!Backend-Huancavelica-Alertas-Agricolas/services/ai-service/trained-models/.gitkeep
+!Backend-Huancavelica-Alertas-Agricolas/services/ai-service/trained-models/**
+
+# MLflow / MinIO / DB artifacts
+**/mlflow.db
+**/weights.bin
+**/*.bin
+**/*.db
+
+# Script outputs and temporary files
+Backend-Huancavelica-Alertas-Agricolas/scripts/out/
+*.err
+*.out
+
+# Docker / compose local data
+**/data/
+
+
+# Ignore terraform artifacts
+aws/terraform/.terraform/
+aws/terraform/terraform.tfstate
+aws/terraform/terraform.tfstate.backup
+

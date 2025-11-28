@@ -956,6 +956,16 @@
     animation: var(--animate-spin);
   }
 
+/* Debug fallback: ensure the refresh icon spins even if Tailwind class isn't picked up */
+.debug-spin {
+  transform-origin: center;
+  animation: spin 1s linear infinite !important;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
   .cursor-default {
     cursor: default;
   }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Phone, Lock, Wifi, WifiOff } from 'lucide-react';
 import { Button, Input, Label, Checkbox, Card, CardContent, CardDescription, CardHeader, CardTitle, Alert, AlertDescription } from '../ui';
 import { AuthFormData } from '../../types';
+import { useAuth } from '../../hooks/useAuth';
 import { PHONE_PATTERN } from '../../utils/constants';
 
 interface LoginFormProps {
@@ -24,16 +25,26 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const [rememberDevice, setRememberDevice] = useState(false);
   const [allowNotifications, setAllowNotifications] = useState(true);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  // Hook de autenticación (debe llamarse en el nivel superior del componente)
+  const auth = useAuth();
   const [successMessage, setSuccessMessage] = useState<string>('');
 
   // Configurar usuario demo automáticamente (solo una vez)
   useEffect(() => {
-    const demoUser = localStorage.getItem('demoUser');
-    if (!demoUser) {
-      localStorage.setItem('demoUser', JSON.stringify({
-        telefono: '+51987654321',
-        contraseña: 'password123'
-      }));
+    // Crear datos demo solo si se habilita explícitamente mediante la variable de entorno
+    try {
+      const enableDemo = (import.meta.env.VITE_OFFLINE_DEMO as string) === 'true';
+      if (enableDemo) {
+        const demoUser = localStorage.getItem('demoUser');
+        if (!demoUser) {
+          localStorage.setItem('demoUser', JSON.stringify({
+            telefono: '+51987654321',
+            contraseña: 'password123'
+          }));
+        }
+      }
+    } catch (e) {
+      // import.meta may not be available in some test environments; ignore
     }
   }, []); // Array vacío para ejecutar solo una vez
 
@@ -68,65 +79,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
     setIsLoading(true);
     
     try {
-      const demoUserRaw = localStorage.getItem('demoUser');
-      if (demoUserRaw) {
-        const demoUser = JSON.parse(demoUserRaw);
-        if (
-          demoUser.telefono === formData.phone.trim() &&
-          demoUser.contraseña === formData.password.trim()
-        ) {
-          const newUser = {
-            id: 'user_' + Date.now(),
-            phone: formData.phone,
-            name: `Usuario ${formData.phone}`,
-            location: 'Huancavelica Centro',
-            isAuthenticated: true,
-            notifications: {
-              sms: true,
-              telegram: false,
-              email: false
-            }
-          };
-          localStorage.setItem('climaAlert_user', JSON.stringify(newUser));
-          setSuccessMessage('✅ ¡Acceso exitoso! Entrando al dashboard...');
-          setTimeout(() => {
-            setIsLoading(false);
-            onSuccess?.();
-          }, 1000);
-          return;
-        }
-      }
-      const predefinedUser = {
-        telefono: '+51999999999',
-        contraseña: 'admin123'
-      };
-
-      if (
-        formData.phone.trim() === predefinedUser.telefono &&
-        formData.password.trim() === predefinedUser.contraseña
-      ) {
-        const newUser = {
-          id: 'user_' + Date.now(),
-          phone: formData.phone,
-          name: `Usuario ${formData.phone}`,
-          location: 'Huancavelica Centro',
-          isAuthenticated: true,
-          notifications: {
-            sms: true,
-            telegram: false,
-            email: false
-          }
-        };
-        localStorage.setItem('climaAlert_user', JSON.stringify(newUser));
+      const result = await auth.login({ phone: formData.phone.trim(), password: formData.password.trim() });
+      if (result.success) {
         setSuccessMessage('✅ ¡Acceso exitoso! Entrando al dashboard...');
         setTimeout(() => {
           setIsLoading(false);
-          onSuccess?.();
-        }, 1000);
+          try {
+            onSuccess?.();
+          } catch (e) {
+            // Silencioso: navegación gestionada por el hook de autenticación
+            console.error('LoginForm: onSuccess handler threw', e);
+          }
+        }, 800);
         return;
       }
-      setGeneralError('Error de autenticación (demo)');
+      setGeneralError(result.error || 'Error de autenticación');
     } catch (error) {
+      console.error('LoginForm: error en handleSubmit', error);
       setGeneralError('Error inesperado. Intenta nuevamente.');
     } finally {
       setIsLoading(false);
