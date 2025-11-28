@@ -1,0 +1,47 @@
+{
+  "id": "m1",
+  "type": "multivariate-linear",
+  "features": ["f1", "f2"],
+  "coefficients": [1, 1, 0],
+  "metadata": {
+    "createdBy": "ci-auto",
+    "description": "Modelo de prueba m1 para CI",
+    "accuracy": 0.9
+  }
+}
+{
+  "id": "m1",
+  "name": "test_model_m1",
+  "type": "multivariate",
+  "features": ["f1", "f2"],
+  "target": "y",
+  "model": {
+    "coefficients": [1, 1, 0]
+  },
+  "metadata": {
+    "accuracy": 0.9,
+    "createdAt": "2025-11-27T00:00:00.000Z",
+    "lastTrained": "2025-11-27T00:00:00.000Z",
+    "trainingMetrics": {
+      "mse": 0,
+      "rmse": 0,
+      "r2": 1
+    }
+  }
+}
+{
+  "id": "m1",
+  "name": "m1",
+  "type": "multivariate",
+  "features": ["f1", "f2"],
+  "target": "y",
+  "model": {
+    "coefficients": [1, 2, 0]
+  },
+  "metadata": {
+    "accuracy": 0.9,
+    "createdAt": "2025-11-23T00:00:00.000Z",
+    "lastTrained": "2025-11-23T00:00:00.000Z",
+    "trainingMetrics": {"mse": 0.1, "rmse": 0.316}
+  }
+}
