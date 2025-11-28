@@ -2,7 +2,7 @@ name: CI/CD Build and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ dev ]
 
 jobs:
   build-and-deploy:
@@ -138,7 +138,7 @@ jobs:
   deploy-frontend:
     needs: build-and-deploy
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/dev'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

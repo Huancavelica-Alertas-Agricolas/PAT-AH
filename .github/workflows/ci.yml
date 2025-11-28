@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, circleci-project-setup ]
+    branches: [ dev, circleci-project-setup ]
   pull_request:
-    branches: [ main ]
+    branches: [ dev ]
 
 jobs:
   test:
