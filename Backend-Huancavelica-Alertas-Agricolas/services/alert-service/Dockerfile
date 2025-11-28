@@ -30,7 +30,8 @@ RUN apt-get update -y && apt-get install -y ca-certificates --no-install-recomme
 # Copy built app and production deps from builder
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/src ./src
+# If the source files aren't present in the builder stage (monorepo builds may omit them),
+# prefer running the compiled output from `dist`. Avoid copying `src` to prevent COPY errors.
 
 EXPOSE 3004
 CMD ["sh","-c","if [ -f dist/main.js ]; then node dist/main.js; else node src/main.js; fi"]
