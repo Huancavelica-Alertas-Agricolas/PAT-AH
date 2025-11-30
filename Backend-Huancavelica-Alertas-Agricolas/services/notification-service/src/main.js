@@ -22,14 +22,23 @@ async function bootstrap() {
   try {
     const http = require('http');
     const net = require('net');
-    // Prometheus metrics
-    let promClient;
+    // Prometheus metrics (require safely and call collectDefaultMetrics separately so that
+    // a failure in metrics collection doesn't disable the module entirely)
+    let promClient = null;
     try {
       promClient = require('prom-client');
-      promClient.collectDefaultMetrics?.();
     }
     catch (e) {
       promClient = null;
+    }
+    if (promClient) {
+      try {
+        promClient.collectDefaultMetrics && promClient.collectDefaultMetrics();
+      }
+      catch (e) {
+        // don't disable promClient if collection fails
+        console.warn('prom-client collectDefaultMetrics failed:', e?.message || e);
+      }
     }
     const queueGauge = promClient ? new promClient.Gauge({ name: 'notification_queue_length', help: 'Length of notification queue' }) : null;
     const healthPort = parseInt(process.env.HEALTH_PORT) || 3004;
