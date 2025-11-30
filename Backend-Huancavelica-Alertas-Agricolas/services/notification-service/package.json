@@ -14,6 +14,7 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "test": "jest --config jest.config.json",
+    "test:unit": "jest --config jest.config.json --runInBand",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage"
   },

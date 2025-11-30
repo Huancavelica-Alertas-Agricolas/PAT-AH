@@ -1,0 +1,9 @@
+{
+  "testEnvironment": "node",
+  "testRegex": ".*\\.spec\\.js$",
+  "rootDir": "src",
+  "collectCoverageFrom": [
+    "**/*.js"
+  ],
+  "coverageDirectory": "../coverage"
+}

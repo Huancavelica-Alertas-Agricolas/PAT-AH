@@ -47,9 +47,11 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
 const bcrypt = __importStar(require("bcryptjs"));
 const jwt = __importStar(require("jsonwebtoken"));
+const { firstValueFrom } = require('rxjs');
 let AuthService = class AuthService {
-    constructor(usersService) {
+    constructor(usersService, notificationClient) {
         this.usersService = usersService;
+        this.notificationClient = notificationClient;
     }
     async register(data) {
         const hashed = await bcrypt.hash(data.password, 10);
@@ -57,6 +59,21 @@ let AuthService = class AuthService {
             const user = await this.usersService.create({ ...data, password: hashed });
             const token = this.signToken(user.id);
             delete user.password;
+
+            // Intentar notificar al usuario con mensaje de bienvenida (no bloquear la respuesta)
+            try {
+                if (this.notificationClient && user && (user.email || user.telefono)) {
+                    const payload = { to: user.email || user.telefono, email: user.email, name: user.nombre };
+                    // Ejecutar en background: enviar petición y capturar error sin interrumpir registro
+                    const obs = this.notificationClient.send({ cmd: 'send_welcome_email' }, payload);
+                    // No await directamente, pero arrancar el observable y capturar errores
+                    (0, firstValueFrom)(obs).catch(e => console.error('Notification send error:', e && (e.stack || e.message || e)));
+                }
+            }
+            catch (e) {
+                console.error('Error intentando notificar welcome:', e && (e.stack || e.message || e));
+            }
+
             return { token, user };
         }
         catch (err) {
@@ -87,6 +104,7 @@ let AuthService = class AuthService {
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [users_service_1.UsersService])
+    __param(1, (0, common_1.Inject)('NOTIFICATION_SERVICE')),
+    __metadata("design:paramtypes", [users_service_1.UsersService, Object])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

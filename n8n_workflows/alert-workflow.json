@@ -1,0 +1,205 @@
+{
+  "name": "Alerta Clima - Agro (Ejemplo)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "webhook/clima-alerta",
+        "httpMethod": "POST",
+        "responseMode": "onReceived",
+        "responseData": "={{ { success: true, message: 'Webhook recibido' } }}"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 250]
+    },
+    {
+      "parameters": {
+        "values": {
+          "boolean": [],
+          "number": [],
+          "string": [
+            {
+              "name": "recipients",
+              "value": "={{ $json.recipients }}"
+            },
+            {
+              "name": "descripcion",
+              "value": "={{ $json.descripcion }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "SetPayload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [450, 250]
+    },
+    {
+      "parameters": {
+        "batchSize": 1
+      },
+      "name": "SplitInBatches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [650, 250]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "from": "={{ $credentials.twilio.accountSid ? $credentials.twilio.from : '' }}",
+        "to": "={{ $json["recipient"] || $json["to"] || $json["phone"] }}",
+        "text": "={{ $json.descripcion || $json.reportMessage || $json.message }}"
+      },
+      "name": "Twilio",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [850, 150],
+      "credentials": {
+        "twilioApi": {
+          "id": "TWILIO_PLACEHOLDER",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $credentials.smtp.user }}",
+        "toEmail": "={{ $json["recipient"] || $json["to"] || $json["email"] }}",
+        "subject": "={{ 'Alerta: ' + ($json.tipo || 'Clima') }}",
+        "text": "={{ $json.descripcion || $json.reportMessage || $json.message }}"
+      },
+      "name": "Send Email",
+      "type": "n8n-nodes-base.smtp",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "smtp": {
+          "id": "SMTP_PLACEHOLDER",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.telegram_chat_id || $json.chat_id || $json.telegramChannel }}",
+        "text": "={{ $json.descripcion || $json.reportMessage || $json.message }}"
+      },
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [850, 450],
+      "credentials": {
+        "telegramApi": {
+          "id": "TELEGRAM_PLACEHOLDER",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "public",
+        "table": "n8n_alert_logs",
+        "columns": "tipo, descripcion, recipients, created_at",
+        "values": "={{ [$json.tipo || 'clima', $json.descripcion || $json.reportMessage || $json.message, JSON.stringify($json.recipients || $json.recipient), new Date().toISOString()] }}"
+      },
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1050, 300],
+      "credentials": {
+        "postgres": {
+          "id": "POSTGRES_PLACEHOLDER",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "SetPayload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SetPayload": {
+      "main": [
+        [
+          {
+            "node": "SplitInBatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SplitInBatches": {
+      "main": [
+        [
+          {
+            "node": "Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {}
+}

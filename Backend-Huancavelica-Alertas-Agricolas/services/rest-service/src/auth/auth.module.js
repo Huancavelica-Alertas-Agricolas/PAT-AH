@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
+const { ClientsModule, Transport } = require('@nestjs/microservices');
 const auth_service_1 = require("./auth.service");
 const auth_resolver_1 = require("./auth.resolver");
 const users_module_1 = require("../users/users.module");
@@ -16,7 +17,20 @@ let AuthModule = class AuthModule {
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
-        imports: [users_module_1.UsersModule],
+        imports: [
+            users_module_1.UsersModule,
+            // Cliente TCP para comunicación con notification-service (welcome emails / sms)
+            ClientsModule.register([
+                {
+                    name: 'NOTIFICATION_SERVICE',
+                    transport: Transport.TCP,
+                    options: {
+                        host: process.env.NOTIFICATION_SERVICE_HOST || 'notification-service',
+                        port: parseInt(process.env.NOTIFICATION_SERVICE_PORT || String(process.env.NOTIFICATION_SERVICE_PORT || '3003'), 10) || 3003,
+                    },
+                },
+            ]),
+        ],
         providers: [auth_service_1.AuthService, auth_resolver_1.AuthResolver],
         exports: [auth_service_1.AuthService],
     })

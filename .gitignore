@@ -53,3 +53,12 @@ aws/terraform/.terraform/
 aws/terraform/terraform.tfstate
 aws/terraform/terraform.tfstate.backup
 
+# Repository cleanup: ignore generated outputs and local install/build logs
+**/*_output.txt
+**/npm-install-output.txt
+**/build-output.txt
+render_deploy_info.txt
+
+# Ignore frontend backups (kept in archive if needed)
+Frontend-Huancavelica-Alertas-Agricolas/src/backup/
+
