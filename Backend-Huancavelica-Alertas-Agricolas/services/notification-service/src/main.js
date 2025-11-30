@@ -22,6 +22,16 @@ async function bootstrap() {
   try {
     const http = require('http');
     const net = require('net');
+    // Prometheus metrics
+    let promClient;
+    try {
+      promClient = require('prom-client');
+      promClient.collectDefaultMetrics?.();
+    }
+    catch (e) {
+      promClient = null;
+    }
+    const queueGauge = promClient ? new promClient.Gauge({ name: 'notification_queue_length', help: 'Length of notification queue' }) : null;
     const healthPort = parseInt(process.env.HEALTH_PORT) || 3004;
     const parseUrlHostPort = (url) => {
       try {
@@ -50,6 +60,16 @@ async function bootstrap() {
     });
 
     const server = http.createServer(async (req, res) => {
+      if (req.url === '/metrics') {
+        if (!promClient) {
+          res.writeHead(404);
+          res.end('metrics not configured');
+          return;
+        }
+        res.writeHead(200, { 'Content-Type': promClient.register.contentType });
+        res.end(await promClient.register.metrics());
+        return;
+      }
       if (req.url === '/healthz') {
         const components = { service: 'notification-service' };
         let ok = true;
@@ -93,22 +113,20 @@ async function bootstrap() {
 
         // Queue check (Redis or RabbitMQ)
         try {
+          // Normalize components.queue to an object when configured
           if (process.env.REDIS_URL) {
+        components.queue = { status: 'unknown', len: null };
             // Prefer deeper Redis check if client library available
-            let redisOk = false;
             try {
               // Try ioredis first
               try {
                 const IORedis = require('ioredis');
                 const client = new IORedis(process.env.REDIS_URL, { connectTimeout: 1000 });
                 await client.ping();
-                redisOk = true;
+                components.queue.status = 'ok';
                 if (process.env.NOTIFICATION_QUEUE_NAME) {
                   const len = await client.llen(process.env.NOTIFICATION_QUEUE_NAME).catch(() => null);
-                  components.queue = len != null ? `ok (len:${len})` : 'ok';
-                }
-                else {
-                  components.queue = 'ok';
+                  components.queue.len = typeof len === 'number' ? len : null;
                 }
                 try { await client.quit(); } catch (_) { }
               }
@@ -118,13 +136,10 @@ async function bootstrap() {
                 const client = redis.createClient({ url: process.env.REDIS_URL });
                 await client.connect();
                 await client.ping();
-                redisOk = true;
+                components.queue.status = 'ok';
                 if (process.env.NOTIFICATION_QUEUE_NAME) {
                   const len = await client.llen(process.env.NOTIFICATION_QUEUE_NAME).catch(() => null);
-                  components.queue = len != null ? `ok (len:${len})` : 'ok';
-                }
-                else {
-                  components.queue = 'ok';
+                  components.queue.len = typeof len === 'number' ? len : null;
                 }
                 try { await client.disconnect(); } catch (_) { }
               }
@@ -133,14 +148,23 @@ async function bootstrap() {
               // Redis client not available or failed — fallback to TCP probe
             }
 
-            if (!components.queue) {
+                if (components.queue.status === 'unknown') {
               const r = parseUrlHostPort(process.env.REDIS_URL);
               const up = await tryConnect(r?.host, r?.port || 6379);
-              components.queue = up ? 'ok' : 'error';
+              components.queue.status = up ? 'ok' : 'error';
               if (!up) ok = false;
             }
+            // update prometheus gauge if available
+            try {
+              if (queueGauge) {
+                const lenVal = typeof components.queue.len === 'number' ? components.queue.len : 0;
+                queueGauge.set(lenVal);
+              }
+            }
+            catch (e) { }
           }
           else if (process.env.RABBITMQ_URL) {
+            components.queue = { status: 'unknown', len: null };
             // Prefer amqplib check if available
             try {
               const amqp = require('amqplib');
@@ -149,15 +173,16 @@ async function bootstrap() {
               if (process.env.NOTIFICATION_QUEUE_NAME) {
                 try {
                   const info = await ch.checkQueue(process.env.NOTIFICATION_QUEUE_NAME);
-                  components.queue = `ok (messages:${info.messageCount || 0})`;
+                  components.queue.status = 'ok';
+                  components.queue.len = typeof info?.messageCount === 'number' ? info.messageCount : null;
                 }
                 catch (e) {
                   // queue might not exist or check failed
-                  components.queue = 'ok';
+                  components.queue.status = 'ok';
                 }
               }
               else {
-                components.queue = 'ok';
+                components.queue.status = 'ok';
               }
               try { await ch.close(); } catch (_) { }
               try { await conn.close(); } catch (_) { }
@@ -166,16 +191,16 @@ async function bootstrap() {
               // amqplib not present or failed — fallback to TCP probe
               const r = parseUrlHostPort(process.env.RABBITMQ_URL);
               const up = await tryConnect(r?.host, r?.port || 5672);
-              components.queue = up ? 'ok' : 'error';
+              components.queue.status = up ? 'ok' : 'error';
               if (!up) ok = false;
             }
           }
           else {
-            components.queue = 'not-configured';
+            components.queue = { status: 'not-configured', len: null };
           }
         }
         catch (e) {
-          components.queue = 'error';
+          components.queue = { status: 'error', len: null };
           ok = false;
         }
 
