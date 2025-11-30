@@ -250,9 +250,9 @@ jobs:
           docker build -t pat-ah/weather-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/weather-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/weather-service || true
           docker build -t pat-ah/frontend:ci -f Frontend-Huancavelica-Alertas-Agricolas/Dockerfile Frontend-Huancavelica-Alertas-Agricolas || true
 
-      - name: Scan built Docker images with Trivy (rest-service)
+      - name: Scan built Docker image with Trivy (rest-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0.13.0
+        uses: aquasecurity/trivy-action@v0
         with:
           image-ref: pat-ah/rest-service:ci
           format: json
@@ -315,7 +315,7 @@ jobs:
       # --- Trivy scan + analysis for ai-service ---
       - name: Scan built Docker image with Trivy (ai-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0.13.0
+        uses: aquasecurity/trivy-action@v0
         with:
           image-ref: pat-ah/ai-service:ci
           format: json
@@ -378,7 +378,7 @@ jobs:
       # --- Trivy scan + analysis for weather-service ---
       - name: Scan built Docker image with Trivy (weather-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0.13.0
+        uses: aquasecurity/trivy-action@v0
         with:
           image-ref: pat-ah/weather-service:ci
           format: json
@@ -441,7 +441,7 @@ jobs:
       # --- Trivy scan + analysis for frontend ---
       - name: Scan built Docker image with Trivy (frontend)
         if: always()
-        uses: aquasecurity/trivy-action@v0.13.0
+        uses: aquasecurity/trivy-action@v0
         with:
           image-ref: pat-ah/frontend:ci
           format: json
@@ -504,7 +504,7 @@ jobs:
       # --- Trivy scan + analysis for ingest-service ---
       - name: Scan built Docker image with Trivy (ingest-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0.13.0
+        uses: aquasecurity/trivy-action@v0
         with:
           image-ref: pat-ah/ingest-service:ci
           format: json
@@ -567,7 +567,7 @@ jobs:
       # --- Trivy scan + analysis for notification-service ---
       - name: Scan built Docker image with Trivy (notification-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0.13.0
+        uses: aquasecurity/trivy-action@v0
         with:
           image-ref: pat-ah/notification-service:ci
           format: json
@@ -630,7 +630,7 @@ jobs:
       # --- Trivy scan + analysis for auth-service ---
       - name: Scan built Docker image with Trivy (auth-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0.13.0
+        uses: aquasecurity/trivy-action@v0
         with:
           image-ref: pat-ah/auth-service:ci
           format: json
@@ -693,7 +693,7 @@ jobs:
       # --- Trivy scan + analysis for users-service ---
       - name: Scan built Docker image with Trivy (users-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0.13.0
+        uses: aquasecurity/trivy-action@v0
         with:
           image-ref: pat-ah/users-service:ci
           format: json
