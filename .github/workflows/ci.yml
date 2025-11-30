@@ -252,13 +252,9 @@ jobs:
 
       - name: Scan built Docker image with Trivy (rest-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0
-        with:
-          image-ref: pat-ah/rest-service:ci
-          format: json
-          output: trivy-rest-service.json
-          severity: CRITICAL,HIGH
-        continue-on-error: true
+        run: |
+          echo "Scanning pat-ah/rest-service:ci with Trivy (docker image)..."
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-rest-service.json --severity CRITICAL,HIGH pat-ah/rest-service:ci || true
 
       - name: Upload trivy report (rest-service)
         if: always()
@@ -315,13 +311,9 @@ jobs:
       # --- Trivy scan + analysis for ai-service ---
       - name: Scan built Docker image with Trivy (ai-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0
-        with:
-          image-ref: pat-ah/ai-service:ci
-          format: json
-          output: trivy-ai-service.json
-          severity: CRITICAL,HIGH
-        continue-on-error: true
+        run: |
+          echo "Scanning pat-ah/ai-service:ci with Trivy (docker image)..."
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-ai-service.json --severity CRITICAL,HIGH pat-ah/ai-service:ci || true
 
       - name: Upload trivy report (ai-service)
         if: always()
@@ -378,13 +370,9 @@ jobs:
       # --- Trivy scan + analysis for weather-service ---
       - name: Scan built Docker image with Trivy (weather-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0
-        with:
-          image-ref: pat-ah/weather-service:ci
-          format: json
-          output: trivy-weather-service.json
-          severity: CRITICAL,HIGH
-        continue-on-error: true
+        run: |
+          echo "Scanning pat-ah/weather-service:ci with Trivy (docker image)..."
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-weather-service.json --severity CRITICAL,HIGH pat-ah/weather-service:ci || true
 
       - name: Upload trivy report (weather-service)
         if: always()
@@ -441,13 +429,9 @@ jobs:
       # --- Trivy scan + analysis for frontend ---
       - name: Scan built Docker image with Trivy (frontend)
         if: always()
-        uses: aquasecurity/trivy-action@v0
-        with:
-          image-ref: pat-ah/frontend:ci
-          format: json
-          output: trivy-frontend.json
-          severity: CRITICAL,HIGH
-        continue-on-error: true
+        run: |
+          echo "Scanning pat-ah/frontend:ci with Trivy (docker image)..."
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-frontend.json --severity CRITICAL,HIGH pat-ah/frontend:ci || true
 
       - name: Upload trivy report (frontend)
         if: always()
@@ -504,13 +488,9 @@ jobs:
       # --- Trivy scan + analysis for ingest-service ---
       - name: Scan built Docker image with Trivy (ingest-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0
-        with:
-          image-ref: pat-ah/ingest-service:ci
-          format: json
-          output: trivy-ingest-service.json
-          severity: CRITICAL,HIGH
-        continue-on-error: true
+        run: |
+          echo "Scanning pat-ah/ingest-service:ci with Trivy (docker image)..."
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-ingest-service.json --severity CRITICAL,HIGH pat-ah/ingest-service:ci || true
 
       - name: Upload trivy report (ingest-service)
         if: always()
@@ -567,13 +547,9 @@ jobs:
       # --- Trivy scan + analysis for notification-service ---
       - name: Scan built Docker image with Trivy (notification-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0
-        with:
-          image-ref: pat-ah/notification-service:ci
-          format: json
-          output: trivy-notification-service.json
-          severity: CRITICAL,HIGH
-        continue-on-error: true
+        run: |
+          echo "Scanning pat-ah/notification-service:ci with Trivy (docker image)..."
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-notification-service.json --severity CRITICAL,HIGH pat-ah/notification-service:ci || true
 
       - name: Upload trivy report (notification-service)
         if: always()
@@ -630,13 +606,9 @@ jobs:
       # --- Trivy scan + analysis for auth-service ---
       - name: Scan built Docker image with Trivy (auth-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0
-        with:
-          image-ref: pat-ah/auth-service:ci
-          format: json
-          output: trivy-auth-service.json
-          severity: CRITICAL,HIGH
-        continue-on-error: true
+        run: |
+          echo "Scanning pat-ah/auth-service:ci with Trivy (docker image)..."
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-auth-service.json --severity CRITICAL,HIGH pat-ah/auth-service:ci || true
 
       - name: Upload trivy report (auth-service)
         if: always()
@@ -693,13 +665,9 @@ jobs:
       # --- Trivy scan + analysis for users-service ---
       - name: Scan built Docker image with Trivy (users-service)
         if: always()
-        uses: aquasecurity/trivy-action@v0
-        with:
-          image-ref: pat-ah/users-service:ci
-          format: json
-          output: trivy-users-service.json
-          severity: CRITICAL,HIGH
-        continue-on-error: true
+        run: |
+          echo "Scanning pat-ah/users-service:ci with Trivy (docker image)..."
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-users-service.json --severity CRITICAL,HIGH pat-ah/users-service:ci || true
 
       - name: Upload trivy report (users-service)
         if: always()
