@@ -1,5 +1,5 @@
 import { useAuth } from '../../hooks/useAuth';
-import { Button } from '../ui/button';
+import { Button } from '../ui';
 import { useState } from 'react';
 
 export const UserProfile = () => {

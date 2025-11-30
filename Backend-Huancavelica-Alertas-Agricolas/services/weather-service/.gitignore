@@ -1,0 +1,5 @@
+# Local ignore for weather-service
+node_modules/
+dist/
+coverage/
+*.log

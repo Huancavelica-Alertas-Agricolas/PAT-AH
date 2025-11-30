@@ -1,0 +1,34 @@
+ # Node
+ node_modules/
+ # Logs
+ *.log
+ npm-debug.log*
+ yarn-debug.log*
+ yarn-error.log*
+ # Build
+ dist/
+ build/
+ coverage/
+ # Env files
+ .env
+ .env.local
+ # OS
+ .DS_Store
+ Thumbs.db
+ # Archives and backups
+ *.zip
+ backups/
+ # Uploaded or trained models
+ uploads/
+ trained-models/
+# Allow committing a placeholder file for CI
+!services/ai-service/trained-models/.gitkeep
+!services/ai-service/trained-models/**
+# Explicitly allow ai-service trained-models by absolute path (avoid nested gitignore override)
+!/Backend-Huancavelica-Alertas-Agricolas/services/ai-service/trained-models/
+!/Backend-Huancavelica-Alertas-Agricolas/services/ai-service/trained-models/**
+ # Temporary
+ *.tmp
+ *.swp
+ # Editor
+ .vscode/

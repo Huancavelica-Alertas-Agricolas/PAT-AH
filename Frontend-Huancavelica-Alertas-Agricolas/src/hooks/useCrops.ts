@@ -53,33 +53,38 @@ export const useCrops = () => {
           updatedAt: new Date(crop.updatedAt)
         }));
       }
-      // Si no hay cultivos, siempre poner demo
+      // Si no hay cultivos, solo rellenar demo cuando VITE_OFFLINE_DEMO está explícitamente habilitado
       if (!parsedCrops || parsedCrops.length === 0) {
-        parsedCrops = [
-          {
-            id: '1',
-            name: 'Papa Blanca Lote Norte',
-            type: 'papa',
-            area: 2.5,
-            location: 'Sector Alto Verde',
-            plantingDate: new Date('2025-03-15'),
-            harvestDate: new Date('2025-08-15'),
-            createdAt: new Date('2025-03-01'),
-            updatedAt: new Date('2025-03-01')
-          },
-          {
-            id: '2',
-            name: 'Maíz Amarillo Lote Sur',
-            type: 'maiz',
-            area: 1.8,
-            location: 'Sector Bajo Verde',
-            plantingDate: new Date('2025-04-01'),
-            harvestDate: new Date('2025-09-01'),
-            createdAt: new Date('2025-03-20'),
-            updatedAt: new Date('2025-03-20')
-          }
-        ];
-        localStorage.setItem('crops', JSON.stringify(parsedCrops));
+        const OFFLINE_DEMO = (import.meta.env.VITE_OFFLINE_DEMO as string) === 'true';
+        if (OFFLINE_DEMO) {
+          parsedCrops = [
+            {
+              id: '1',
+              name: 'Papa Blanca Lote Norte',
+              type: 'papa',
+              area: 2.5,
+              location: 'Sector Alto Verde',
+              plantingDate: new Date('2025-03-15'),
+              harvestDate: new Date('2025-08-15'),
+              createdAt: new Date('2025-03-01'),
+              updatedAt: new Date('2025-03-01')
+            },
+            {
+              id: '2',
+              name: 'Maíz Amarillo Lote Sur',
+              type: 'maiz',
+              area: 1.8,
+              location: 'Sector Bajo Verde',
+              plantingDate: new Date('2025-04-01'),
+              harvestDate: new Date('2025-09-01'),
+              createdAt: new Date('2025-03-20'),
+              updatedAt: new Date('2025-03-20')
+            }
+          ];
+          localStorage.setItem('crops', JSON.stringify(parsedCrops));
+        } else {
+          parsedCrops = [];
+        }
       }
       setCrops(parsedCrops);
     } catch (error) {

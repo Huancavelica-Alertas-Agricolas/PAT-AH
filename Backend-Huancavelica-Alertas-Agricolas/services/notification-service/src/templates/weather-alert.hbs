@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang='es'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Alerta Climática</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+      .header {
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #4CAF50;
+      }
+      .header h1 {
+        color: #4CAF50;
+        margin: 0;
+      }
+      .alert-icon {
+        font-size: 48px;
+        color: #FF9800;
+        margin-bottom: 10px;
+      }
+      .content {
+        line-height: 1.6;
+        padding: 20px 0;
+      }
+      .alert-box {
+        background-color: #FFF3CD;
+        border: 1px solid #FFEAA7;
+        border-radius: 5px;
+        padding: 15px;
+        margin: 15px 0;
+      }
+      .footer {
+        border-top: 1px solid #ddd;
+        padding-top: 20px;
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <div class='alert-icon'>🌦️</div>
+        <h1>Alerta Climática</h1>
+        <p>Sistema Agro-Alertas</p>
+      </div>
+      <div class='content'>
+        <p>Estimado/a <strong>{{name}}</strong>,</p>
+        <p>Se ha generado un nuevo reporte climático para tu región el <strong>{{date}}</strong>. Te mantenemos informado sobre las condiciones meteorológicas que podrían afectar tus cultivos.</p>
+        
+        <div class='alert-box'>
+          <h3>📊 Estado del Reporte:</h3>
+          <p>{{reportMessage}}</p>
+        </div>
+
+        <p><strong>Recomendaciones:</strong></p>
+        <ul>
+          <li>Revisa el archivo de reporte generado para obtener detalles específicos</li>
+          <li>Considera las condiciones de riesgo de helada y sequía identificadas</li>
+          <li>Planifica las actividades agrícolas según las condiciones previstas</li>
+        </ul>
+
+        <p>Este reporte incluye información sobre:</p>
+        <ul>
+          <li>🌡️ Temperatura y humedad</li>
+          <li>🌧️ Probabilidad de lluvia y precipitación</li>
+          <li>❄️ Riesgo de heladas</li>
+          <li>🌵 Riesgo de sequía</li>
+        </ul>
+      </div>
+      <div class='footer'>
+        <p>Sistema Agro-Alertas - Cuidando tu cosecha<br>
+        Este es un mensaje automático, no responder a este correo.</p>
+      </div>
+    </div>
+  </body>
+</html>

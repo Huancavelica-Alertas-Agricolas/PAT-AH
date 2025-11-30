@@ -49,7 +49,9 @@ export const RegistrationForm: React.FC = () => {
     }
 
     // Si estamos online, intentamos crear el usuario en el backend
-    const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000/api';
+    const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3003/api';
+    const OFFLINE_DEMO = (import.meta.env.VITE_OFFLINE_DEMO as string) === 'true';
+
     if (typeof window !== 'undefined' && window.navigator?.onLine) {
       try {
         const payload = {
@@ -70,25 +72,19 @@ export const RegistrationForm: React.FC = () => {
         }
         setSubmitError(resp?.data?.message || 'Error al registrar en el servidor');
       } catch (err: any) {
-        console.warn('Registro API falló, guardando demo localmente:', err?.message || err);
-        setSubmitError('Error al conectar con el servidor. Intenta nuevamente o use modo offline.');
+        console.warn('Registro API falló — servidor inaccesible:', err?.message || err);
+        if (OFFLINE_DEMO) {
+          setSubmitError('Error al conectar con el servidor. Para pruebas locales, habilita `VITE_OFFLINE_DEMO=true` en tu archivo `.env.local`.');
+        } else {
+          setSubmitError('Error al conectar con el servidor. Intenta nuevamente más tarde.');
+        }
       } finally {
         setSubmitting(false);
       }
     } else {
-      // DEMO offline: Guarda los datos en localStorage para pruebas locales
-      try {
-        localStorage.setItem('demoUser', JSON.stringify({ telefono: form.telefono, contraseña: form.contraseña }));
-        setSubmitSuccess(true);
-        setTimeout(() => {
-          setSubmitSuccess(false);
-          window.location.href = '/login';
-        }, 2500);
-      } catch (err: any) {
-        setSubmitError('Error al registrar. Intente nuevamente.');
-      } finally {
-        setSubmitting(false);
-      }
+      // Offline path: do not auto-save demo credentials in production builds.
+      setSubmitError('Sin conexión: no se pudo contactar con el servidor. Intente más tarde.');
+      setSubmitting(false);
     }
   };
 

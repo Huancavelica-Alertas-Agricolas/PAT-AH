@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { User, AuthFormData, ConsentData } from '../types';
 
 const STORAGE_KEY = 'climaAlert_user';
@@ -8,13 +9,18 @@ const STORAGE_KEY = 'climaAlert_user';
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Cargar usuario desde localStorage al inicializar
     const savedUser = localStorage.getItem(STORAGE_KEY);
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        const u = JSON.parse(savedUser);
+        setUser(u);
+        // Si existe token en storage, configure axios header
+        const t = localStorage.getItem('climaAlert_token');
+        if (t) axios.defaults.headers.common['Authorization'] = `Bearer ${t}`;
       } catch (error) {
         console.error('Error parsing saved user:', error);
         localStorage.removeItem(STORAGE_KEY);
@@ -23,12 +29,37 @@ export const useAuth = () => {
     setIsLoading(false);
   }, []);
 
+  // Añadir interceptor para manejar 401 globalmente
+  useEffect(() => {
+    const id = axios.interceptors.response.use(
+      (resp) => resp,
+      (error) => {
+        if (error?.response?.status === 401) {
+          // limpiar estado y redirigir al login
+          try {
+            localStorage.removeItem('climaAlert_token');
+            localStorage.removeItem(STORAGE_KEY);
+            setUser(null);
+          } catch (e) {
+            // noop
+          }
+          navigate('/login');
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(id);
+    };
+  }, [navigate]);
+
   const login = async (formData: AuthFormData): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     // Si estamos online, intentar login contra API Gateway
     try {
       if (typeof window !== 'undefined' && window.navigator?.onLine) {
-        const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000/api';
+        const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3003/api';
         const resp = await axios.post(`${API_BASE}/auth/login`, {
           phone: formData.phone,
           password: formData.password,
@@ -36,11 +67,31 @@ export const useAuth = () => {
 
         if (resp?.data?.success) {
           const { token, user } = resp.data;
-          // Guardar token y usuario
-          localStorage.setItem('climaAlert_token', token);
-          setUser(user);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+          try {
+            localStorage.setItem('climaAlert_token', token);
+          } catch (e) {
+            console.error('useAuth: error saving token to localStorage', e);
+          }
+          try {
+            const authenticatedUser = { ...user, isAuthenticated: true };
+            setUser(authenticatedUser as any);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(authenticatedUser));
+          } catch (e) {
+            console.error('useAuth: error saving user to localStorage', e);
+          }
+          // Establecer header global de axios
+          try {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          } catch (e) {
+            // noop
+          }
           setIsLoading(false);
+          // Navegar al dashboard centralmente desde el hook
+          try {
+            navigate('/dashboard');
+          } catch (e) {
+            // noop: si no hay router, no navegar
+          }
           return { success: true };
         }
         // si hay un mensaje de error del servidor, devolverlo
@@ -50,47 +101,11 @@ export const useAuth = () => {
         }
       }
     } catch (err: any) {
-      // No bloqueante: si falla la llamada al backend, caer al modo demo
-      console.warn('API login failed, falling back to demo login:', err?.message || err);
-    }
-
-    // Validación DEMO: compara con datos guardados en registro
-    const demoUserRaw = localStorage.getItem('demoUser');
-    if (demoUserRaw) {
-      try {
-        const demoUser = JSON.parse(demoUserRaw);
-        if (
-          demoUser.telefono === formData.phone &&
-          demoUser.contraseña === formData.password
-        ) {
-          const newUser: User = {
-            id: 'user_' + Date.now(),
-            phone: formData.phone,
-            name: `Usuario ${formData.phone}`,
-            location: 'Huancavelica Centro',
-            isAuthenticated: true,
-            notifications: {
-              sms: true,
-              telegram: false,
-              email: false
-            }
-          };
-          setUser(newUser);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
-          localStorage.removeItem('climaAlert_token');
-          setIsLoading(false);
-          return { success: true };
-        } else {
-          setIsLoading(false);
-          return { success: false, error: 'Teléfono o contraseña incorrectos.' };
-        }
-      } catch (e) {
-        setIsLoading(false);
-        return { success: false, error: 'Error de datos de usuario demo.' };
-      }
+      // No bloqueante: si falla la llamada al backend, registrar y retornar error neutral
+      console.warn('API login failed — server may be unreachable:', err?.message || err);
     }
     setIsLoading(false);
-    return { success: false, error: 'No existe usuario registrado. Regístrese primero.' };
+    return { success: false, error: 'Error de autenticación. Verifica tus credenciales e intenta nuevamente.' };
   };
 
   const logout = () => {

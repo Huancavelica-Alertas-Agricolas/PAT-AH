@@ -1,6 +1,5 @@
 import { AlertTriangle, Sprout, Lightbulb, BarChart3 } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Card, CardContent } from '../ui/card';
+import { Button, Card, CardContent } from '../ui';
 import { useLanguage } from '../../context/LanguageContext';
 
 interface QuickActionsProps {

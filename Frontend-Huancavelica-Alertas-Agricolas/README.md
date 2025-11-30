@@ -1,3 +1,68 @@
+# Frontend — Huancavelica Alertas Agrícolas
+
+Breve guía de buenas prácticas, configuración y comandos comunes para el frontend (React + Vite + TypeScript).
+
+## Resumen
+- Stack: `React`, `Vite`, `TypeScript`, `axios`.
+- Objetivo: aplicación SPA que consume la API REST gateway (`rest-service`) y muestra el dashboard.
+
+## Requisitos locales
+- Node.js LTS (ej. 18/20), npm o yarn
+- Git
+- Acceso al backend (local via Docker Compose o URL remota)
+
+## Variables de entorno
+- `VITE_API_URL` — URL base del gateway REST (p. ej. `http://localhost:3003/api`).
+Guarda variables en `.env` (no comitear `.env` en git).
+
+## Comandos comunes
+- Instalar dependencias:
+  - `npm install`
+- Ejecutar en modo desarrollo:
+  - `npm run dev`
+- Construir para producción:
+  - `npm run build`
+- Servir build localmente (ver scripts o usar `serve`):
+  - `npx serve dist`
+- Tests (si existen):
+  - `npm test`
+
+## Buenas prácticas de desarrollo
+- Mantener tipos estrictos en TypeScript y evitar `any` salvo casos controlados.
+- Separar lógica de hooks (p. ej. `useAuth`, `useWeather`) y componentes UI.
+- Manejar errores de red con reintentos limitados y mostrar mensajes útiles al usuario.
+- Centralizar la configuración de axios (instancia con interceptores para `Authorization` y 401).
+- Evitar side-effects en componentes; preferir hooks `useEffect` con dependencias estables y `useCallback`/`useMemo` para memorizar.
+- Evitar polución del global scope (no instalar scripts externos no confiables). Si hay scripts de terceros, aislar y envolver llamadas en try/catch.
+
+## Seguridad
+- Nunca almacenar tokens sensibles en localStorage si puedes usar cookies `HttpOnly`.
+- Escapar y sanitizar cualquier contenido dinámico mostrado.
+- Revisar CORS y políticas de Content-Security-Policy en producción.
+
+## Test y CI
+- Agregar pruebas unitarias y e2e (Playwright o Cypress) para las rutas críticas: registro/login y flujo dashboard.
+- Incluir linters y formatter (ESLint + Prettier) en CI.
+
+## Observabilidad y debugging
+- Añadir logging de cliente para errores importantes (ej. Sentry) con sampling apropiado.
+- Herramientas devtools: Network tab para chequear llamadas a `VITE_API_URL` y auth headers.
+
+## Docker / Docker Compose (dev)
+- En local suele usarse `docker compose` desde el repo raíz para levantar backend y DB.
+- Asegurar que `VITE_API_URL` apunte al gateway cuando se pruebe con contenedores.
+
+## Checklist antes de PR
+- Ejecutar linter y tests localmente.
+- Comprobar que no se comitean secretos.
+- Añadir changelog / descripción clara del cambio.
+
+## Contribuir
+- Abrir un issue para discutir características grandes.
+- Crear un branch con prefijo `feat/`, `fix/`, `chore/` y enviar PR con descripción y pasos para probar.
+
+---
+Archivo generado automáticamente con prácticas recomendadas. Adáptalo a convenciones del equipo.
 # Plataforma de Alertas Tempranas para Agricultores de Huancavelica
 
 ## Descripción

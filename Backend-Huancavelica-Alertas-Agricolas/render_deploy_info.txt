@@ -1,0 +1,81 @@
+SERVICIOS BACKEND - CONFIGURACION PARA RENDER
+
+SERVICIO: ai-service
+Name: PAT-AH-ai-service
+Branch: main
+Root Directory: Backend-Huancavelica-Alertas-Agricolas/services/ai-service
+Dockerfile Path: Backend-Huancavelica-Alertas-Agricolas/services/ai-service/Dockerfile
+Build Context: .
+Port Name: PORT
+Port: 3000
+Health Check Path: /healthz
+Env vars:
+NODE_ENV=production
+PORT=3000
+MODEL_DIR=/app/trained-models
+UPLOADS_DIR=/app/uploads
+
+SERVICIO: auth-service
+Name: PAT-AH-auth-service
+Branch: main
+Root Directory: Backend-Huancavelica-Alertas-Agricolas/services/auth-service
+Dockerfile Path: Backend-Huancavelica-Alertas-Agricolas/services/auth-service/Dockerfile
+Build Context: .
+Port Name: PORT
+Port: 3001
+Health Check Path: /healthz
+Env vars:
+NODE_ENV=production
+PORT=3001
+DATABASE_URL=YOUR_DATABASE_URL
+JWT_SECRET=YOUR_JWT_SECRET
+
+SERVICIO: ingest-service
+Name: PAT-AH-ingest-service
+Branch: main
+Root Directory: Backend-Huancavelica-Alertas-Agricolas/services/ingest-service
+Dockerfile Path: Backend-Huancavelica-Alertas-Agricolas/services/ingest-service/Dockerfile
+Build Context: .
+Port Name: PORT
+Port: 3002
+Health Check Path: /healthz
+Env vars:
+NODE_ENV=production
+PORT=3002
+STORAGE_PATH=/app/uploads
+
+SERVICIO: rest-service
+Name: PAT-AH-rest-service
+Branch: main
+Root Directory: Backend-Huancavelica-Alertas-Agricolas/services/rest-service
+Dockerfile Path: Backend-Huancavelica-Alertas-Agricolas/services/rest-service/Dockerfile
+Build Context: .
+Port Name: PORT
+Port: 3003
+Health Check Path: /healthz
+Env vars:
+NODE_ENV=production
+PORT=3003
+DATABASE_URL=YOUR_DATABASE_URL
+JWT_SECRET=YOUR_JWT_SECRET
+
+SERVICIO: users-service
+Name: PAT-AH-users-service
+Branch: main
+Root Directory: Backend-Huancavelica-Alertas-Agricolas/services/users-service
+Dockerfile Path: Backend-Huancavelica-Alertas-Agricolas/services/users-service/Dockerfile
+Build Context: .
+Port Name: PORT
+Port: 3004
+Health Check Path: /healthz
+Env vars:
+NODE_ENV=production
+PORT=3004
+DATABASE_URL=YOUR_DATABASE_URL
+
+NOTAS
+- Si fijas Root Directory en Render usa Dockerfile Path como "Dockerfile" y Build Context ".".
+- Si no fijas Root Directory, pega la ruta completa del Dockerfile en Dockerfile Path y usa como Build Context la carpeta del servicio.
+- Reemplaza las variables YOUR_DATABASE_URL y YOUR_JWT_SECRET por tus valores reales antes del deploy.
+--
+Archivo generado para pegar en la UI de Render o mantener en el repositorio sin formateo adicional.

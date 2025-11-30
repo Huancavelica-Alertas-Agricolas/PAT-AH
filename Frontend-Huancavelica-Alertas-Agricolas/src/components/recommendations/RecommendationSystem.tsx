@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Lightbulb, AlertTriangle, CheckCircle, Clock, Sprout, Droplets, Thermometer, Wind } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle, Badge, Tabs, TabsContent, TabsList, TabsTrigger, Button } from '../ui';
 import { useRecommendations } from '../../hooks/useRecommendations';
 import { useCrops } from '../../hooks/useCrops';
 import { useAlerts } from '../../hooks/useAlerts';

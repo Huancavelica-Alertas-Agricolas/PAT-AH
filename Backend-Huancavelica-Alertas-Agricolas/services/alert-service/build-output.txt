@@ -1,0 +1,4 @@
+﻿
+> alert-service@1.0.0 build
+> nest build && node -e "const fs=require('fs'); if(!fs.existsSync('dist/main.js') && fs.existsSync('src/main.js')) { fs.mkdirSync('dist', { recursive: true }); fs.cpSync('src','dist',{ recursive: true }); }"
+

@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: pat_ah
+      POSTGRES_USER: pat
+      POSTGRES_PASSWORD: pat
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+
+  redis:
+    image: redis:7
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  users-service:
+    build:
+      context: ./services/users-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
+    ports:
+      - "3005:3002"
+    depends_on:
+      - db
+
+  rest-service:
+    build:
+      context: ./services/rest-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
+      WEATHER_HOST: weather-service
+      WEATHER_PORT: '3002'
+    ports:
+      - "3003:3003"
+    depends_on:
+      - db
+
+  ai-service:
+    build:
+      context: ./services/ai-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
+    ports:
+      - "3004:3003"
+    depends_on:
+      - db
+
+  ingest-service:
+    build:
+      context: ./services/ingest-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
+    command: ["sh","-c","node src/index.js"]
+    depends_on:
+      - db
+
+  alert-service:
+    build:
+      context: ./services/alert-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
+    ports:
+      - "3007:3001"
+    depends_on:
+      - db
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    environment:
+      REDIS_URL: redis://redis:6379
+      NOTIFICATION_QUEUE_NAME: notifications
+      METRICS_PORT: '9400'
+      METRICS_BIND_ADDR: '0.0.0.0'
+    ports:
+      - "3008:3003"
+      - "3009:3004"
+      - "9410:9400"
+
+  weather-service:
+    build:
+      context: ./services/weather-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
+    ports:
+      - "3006:3002"
+      - "3010:3005"
+    depends_on:
+      - db
+
+volumes:
+  db-data:
+  redis-data:

@@ -1,0 +1,56 @@
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: rest_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d rest_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - pgtest:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  rest-service:
+    build: .
+    environment:
+      DATABASE_URL: "postgresql://test:test@postgres:5432/rest_test"
+      REDIS_URL: "redis://redis:6379"
+      NODE_ENV: test
+    ports:
+      - "3003:3003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  runner:
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./:/app:rw
+    depends_on:
+      - rest-service
+    environment:
+      DATABASE_URL: "postgresql://test:test@postgres:5432/rest_test"
+      REDIS_URL: "redis://redis:6379"
+    entrypoint: ["sh", "-c"]
+    command: |
+      "npm ci --legacy-peer-deps --no-audit || true && npx prisma generate --schema=./prisma/schema.prisma || true && npm test -- --runInBand"
+
+volumes:
+  pgtest: {}
