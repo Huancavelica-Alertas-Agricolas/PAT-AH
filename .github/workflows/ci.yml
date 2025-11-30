@@ -159,6 +159,77 @@ jobs:
             Backend-Huancavelica-Alertas-Agricolas/services/rest-service/jest.config.json
             Backend-Huancavelica-Alertas-Agricolas/services/weather-service/jest.config.json
 
+      - name: Run coverage for services that provide it
+        if: always()
+        run: |
+          echo "Running coverage for services that expose test:cov..."
+          SERVICES=(
+            "Backend-Huancavelica-Alertas-Agricolas/services/notification-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/users-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/rest-service"
+          )
+          mkdir -p coverage-artifacts || true
+          for pkg in "${SERVICES[@]}"; do
+            if [ -f "$pkg/package.json" ]; then
+              echo "Checking $pkg for test:cov script"
+              if grep -q '"test:cov"' "$pkg/package.json"; then
+                echo "-> Running coverage for $pkg"
+                npm run test:cov --prefix "$pkg" || true
+                # copy summary if exists
+                if [ -f "$pkg/coverage/coverage-summary.json" ]; then
+                  name=$(basename "$pkg")
+                  mkdir -p coverage-artifacts/$name
+                  cp "$pkg/coverage/coverage-summary.json" coverage-artifacts/$name/coverage-summary.json || true
+                fi
+              else
+                echo "-> $pkg does not declare test:cov"
+              fi
+            fi
+          done
+
+      - name: Check coverage thresholds
+        if: always()
+        env:
+          COVERAGE_THRESHOLD: 70
+        run: |
+          echo "Checking coverage against threshold: $COVERAGE_THRESHOLD%"
+          python3 - <<'PY'
+import json,os,sys
+threshold=int(os.environ.get('COVERAGE_THRESHOLD','70'))
+failures=[]
+base='coverage-artifacts'
+if not os.path.exists(base):
+    print('No coverage artifacts found, skipping threshold check')
+    sys.exit(0)
+for svc in os.listdir(base):
+    p=os.path.join(base,svc,'coverage-summary.json')
+    if not os.path.exists(p):
+        print(f'No coverage summary for {svc}, skipping')
+        continue
+    j=json.load(open(p,'r',encoding='utf-8'))
+    # prefer lines as primary metric
+    lines=j.get('total',{}).get('lines',{})
+    pct=lines.get('pct',0)
+    print(f'{svc}: lines coverage {pct}%')
+    if pct < threshold:
+        failures.append((svc,pct))
+if failures:
+    print('Coverage threshold not met for services:')
+    for f in failures:
+        print(f' - {f[0]}: {f[1]}% < {threshold}%')
+    sys.exit(1)
+else:
+    print('All services meet coverage threshold')
+    sys.exit(0)
+PY
+
+      - name: Upload coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-artifacts
+          path: coverage-artifacts
+
       - name: Upload audit reports
         if: always()
         uses: actions/upload-artifact@v4

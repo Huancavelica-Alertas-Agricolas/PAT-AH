@@ -7,6 +7,8 @@
     "start": "node src/main.js",
     "start:prod": "node src/main.js",
     "test": "jest --config jest.config.json",
+    "test:unit": "jest --config jest.config.json --runInBand",
+    "test:cov": "jest --config jest.config.json --coverage --runInBand",
     "test:integration:docker:ps1": "powershell -ExecutionPolicy Bypass -File test/setup/run_tests_with_postgres.ps1",
     "test:integration:docker:sh": "bash test/setup/run_tests_with_postgres.sh"
   },
