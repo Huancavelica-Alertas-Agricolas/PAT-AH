@@ -910,7 +910,7 @@ jobs:
           target: 'http://localhost:3003'
         continue-on-error: true
 
-      - name: Fallback: Run OWASP ZAP baseline scan (container, host network)
+      - name: "Fallback: Run OWASP ZAP baseline scan (container, host network)"
         if: steps.zap_action.outcome != 'success'
         run: |
           echo "Running OWASP ZAP baseline scan (fallback) against http://localhost:3003"
