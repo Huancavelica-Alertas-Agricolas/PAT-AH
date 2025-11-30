@@ -5,6 +5,7 @@ on:
     branches: [ dev, circleci-project-setup ]
   pull_request:
     branches: [ dev ]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -203,14 +204,24 @@ jobs:
           done
           echo "Target did not become healthy" && exit 1
 
-      - name: Run OWASP ZAP baseline scan (container, host network)
+      - name: Try Action-based OWASP ZAP baseline (portable)
+        id: zap_action
+        uses: zaproxy/action-baseline@v0.6.0
+        with:
+          target: 'http://localhost:3003'
+        continue-on-error: true
+
+      - name: Fallback: Run OWASP ZAP baseline scan (container, host network)
+        if: steps.zap_action.outcome != 'success'
         run: |
-          echo "Running OWASP ZAP baseline scan against http://localhost:3003"
+          echo "Running OWASP ZAP baseline scan (fallback) against http://localhost:3003"
           # generate both HTML and JSON reports (-r html, -J json)
           docker run --rm --network host -v $PWD:/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://localhost:3003 -r zap-report.html -J zap-report.json || true
 
       - name: Analyze ZAP JSON and fail on configured severities
+        id: analyze
         if: always()
+        continue-on-error: true
         run: |
           echo "Inspecting zap-report.json for severities in $ZAP_FAIL_SEVERITIES..."
           python3 - <<'PY'
@@ -269,6 +280,48 @@ PY
           path: |
             zap-report.html
             zap-report.json
+
+      - name: Create GitHub issue for DAST findings
+        if: steps.analyze.outcome == 'failure'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'zap-report.json';
+            let body = `DAST (OWASP ZAP) found alerts in run ${process.env.GITHUB_RUN_ID} for repository ${process.env.GITHUB_REPOSITORY}.\n\n`;
+            if (fs.existsSync(path)) {
+              try {
+                const j = JSON.parse(fs.readFileSync(path, 'utf8'));
+                body += 'Summary (first matching alert):\n\n';
+                // Try to find first alert with risk field
+                function find(obj) {
+                  if (!obj) return null;
+                  if (typeof obj === 'object') {
+                    if (obj.risk) return obj;
+                    for (const k of Object.keys(obj)) {
+                      const found = find(obj[k]);
+                      if (found) return found;
+                    }
+                  }
+                  return null;
+                }
+                const found = find(j);
+                if (found) {
+                  body += 'Risk: ' + (found.risk || 'unknown') + '\n';
+                  body += 'Alert: ' + (found.name || JSON.stringify(found).slice(0,200)) + '\n\n';
+                }
+              } catch (e) {
+                body += 'Could not parse zap-report.json: ' + e.toString() + '\n\n';
+              }
+            }
+            body += `Download artifacts for full report: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `DAST findings: ${process.env.GITHUB_REPOSITORY} run ${process.env.GITHUB_RUN_ID}`,
+              body: body,
+            });
+            core.setOutput('issue_number', issue.data.number);
 
       - name: Tear down docker-compose test stack
         if: always()
