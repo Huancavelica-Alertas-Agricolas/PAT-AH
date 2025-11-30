@@ -14,8 +14,8 @@ services:
 
   auth-service:
     build:
-      context: .
-      dockerfile: services/auth-service/Dockerfile
+      context: ./services/auth-service
+      dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     ports:
@@ -25,8 +25,8 @@ services:
 
   users-service:
     build:
-      context: .
-      dockerfile: services/users-service/Dockerfile
+      context: ./services/users-service
+      dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     ports:
@@ -36,8 +36,8 @@ services:
 
   rest-service:
     build:
-      context: .
-      dockerfile: services/rest-service/Dockerfile
+      context: ./services/rest-service
+      dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
       WEATHER_HOST: weather-service
@@ -49,8 +49,8 @@ services:
 
   ai-service:
     build:
-      context: .
-      dockerfile: services/ai-service/Dockerfile
+      context: ./services/ai-service
+      dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     ports:
@@ -60,8 +60,8 @@ services:
 
   ingest-service:
     build:
-      context: .
-      dockerfile: services/ingest-service/Dockerfile
+      context: ./services/ingest-service
+      dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     command: ["sh","-c","node src/index.js"]
@@ -70,8 +70,8 @@ services:
 
   alert-service:
     build:
-      context: .
-      dockerfile: services/alert-service/Dockerfile
+      context: ./services/alert-service
+      dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     ports:
@@ -81,15 +81,16 @@ services:
 
   notification-service:
     build:
-      context: .
-      dockerfile: services/notification-service/Dockerfile
+      context: ./services/notification-service
+      dockerfile: Dockerfile
     ports:
       - "3008:3003"
+      - "3009:3004"
 
   weather-service:
     build:
-      context: .
-      dockerfile: services/weather-service/Dockerfile
+      context: ./services/weather-service
+      dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     ports:
