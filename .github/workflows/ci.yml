@@ -164,3 +164,55 @@ jobs:
         with:
           name: audit-reports
           path: audit-reports
+
+  dast:
+    name: DAST - OWASP ZAP baseline scan
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Ensure docker-compose and docker available
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y docker-compose-plugin || true
+          if [ -f /usr/libexec/docker/cli-plugins/docker-compose ]; then
+            sudo ln -sf /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose || true
+          fi
+          docker --version || true
+
+      - name: Start test stack for DAST
+        run: |
+          echo "Starting docker-compose test stack for DAST..."
+          docker-compose -f Backend-Huancavelica-Alertas-Agricolas/services/rest-service/docker-compose.test.yml up -d || docker-compose -f docker-compose.test.yml up -d || true
+
+      - name: Wait for target to be healthy
+        run: |
+          TARGET_URL=http://localhost:3003/healthz
+          echo "Waiting for $TARGET_URL to respond (timeout 120s)..."
+          for i in $(seq 1 24); do
+            if curl -sSf $TARGET_URL >/dev/null 2>&1; then
+              echo "Target healthy"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Target did not become healthy" && exit 1
+
+      - name: Run OWASP ZAP baseline scan (container, host network)
+        run: |
+          echo "Running OWASP ZAP baseline scan against http://localhost:3003"
+          docker run --rm --network host -v $PWD:/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://localhost:3003 -r zap-report.html || true
+
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report
+          path: zap-report.html
+
+      - name: Tear down docker-compose test stack
+        if: always()
+        run: |
+          docker-compose -f Backend-Huancavelica-Alertas-Agricolas/services/rest-service/docker-compose.test.yml down -v || docker-compose -f docker-compose.test.yml down -v || true
