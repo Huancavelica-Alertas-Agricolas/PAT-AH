@@ -95,6 +95,7 @@ services:
       DATABASE_URL: postgres://pat:pat@db:5432/pat_ah
     ports:
       - "3006:3002"
+      - "3010:3005"
     depends_on:
       - db
 
