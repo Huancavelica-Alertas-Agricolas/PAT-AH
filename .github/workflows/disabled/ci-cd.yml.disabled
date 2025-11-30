@@ -234,4 +234,3 @@ jobs:
           done
           echo "Frontend did not respond 200 after $max attempts"
           exit 1
-
