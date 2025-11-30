@@ -11,6 +11,18 @@ on:
         description: 'Coverage threshold percent (integer) to override default in CI'
         required: false
         default: '70'
+      coverage_notification:
+        description: 'Coverage threshold for notification-service (optional)'
+        required: false
+        default: ''
+      coverage_users:
+        description: 'Coverage threshold for users-service (optional)'
+        required: false
+        default: ''
+      coverage_rest:
+        description: 'Coverage threshold for rest-service (optional)'
+        required: false
+        default: ''
 
 env:
   COVERAGE_THRESHOLD: 70
@@ -195,41 +207,49 @@ jobs:
             fi
           done
 
-      - name: Check coverage thresholds
+        - name: Check coverage thresholds
         if: always()
         env:
           COVERAGE_THRESHOLD: ${{ github.event.inputs.coverage_threshold || env.COVERAGE_THRESHOLD }}
+          NOTIFICATION_THRESHOLD: ${{ github.event.inputs.coverage_notification || '' }}
+          USERS_THRESHOLD: ${{ github.event.inputs.coverage_users || '' }}
+          REST_THRESHOLD: ${{ github.event.inputs.coverage_rest || '' }}
         run: |
-          echo "Checking coverage against threshold: $COVERAGE_THRESHOLD%"
+          echo "Checking coverage against threshold: $COVERAGE_THRESHOLD% (overrides allowed per-service)"
           python3 - <<'PY'
-import json,os,sys
-threshold=int(os.environ.get('COVERAGE_THRESHOLD','70'))
-failures=[]
-base='coverage-artifacts'
-if not os.path.exists(base):
-    print('No coverage artifacts found, skipping threshold check')
-    sys.exit(0)
-for svc in os.listdir(base):
-    p=os.path.join(base,svc,'coverage-summary.json')
-    if not os.path.exists(p):
+    import json,os,sys
+    default_threshold=int(os.environ.get('COVERAGE_THRESHOLD','70'))
+    overrides={
+      'notification-service': int(os.environ['NOTIFICATION_THRESHOLD']) if os.environ.get('NOTIFICATION_THRESHOLD') else None,
+      'users-service': int(os.environ['USERS_THRESHOLD']) if os.environ.get('USERS_THRESHOLD') else None,
+      'rest-service': int(os.environ['REST_THRESHOLD']) if os.environ.get('REST_THRESHOLD') else None,
+    }
+    failures=[]
+    base='coverage-artifacts'
+    if not os.path.exists(base):
+      print('No coverage artifacts found, skipping threshold check')
+      sys.exit(0)
+    for svc in os.listdir(base):
+      p=os.path.join(base,svc,'coverage-summary.json')
+      if not os.path.exists(p):
         print(f'No coverage summary for {svc}, skipping')
         continue
-    j=json.load(open(p,'r',encoding='utf-8'))
-    # prefer lines as primary metric
-    lines=j.get('total',{}).get('lines',{})
-    pct=lines.get('pct',0)
-    print(f'{svc}: lines coverage {pct}%')
-    if pct < threshold:
-        failures.append((svc,pct))
-if failures:
-    print('Coverage threshold not met for services:')
-    for f in failures:
-        print(f' - {f[0]}: {f[1]}% < {threshold}%')
-    sys.exit(1)
-else:
-    print('All services meet coverage threshold')
-    sys.exit(0)
-PY
+      j=json.load(open(p,'r',encoding='utf-8'))
+      lines=j.get('total',{}).get('lines',{})
+      pct=lines.get('pct',0)
+      threshold=overrides.get(svc) if overrides.get(svc) is not None else default_threshold
+      print(f'{svc}: lines coverage {pct}% (threshold: {threshold}%)')
+      if pct < threshold:
+        failures.append((svc,pct,threshold))
+    if failures:
+      print('Coverage threshold not met for services:')
+      for f in failures:
+        print(f' - {f[0]}: {f[1]}% < {f[2]}%')
+      sys.exit(1)
+    else:
+      print('All services meet coverage threshold')
+      sys.exit(0)
+    PY
 
       - name: Upload coverage artifacts
         if: always()
