@@ -86,16 +86,81 @@ async function bootstrap() {
         // Queue check (Redis or RabbitMQ)
         try {
           if (process.env.REDIS_URL) {
-            const r = parseUrlHostPort(process.env.REDIS_URL);
-            const up = await tryConnect(r?.host, r?.port || 6379);
-            components.queue = up ? 'ok' : 'error';
-            if (!up) ok = false;
+            // Prefer deeper Redis check if client library available
+            let redisOk = false;
+            try {
+              // Try ioredis first
+              try {
+                const IORedis = require('ioredis');
+                const client = new IORedis(process.env.REDIS_URL, { connectTimeout: 1000 });
+                await client.ping();
+                redisOk = true;
+                if (process.env.NOTIFICATION_QUEUE_NAME) {
+                  const len = await client.llen(process.env.NOTIFICATION_QUEUE_NAME).catch(() => null);
+                  components.queue = len != null ? `ok (len:${len})` : 'ok';
+                }
+                else {
+                  components.queue = 'ok';
+                }
+                try { await client.quit(); } catch (_) { }
+              }
+              catch (e) {
+                // Try node-redis
+                const redis = require('redis');
+                const client = redis.createClient({ url: process.env.REDIS_URL });
+                await client.connect();
+                await client.ping();
+                redisOk = true;
+                if (process.env.NOTIFICATION_QUEUE_NAME) {
+                  const len = await client.llen(process.env.NOTIFICATION_QUEUE_NAME).catch(() => null);
+                  components.queue = len != null ? `ok (len:${len})` : 'ok';
+                }
+                else {
+                  components.queue = 'ok';
+                }
+                try { await client.disconnect(); } catch (_) { }
+              }
+            }
+            catch (e) {
+              // Redis client not available or failed — fallback to TCP probe
+            }
+
+            if (!components.queue) {
+              const r = parseUrlHostPort(process.env.REDIS_URL);
+              const up = await tryConnect(r?.host, r?.port || 6379);
+              components.queue = up ? 'ok' : 'error';
+              if (!up) ok = false;
+            }
           }
           else if (process.env.RABBITMQ_URL) {
-            const r = parseUrlHostPort(process.env.RABBITMQ_URL);
-            const up = await tryConnect(r?.host, r?.port || 5672);
-            components.queue = up ? 'ok' : 'error';
-            if (!up) ok = false;
+            // Prefer amqplib check if available
+            try {
+              const amqp = require('amqplib');
+              const conn = await amqp.connect(process.env.RABBITMQ_URL, { timeout: 1000 });
+              const ch = await conn.createChannel();
+              if (process.env.NOTIFICATION_QUEUE_NAME) {
+                try {
+                  const info = await ch.checkQueue(process.env.NOTIFICATION_QUEUE_NAME);
+                  components.queue = `ok (messages:${info.messageCount || 0})`;
+                }
+                catch (e) {
+                  // queue might not exist or check failed
+                  components.queue = 'ok';
+                }
+              }
+              else {
+                components.queue = 'ok';
+              }
+              try { await ch.close(); } catch (_) { }
+              try { await conn.close(); } catch (_) { }
+            }
+            catch (e) {
+              // amqplib not present or failed — fallback to TCP probe
+              const r = parseUrlHostPort(process.env.RABBITMQ_URL);
+              const up = await tryConnect(r?.host, r?.port || 5672);
+              components.queue = up ? 'ok' : 'error';
+              if (!up) ok = false;
+            }
           }
           else {
             components.queue = 'not-configured';
