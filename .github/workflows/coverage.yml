@@ -1,0 +1,59 @@
+name: Coverage checks
+
+on:
+  pull_request:
+  push:
+    branches: [ dev-monitoring-testing, main ]
+
+jobs:
+  coverage:
+    name: Run per-service coverage and check thresholds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Create coverage-artifacts dir
+        run: mkdir -p coverage-artifacts
+
+      - name: Run per-service coverage
+        run: |
+          set -euo pipefail
+          for dir in services/*; do
+            if [ -f "$dir/package.json" ] && grep -q '"test:cov"' "$dir/package.json"; then
+              echo "---- Running coverage for: $dir"
+              pushd "$dir"
+              npm ci --silent --no-audit --no-fund || npm install --no-audit --no-fund
+              # Prefer explicit test:cov if present, fallback to jest invocation that emits json-summary
+              if npm run test:cov --silent --if-present; then
+                echo "test:cov finished for $dir"
+              else
+                echo "Fallback: running jest with json-summary for $dir"
+                npx jest --coverage --coverageReporters=json-summary --runInBand || true
+              fi
+              popd
+              if [ -d "$dir/coverage" ]; then
+                cp -r "$dir/coverage" "coverage-artifacts/$(basename $dir)"
+              else
+                echo "Warning: no coverage produced for $dir"
+              fi
+            fi
+          done
+
+      - name: Install root deps (scripts)
+        run: npm ci --silent || true
+        continue-on-error: true
+
+      - name: Run check-coverage script
+        run: node scripts/check-coverage.js --path coverage-artifacts --config coverage.config.json
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-artifacts
+          path: coverage-artifacts

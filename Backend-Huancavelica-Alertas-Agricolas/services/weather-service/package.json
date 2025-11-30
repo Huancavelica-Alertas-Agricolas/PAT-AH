@@ -15,6 +15,7 @@
     "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "test:all": "npm --prefix microservices/services/user-service test && npm --prefix microservices/services/alert-service test && npm --prefix microservices/services/weather-service test && npm --prefix microservices/services/notification-service test && npm --prefix microservices/services/preference-service test && npm --prefix microservices/services/log-service test && npm --prefix microservices/gateway/api-gateway test",
     "test": "jest --config jest.config.json",
+    "test:unit": "jest --config jest.config.json --runInBand",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage"
   },
