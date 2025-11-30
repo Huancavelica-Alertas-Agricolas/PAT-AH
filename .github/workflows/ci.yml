@@ -6,6 +6,14 @@ on:
   pull_request:
     branches: [ dev ]
   workflow_dispatch:
+    inputs:
+      coverage_threshold:
+        description: 'Coverage threshold percent (integer) to override default in CI'
+        required: false
+        default: '70'
+
+env:
+  COVERAGE_THRESHOLD: 70
 
 jobs:
   test:
@@ -190,7 +198,7 @@ jobs:
       - name: Check coverage thresholds
         if: always()
         env:
-          COVERAGE_THRESHOLD: 70
+          COVERAGE_THRESHOLD: ${{ github.event.inputs.coverage_threshold || env.COVERAGE_THRESHOLD }}
         run: |
           echo "Checking coverage against threshold: $COVERAGE_THRESHOLD%"
           python3 - <<'PY'
