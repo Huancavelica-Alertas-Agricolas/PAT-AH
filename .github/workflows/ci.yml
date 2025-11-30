@@ -924,53 +924,53 @@ jobs:
         continue-on-error: true
         run: |
           echo "Inspecting zap-report.json for severities in $ZAP_FAIL_SEVERITIES..."
-          python3 - <<'PY'
-import json,sys,os
-path='zap-report.json'
-if not os.path.exists(path):
-    print('zap-report.json not found, skipping fail-on-alerts check')
-    sys.exit(0)
-with open(path,'r',encoding='utf-8') as f:
-    try:
-        j=json.load(f)
-    except Exception as e:
-        print('Failed to parse zap-report.json:',e)
-        sys.exit(0)
+            python3 - <<'PY'
+            import json,sys,os
+            path='zap-report.json'
+            if not os.path.exists(path):
+              print('zap-report.json not found, skipping fail-on-alerts check')
+              sys.exit(0)
+            with open(path,'r',encoding='utf-8') as f:
+              try:
+                j=json.load(f)
+              except Exception as e:
+                print('Failed to parse zap-report.json:',e)
+                sys.exit(0)
 
-severities_env = os.environ.get('ZAP_FAIL_SEVERITIES','High,Critical')
-severities = set([s.strip().lower() for s in severities_env.split(',') if s.strip()])
-print('Configured fail severities:', severities)
+            severities_env = os.environ.get('ZAP_FAIL_SEVERITIES','High,Critical')
+            severities = set([s.strip().lower() for s in severities_env.split(',') if s.strip()])
+            print('Configured fail severities:', severities)
 
-def scan(obj):
-    # Prefer explicit 'risk' fields typical in ZAP JSON
-    if isinstance(obj, dict):
-        if 'risk' in obj and isinstance(obj['risk'], str):
-            if obj['risk'].strip().lower() in severities:
-                return True, ('risk', obj['risk'], obj)
-        for v in obj.values():
-            found = scan(v)
+            def scan(obj):
+              # Prefer explicit 'risk' fields typical in ZAP JSON
+              if isinstance(obj, dict):
+                if 'risk' in obj and isinstance(obj['risk'], str):
+                  if obj['risk'].strip().lower() in severities:
+                    return True, ('risk', obj['risk'], obj)
+                for v in obj.values():
+                  found = scan(v)
+                  if found[0]:
+                    return found
+              elif isinstance(obj, list):
+                for item in obj:
+                  found = scan(item)
+                  if found[0]:
+                    return found
+              elif isinstance(obj, str):
+                low = obj.lower()
+                for sev in severities:
+                  if sev in low:
+                    return True, (None, obj, obj)
+              return (False, None)
+
+            found = scan(j)
             if found[0]:
-                return found
-    elif isinstance(obj, list):
-        for item in obj:
-            found = scan(item)
-            if found[0]:
-                return found
-    elif isinstance(obj, str):
-        low = obj.lower()
-        for sev in severities:
-            if sev in low:
-                return True, (None, obj, obj)
-    return (False, None)
-
-found = scan(j)
-if found[0]:
-    print('Failing build due to alert:', found[1])
-    sys.exit(1)
-else:
-    print('No configured-severity alerts found in zap-report.json')
-    sys.exit(0)
-PY
+              print('Failing build due to alert:', found[1])
+              sys.exit(1)
+            else:
+              print('No configured-severity alerts found in zap-report.json')
+              sys.exit(0)
+            PY
 
       - name: Upload ZAP report artifacts
         if: always()
