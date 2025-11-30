@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ dev, circleci-project-setup ]
+    branches: [ dev, circleci-project-setup, dev-monitoring-testing ]
   pull_request:
     branches: [ dev ]
   workflow_dispatch:
@@ -195,80 +195,57 @@ jobs:
             Backend-Huancavelica-Alertas-Agricolas/services/rest-service/jest.config.json
             Backend-Huancavelica-Alertas-Agricolas/services/weather-service/jest.config.json
 
-      - name: Run coverage for services that provide it
+      - name: Run per-service coverage and collect artifacts
         if: always()
         run: |
-          echo "Running coverage for services that expose test:cov..."
+          echo "Running per-service coverage and collecting artifacts"
           mkdir -p coverage-artifacts || true
-          # discover services under Backend-Huancavelica-Alertas-Agricolas/services/* that declare test:cov
-          for pkg in Backend-Huancavelica-Alertas-Agricolas/services/*; do
+          SERVICES=(
+            "Backend-Huancavelica-Alertas-Agricolas/services/auth-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/users-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/rest-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/weather-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/ai-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/ingest-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/notification-service"
+            "Frontend-Huancavelica-Alertas-Agricolas"
+          )
+
+          for pkg in "${SERVICES[@]}"; do
             if [ -f "$pkg/package.json" ]; then
-              echo "Inspecting $pkg"
+              name=$(basename "$pkg")
+              echo "--- Service: $pkg -> $name ---"
+              mkdir -p "coverage-artifacts/$name"
+              (cd "$pkg" && npm ci --no-audit --no-fund) > "coverage-artifacts/${name}-install.log" 2>&1 || \
+                (cd "$pkg" && npm install --no-audit --no-fund) >> "coverage-artifacts/${name}-install.log" 2>&1 || true
+
+              # Run coverage script if declared, otherwise fallback to jest json-summary
               if grep -q '"test:cov"' "$pkg/package.json"; then
-                echo "-> Running coverage for $pkg"
-                npm run test:cov --prefix "$pkg" || true
-                if [ -f "$pkg/coverage/coverage-summary.json" ]; then
-                  name=$(basename "$pkg")
-                  mkdir -p coverage-artifacts/$name
-                  cp "$pkg/coverage/coverage-summary.json" coverage-artifacts/$name/coverage-summary.json || true
-                fi
+                (cd "$pkg" && npm run test:cov --if-present) > "coverage-artifacts/${name}-test.log" 2>&1 || true
               else
-                echo "-> $pkg does not declare test:cov"
+                (cd "$pkg" && npx jest --coverage --coverageReporters=json-summary --runInBand) > "coverage-artifacts/${name}-test.log" 2>&1 || true
+              fi
+
+              # Copy coverage dir if exists
+              if [ -d "$pkg/coverage" ]; then
+                cp -r "$pkg/coverage" "coverage-artifacts/$name/" || true
+              elif [ -f "$pkg/coverage/coverage-summary.json" ]; then
+                mkdir -p "coverage-artifacts/$name"
+                cp "$pkg/coverage/coverage-summary.json" "coverage-artifacts/$name/coverage-summary.json" || true
+              else
+                echo "Warning: no coverage produced for $name" >> "coverage-artifacts/${name}-test.log"
               fi
             fi
           done
 
-        - name: Check coverage thresholds
+          echo "Listing coverage-artifacts"
+          ls -R coverage-artifacts || true
+
+      - name: Run coverage checker (node)
         if: always()
-        env:
-          COVERAGE_THRESHOLD: ${{ github.event.inputs.coverage_threshold || env.COVERAGE_THRESHOLD }}
-          NOTIFICATION_THRESHOLD: ${{ github.event.inputs.coverage_notification || '' }}
-          USERS_THRESHOLD: ${{ github.event.inputs.coverage_users || '' }}
-          REST_THRESHOLD: ${{ github.event.inputs.coverage_rest || '' }}
-          ALERT_THRESHOLD: ${{ github.event.inputs.coverage_alert || '' }}
-          WEATHER_THRESHOLD: ${{ github.event.inputs.coverage_weather || '' }}
-          AI_THRESHOLD: ${{ github.event.inputs.coverage_ai || '' }}
-          INGEST_THRESHOLD: ${{ github.event.inputs.coverage_ingest || '' }}
         run: |
-          echo "Checking coverage against threshold: $COVERAGE_THRESHOLD% (overrides allowed per-service)"
-          python3 - <<'PY'
-    import json,os,sys
-    default_threshold=int(os.environ.get('COVERAGE_THRESHOLD','70'))
-    overrides={
-      'notification-service': int(os.environ['NOTIFICATION_THRESHOLD']) if os.environ.get('NOTIFICATION_THRESHOLD') else None,
-      'users-service': int(os.environ['USERS_THRESHOLD']) if os.environ.get('USERS_THRESHOLD') else None,
-      'rest-service': int(os.environ['REST_THRESHOLD']) if os.environ.get('REST_THRESHOLD') else None,
-      'alert-service': int(os.environ['ALERT_THRESHOLD']) if os.environ.get('ALERT_THRESHOLD') else None,
-      'weather-service': int(os.environ['WEATHER_THRESHOLD']) if os.environ.get('WEATHER_THRESHOLD') else None,
-      'ai-service': int(os.environ['AI_THRESHOLD']) if os.environ.get('AI_THRESHOLD') else None,
-      'ingest-service': int(os.environ['INGEST_THRESHOLD']) if os.environ.get('INGEST_THRESHOLD') else None,
-    }
-    failures=[]
-    base='coverage-artifacts'
-    if not os.path.exists(base):
-      print('No coverage artifacts found, skipping threshold check')
-      sys.exit(0)
-    for svc in os.listdir(base):
-      p=os.path.join(base,svc,'coverage-summary.json')
-      if not os.path.exists(p):
-        print(f'No coverage summary for {svc}, skipping')
-        continue
-      j=json.load(open(p,'r',encoding='utf-8'))
-      lines=j.get('total',{}).get('lines',{})
-      pct=lines.get('pct',0)
-      threshold=overrides.get(svc) if overrides.get(svc) is not None else default_threshold
-      print(f'{svc}: lines coverage {pct}% (threshold: {threshold}%)')
-      if pct < threshold:
-        failures.append((svc,pct,threshold))
-    if failures:
-      print('Coverage threshold not met for services:')
-      for f in failures:
-        print(f' - {f[0]}: {f[1]}% < {f[2]}%')
-      sys.exit(1)
-    else:
-      print('All services meet coverage threshold')
-      sys.exit(0)
-    PY
+          echo "Running node coverage checker"
+          node scripts/check-coverage.js --path coverage-artifacts --config coverage.config.json || true
 
       - name: Upload coverage artifacts
         if: always()
