@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [ dev-monitoring-testing, main ]
+  workflow_dispatch: {}
 
 jobs:
   coverage:
