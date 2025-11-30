@@ -60,7 +60,7 @@ La forma recomendada en desarrollo es levantar los microservicios mediante `dock
 
 - Levantar todo (root):
   ```powershell
-  cd 'A:\PAT-AH-repopersonal\PAT-AH\Backend-Huancavelica-Alertas-Agricolas'
+  A:\Proyecto\PAT-AH\Backend-Huancavelica-Alertas-Agricolas>
   docker compose up -d --build
   ```
 
@@ -93,6 +93,41 @@ La forma recomendada en desarrollo es levantar los microservicios mediante `dock
   ```powershell
   Invoke-RestMethod -Method Get -Uri 'http://localhost:3003/api/weather/current' -TimeoutSec 8 | ConvertTo-Json -Depth 5
   ```
+
+## Health endpoints y Redis local
+
+- `notification-service` y otros microservicios exponen un endpoint de salud en `/healthz`.
+- Variables relevantes para pruebas locales:
+  - `REDIS_URL` (p. ej. `redis://redis:6379`) — si está configurada, el `notification-service` comprobará la cola.
+  - `NOTIFICATION_QUEUE_NAME` (p. ej. `notifications`) — nombre de la lista Redis usada como cola.
+  - `HEALTH_PORT` — puerto donde el servicio expone su `/healthz` (por defecto `3004` para `notification-service`).
+
+- Levantar Redis con Docker Compose (ya incluido en `docker-compose.yml` del backend):
+  ```powershell
+  cd Backend-Huancavelica-Alertas-Agricolas
+  docker compose up -d --build redis notification-service
+  ```
+
+- Probar `/healthz` desde PowerShell (ejemplo para `notification-service` escuchando en host `3009`):
+  ```powershell
+  # usando Invoke-RestMethod
+  Invoke-RestMethod -Method Get -Uri 'http://localhost:3009/healthz' -TimeoutSec 5 | ConvertTo-Json -Depth 5
+
+  # o usando curl.exe (Windows)
+  curl.exe -s http://localhost:3009/healthz
+  ```
+
+- Si Redis está activo y `NOTIFICATION_QUEUE_NAME` configurado, la respuesta incluirá `components.queue` como objeto `{ "status": "ok", "len": <n> }`.
+
+- Para probar colas manualmente:
+  ```powershell
+  # Añadir un mensaje a la lista notifications
+  docker compose exec redis redis-cli LPUSH notifications "test-message-1"
+  # Ver la longitud
+  docker compose exec redis redis-cli LLEN notifications
+  ```
+
+Estas instrucciones facilitan probar la integración de la cola de notificaciones y validar los healthchecks localmente.
 
 
 ## Buenas prácticas (Front y Back)
@@ -137,3 +172,28 @@ La forma recomendada en desarrollo es levantar los microservicios mediante `dock
 
 ---
 Si quieres, puedo añadir ahora un `env.example` en la raíz o por servicio, o generar un `docs/` con contratos (ej. OpenAPI) para las rutas del `rest-service`.
+
+## DAST (OWASP ZAP) en CI
+
+Hemos integrado un job DAST en el workflow de CI que ejecuta un escaneo básico con OWASP ZAP (`zap-baseline.py`) contra el `rest-service` levantado por `docker-compose.test.yml`.
+
+- Variable configurable: `ZAP_FAIL_SEVERITIES` (por defecto: `High,Critical`).
+  - En el workflow de GitHub Actions se define como `env` del job `dast` y puedes cambiarla si quieres que el job falle con severidades más bajas (por ejemplo `Medium,High,Critical`).
+  - Formato: lista separada por comas, case-insensitive.
+
+- Ejecutar localmente (ejemplo, PowerShell):
+  ```powershell
+  # Levantar el stack de pruebas
+  cd Backend-Huancavelica-Alertas-Agricolas/services/rest-service
+  docker compose -f docker-compose.test.yml up -d
+
+  # Ejecutar ZAP desde Docker en la máquina host
+  docker run --rm --network host -v ${PWD}:/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://localhost:3003 -r zap-report.html -J zap-report.json
+
+  # Revisar resultados
+  docker compose -f docker-compose.test.yml down -v
+  ```
+
+- Para cambiar el umbral en CI: edita `.github/workflows/ci.yml` y modifica la variable `ZAP_FAIL_SEVERITIES` en el job `dast`.
+
+Si quieres que yo: (A) añada una entrada `workflow_dispatch` para ejecutar DAST manualmente desde la UI; (B) haga que el job genere un issue automático cuando encuentre alertas; o (C) use la Action `zaproxy/action-baseline` en vez del contenedor `zap2docker-stable` (más portable), dime cuál prefieres y lo implemento. (Explica entre paréntesis la utilidad y por qué.)

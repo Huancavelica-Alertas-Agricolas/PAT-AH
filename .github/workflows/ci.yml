@@ -169,6 +169,9 @@ jobs:
     name: DAST - OWASP ZAP baseline scan
     runs-on: ubuntu-latest
     needs: test
+    env:
+      # Comma-separated severities that should make the job fail (case-insensitive)
+      ZAP_FAIL_SEVERITIES: "High,Critical"
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -200,64 +203,72 @@ jobs:
           done
           echo "Target did not become healthy" && exit 1
 
-        - name: Run OWASP ZAP baseline scan (container, host network)
+      - name: Run OWASP ZAP baseline scan (container, host network)
         run: |
           echo "Running OWASP ZAP baseline scan against http://localhost:3003"
           # generate both HTML and JSON reports (-r html, -J json)
           docker run --rm --network host -v $PWD:/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://localhost:3003 -r zap-report.html -J zap-report.json || true
 
-        - name: Analyze ZAP JSON and fail on High/Critical alerts
+      - name: Analyze ZAP JSON and fail on configured severities
         if: always()
         run: |
-          echo "Inspecting zap-report.json for High/Critical alerts..."
+          echo "Inspecting zap-report.json for severities in $ZAP_FAIL_SEVERITIES..."
           python3 - <<'PY'
-    import json,sys,os
-    path='zap-report.json'
-    if not os.path.exists(path):
-      print('zap-report.json not found, skipping fail-on-alerts check')
-      sys.exit(0)
-    with open(path,'r',encoding='utf-8') as f:
-      try:
+import json,sys,os
+path='zap-report.json'
+if not os.path.exists(path):
+    print('zap-report.json not found, skipping fail-on-alerts check')
+    sys.exit(0)
+with open(path,'r',encoding='utf-8') as f:
+    try:
         j=json.load(f)
-      except Exception as e:
+    except Exception as e:
         print('Failed to parse zap-report.json:',e)
         sys.exit(0)
 
-    def scan(obj):
-      if isinstance(obj, dict):
-        for k,v in obj.items():
-          if isinstance(v,str) and v.lower() in ('high','critical'):
-            return True, (k,v,obj)
-          if isinstance(v,str) and 'high' in v.lower():
-            # some fields may include severity in text
-            return True, (k,v,obj)
-          found = scan(v)
-          if found[0]:
-            return found
-      elif isinstance(obj, list):
+severities_env = os.environ.get('ZAP_FAIL_SEVERITIES','High,Critical')
+severities = set([s.strip().lower() for s in severities_env.split(',') if s.strip()])
+print('Configured fail severities:', severities)
+
+def scan(obj):
+    # Prefer explicit 'risk' fields typical in ZAP JSON
+    if isinstance(obj, dict):
+        if 'risk' in obj and isinstance(obj['risk'], str):
+            if obj['risk'].strip().lower() in severities:
+                return True, ('risk', obj['risk'], obj)
+        for v in obj.values():
+            found = scan(v)
+            if found[0]:
+                return found
+    elif isinstance(obj, list):
         for item in obj:
-          found = scan(item)
-          if found[0]:
-            return found
-      return (False, None)
+            found = scan(item)
+            if found[0]:
+                return found
+    elif isinstance(obj, str):
+        low = obj.lower()
+        for sev in severities:
+            if sev in low:
+                return True, (None, obj, obj)
+    return (False, None)
 
-    found = scan(j)
-    if found[0]:
-      print('High/Critical alert found:', found[1])
-      sys.exit(1)
-    else:
-      print('No High/Critical alerts found in zap-report.json')
-      sys.exit(0)
-    PY
+found = scan(j)
+if found[0]:
+    print('Failing build due to alert:', found[1])
+    sys.exit(1)
+else:
+    print('No configured-severity alerts found in zap-report.json')
+    sys.exit(0)
+PY
 
-        - name: Upload ZAP report artifacts
+      - name: Upload ZAP report artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: zap-report
           path: |
-          zap-report.html
-          zap-report.json
+            zap-report.html
+            zap-report.json
 
       - name: Tear down docker-compose test stack
         if: always()
