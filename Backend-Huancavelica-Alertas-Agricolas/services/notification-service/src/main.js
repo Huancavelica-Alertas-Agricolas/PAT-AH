@@ -25,10 +25,18 @@ async function bootstrap() {
     const healthPort = parseInt(process.env.HEALTH_PORT) || 3004;
     const parseUrlHostPort = (url) => {
       try {
-        const m = url.match(/@([^:/]+)(?::(\d+))?/);
-        if (m) return { host: m[1], port: parseInt(m[2] || '6379') };
+        // Prefer URL parsing for common schemes
+        const u = new URL(url);
+        const defaultPort = u.protocol === 'redis:' ? 6379 : (u.protocol === 'amqp:' || u.protocol === 'amqps:' ? 5672 : 5432);
+        return { host: u.hostname, port: u.port ? parseInt(u.port) : defaultPort };
       }
-      catch (e) { }
+      catch (e) {
+        try {
+          const m = url.match(/@([^:/]+)(?::(\d+))?/);
+          if (m) return { host: m[1], port: parseInt(m[2] || '6379') };
+        }
+        catch (e) { }
+      }
       return null;
     };
     const tryConnect = (host, port, timeout = 1000) => new Promise((resolve) => {
