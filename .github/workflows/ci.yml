@@ -241,18 +241,29 @@ jobs:
           echo "Listing coverage-artifacts"
           ls -R coverage-artifacts || true
 
-      - name: Run coverage checker (node)
-        if: always()
-        run: |
-          echo "Running node coverage checker"
-          node scripts/check-coverage.js --path coverage-artifacts --config coverage.config.json || true
-
-      - name: Upload coverage artifacts
+      - name: Upload coverage artifacts (diagnostic)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-artifacts
           path: coverage-artifacts
+
+      - name: Diagnostic - list coverage summaries
+        if: always()
+        run: |
+          echo "Looking for coverage-summary.json files under coverage-artifacts"
+          find coverage-artifacts -type f -name 'coverage-summary.json' -print || true
+          echo "Show first 200 lines of each coverage-summary.json (if any)"
+          for f in $(find coverage-artifacts -type f -name 'coverage-summary.json' -print || true); do
+            echo "--- $f ---"
+            head -n 200 "$f" || true
+          done
+
+      - name: Run coverage checker (node)
+        if: always()
+        run: |
+          echo "Running node coverage checker"
+          node scripts/check-coverage.js --path coverage-artifacts --config coverage.config.json
 
       - name: Upload audit reports
         if: always()
