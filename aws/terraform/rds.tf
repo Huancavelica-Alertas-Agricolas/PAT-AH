@@ -6,7 +6,20 @@ resource "aws_db_subnet_group" "main" {
   tags = {
     Name = "PAT-AH DB subnet group"
   }
+  lifecycle {
+    ignore_changes = [subnet_ids]
+  }
 }
+
+// Temporal: evitar que Terraform intente reemplazar las subnets del DB subnet group
+// cuando las subnets actuales están en otra VPC. Esto permite aplicar el resto
+// de la infraestructura mientras se planifica una migración de subnets controlada.
+resource "null_resource" "rds_subnet_ignore_note" {
+  provisioner "local-exec" {
+    command = "echo 'rds subnet_ids changes are ignored in Terraform lifecycle for now'"
+  }
+}
+
 
 resource "aws_security_group" "rds" {
   name_prefix = "pat-ah-rds-"

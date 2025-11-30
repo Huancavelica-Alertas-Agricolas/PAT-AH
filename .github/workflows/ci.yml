@@ -2,10 +2,46 @@ name: CI
 
 on:
   push:
-    branches: [ dev, circleci-project-setup ]
+    branches: [ dev, circleci-project-setup, dev-monitoring-testing ]
   pull_request:
     branches: [ dev ]
   workflow_dispatch:
+    inputs:
+      coverage_threshold:
+        description: 'Coverage threshold percent (integer) to override default in CI'
+        required: false
+        default: '70'
+      coverage_notification:
+        description: 'Coverage threshold for notification-service (optional)'
+        required: false
+        default: ''
+      coverage_alert:
+        description: 'Coverage threshold for alert-service (optional)'
+        required: false
+        default: ''
+      coverage_weather:
+        description: 'Coverage threshold for weather-service (optional)'
+        required: false
+        default: ''
+      coverage_ai:
+        description: 'Coverage threshold for ai-service (optional)'
+        required: false
+        default: ''
+      coverage_ingest:
+        description: 'Coverage threshold for ingest-service (optional)'
+        required: false
+        default: ''
+      coverage_users:
+        description: 'Coverage threshold for users-service (optional)'
+        required: false
+        default: ''
+      coverage_rest:
+        description: 'Coverage threshold for rest-service (optional)'
+        required: false
+        default: ''
+
+env:
+  COVERAGE_THRESHOLD: 70
 
 jobs:
   test:
@@ -158,6 +194,92 @@ jobs:
           path: |
             Backend-Huancavelica-Alertas-Agricolas/services/rest-service/jest.config.json
             Backend-Huancavelica-Alertas-Agricolas/services/weather-service/jest.config.json
+
+      - name: Run per-service coverage and collect artifacts
+        if: always()
+        run: |
+          echo "Running per-service coverage and collecting artifacts"
+          mkdir -p coverage-artifacts || true
+          SERVICES=(
+            "Backend-Huancavelica-Alertas-Agricolas/services/auth-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/users-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/rest-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/weather-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/ai-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/ingest-service"
+            "Backend-Huancavelica-Alertas-Agricolas/services/notification-service"
+            "Frontend-Huancavelica-Alertas-Agricolas"
+          )
+
+          for pkg in "${SERVICES[@]}"; do
+            if [ -f "$pkg/package.json" ]; then
+              name=$(basename "$pkg")
+              echo "--- Service: $pkg -> $name ---"
+              mkdir -p "coverage-artifacts/$name"
+              (cd "$pkg" && npm ci --no-audit --no-fund) > "coverage-artifacts/${name}-install.log" 2>&1 || \
+                (cd "$pkg" && npm install --no-audit --no-fund) >> "coverage-artifacts/${name}-install.log" 2>&1 || true
+
+              # Run coverage script if declared, otherwise fallback to jest json-summary
+              if grep -q '"test:cov"' "$pkg/package.json"; then
+                (cd "$pkg" && npm run test:cov --if-present) > "coverage-artifacts/${name}-test.log" 2>&1 || true
+              else
+                (cd "$pkg" && npx jest --coverage --coverageReporters=json-summary --runInBand) > "coverage-artifacts/${name}-test.log" 2>&1 || true
+              fi
+
+              # Copy coverage dir if exists
+              if [ -d "$pkg/coverage" ]; then
+                cp -r "$pkg/coverage" "coverage-artifacts/$name/" || true
+              elif [ -f "$pkg/coverage/coverage-summary.json" ]; then
+                mkdir -p "coverage-artifacts/$name"
+                cp "$pkg/coverage/coverage-summary.json" "coverage-artifacts/$name/coverage-summary.json" || true
+              else
+                echo "Warning: no coverage produced for $name" >> "coverage-artifacts/${name}-test.log"
+              fi
+            fi
+          done
+
+          echo "Listing coverage-artifacts"
+          ls -R coverage-artifacts || true
+
+      - name: Upload coverage artifacts (diagnostic)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-artifacts
+          path: coverage-artifacts
+
+      - name: Diagnostic - list coverage summaries
+        if: always()
+        run: |
+          echo "Looking for coverage-summary.json files under coverage-artifacts"
+          find coverage-artifacts -type f -name 'coverage-summary.json' -print || true
+          echo "Show first 200 lines of each coverage-summary.json (if any)"
+          for f in $(find coverage-artifacts -type f -name 'coverage-summary.json' -print || true); do
+            echo "--- $f ---"
+            head -n 200 "$f" || true
+          done
+
+      - name: Collect and upload diagnostic logs
+        if: always()
+        run: |
+          echo "Collecting install/test logs into diagnostics folder"
+          mkdir -p diagnostic-logs || true
+          # copy any per-service logs from coverage-artifacts
+          cp -v coverage-artifacts/*-install.log diagnostic-logs/ 2>/dev/null || true
+          cp -v coverage-artifacts/*-test.log diagnostic-logs/ 2>/dev/null || true
+        # upload the logs even if empty
+      - name: Upload CI diagnostic logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-diagnostics
+          path: diagnostic-logs
+
+      - name: Run coverage checker (node)
+        if: always()
+        run: |
+          echo "Running node coverage checker"
+          node scripts/check-coverage.js --path coverage-artifacts --config coverage.config.json
 
       - name: Upload audit reports
         if: always()

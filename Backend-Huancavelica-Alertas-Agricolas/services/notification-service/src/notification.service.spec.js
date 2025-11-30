@@ -1,24 +1,38 @@
-const { Test, TestingModule } = require('@nestjs/testing');
-const { NotificationService } = require('./notification.service');
-const { MailService } = require('./mail/mail.service');
+const NotificationService = require('./notification.service');
 
-describe('NotificationService', () => {
+describe('NotificationService (unit)', () => {
   let service;
+  const mockMailService = {
+    sendMail: jest.fn().mockResolvedValue(true),
+    sendPlainTextMail: jest.fn().mockResolvedValue(true),
+    sendWelcomeEmail: jest.fn().mockResolvedValue(true),
+    sendWeatherAlert: jest.fn().mockResolvedValue(true),
+  };
 
-  beforeEach(async () => {
-    const mockMailService = { sendMail: jest.fn(), sendPlainTextMail: jest.fn(), sendWelcomeEmail: jest.fn() };
-    const module = await Test.createTestingModule({
-      providers: [
-        NotificationService,
-        { provide: MailService, useValue: mockMailService },
-      ],
-    }).compile();
-    service = module.get(NotificationService);
+  beforeEach(() => {
+    service = new NotificationService(mockMailService);
+    jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
+  test('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  // Agrega aquí más tests unitarios
+  test('sendEmail returns success when mailService resolves', async () => {
+    const res = await service.sendEmail('a@b.com', 'subj', 'tpl', {});
+    expect(mockMailService.sendMail).toHaveBeenCalled();
+    expect(res.success).toBe(true);
+  });
+
+  test('sendPlainTextEmail returns success when mailService resolves', async () => {
+    const res = await service.sendPlainTextEmail('a@b.com', 'subj', 'hi');
+    expect(mockMailService.sendPlainTextMail).toHaveBeenCalled();
+    expect(res.success).toBe(true);
+  });
+
+  test('sendWelcomeEmail returns success when mailService resolves', async () => {
+    const res = await service.sendWelcomeEmail('a@b.com', 'Name');
+    expect(mockMailService.sendWelcomeEmail).toHaveBeenCalled();
+    expect(res.success).toBe(true);
+  });
 });

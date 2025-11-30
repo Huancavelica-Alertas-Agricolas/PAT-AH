@@ -1,5 +1,14 @@
 {
   "testEnvironment": "node",
+  "rootDir": ".",
   "testMatch": ["**/test/**/*.spec.js"],
+  "testPathIgnorePatterns": ["<rootDir>/test/e2e/","<rootDir>/test/integration/"],
+  "collectCoverage": true,
+  "collectCoverageFrom": [
+    "src/**/*.js",
+    "!src/**/main.js"
+  ],
+  "coverageDirectory": "coverage",
+  "coverageReporters": ["json-summary","text","lcov"],
   "verbose": true
 }

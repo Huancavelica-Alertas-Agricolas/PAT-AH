@@ -1,3 +1,47 @@
+### Node / general
+node_modules/
+dist/
+
+### Coverage artifacts
+**/coverage/
+**/coverage/**
+**/lcov-report/
+**/lcov-report/**
+*.lcov
+
+### CI artifacts created by our workflows
+coverage-artifacts/
+diagnostic-logs/
+ci-diagnostics/
+coverage_reports/
+
+# OS / editor
+.DS_Store
+.vscode/
+.env
+# Node
+node_modules/
+
+# Logs
+.logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage reports (ignore heavy HTML reports and lcov files)
+**/coverage/lcov-report/
+**/coverage/lcov.info
+**/coverage/coverage-final.json
+**/coverage/*.html
+**/coverage/*.css
+**/coverage/*.js
+
+# CI / artifacts
+coverage-artifacts/
+
+# OS files
+.DS_Store
+Thumbs.db
 # Node
 node_modules/
 **/node_modules/
@@ -52,4 +96,13 @@ Backend-Huancavelica-Alertas-Agricolas/scripts/out/
 aws/terraform/.terraform/
 aws/terraform/terraform.tfstate
 aws/terraform/terraform.tfstate.backup
+
+# Repository cleanup: ignore generated outputs and local install/build logs
+**/*_output.txt
+**/npm-install-output.txt
+**/build-output.txt
+render_deploy_info.txt
+
+# Ignore frontend backups (kept in archive if needed)
+Frontend-Huancavelica-Alertas-Agricolas/src/backup/
 

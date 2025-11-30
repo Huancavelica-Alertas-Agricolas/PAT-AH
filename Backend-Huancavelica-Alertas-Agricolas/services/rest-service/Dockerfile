@@ -20,4 +20,5 @@ RUN apt-get update -y && apt-get install -y openssl ca-certificates curl iproute
 # Copy everything from builder's app dir into runtime (safer if /src is missing in some contexts)
 COPY --from=builder /usr/src/app/. ./
 EXPOSE 3003
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s CMD curl -f http://localhost:3003/healthz || exit 1
 CMD ["node","src/main.js"]
