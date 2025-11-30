@@ -97,7 +97,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
       return;
     }
     setTimeout(() => {
-      setResetMessage('Se ha enviado un enlace de restablecimiento a tu número. (demo)');
+      setResetMessage('Se ha enviado un enlace de restablecimiento a tu número.');
     }, 1000);
   };
 

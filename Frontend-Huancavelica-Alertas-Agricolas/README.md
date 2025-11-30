@@ -13,8 +13,6 @@ Breve guía de buenas prácticas, configuración y comandos comunes para el fron
 
 ## Variables de entorno
 - `VITE_API_URL` — URL base del gateway REST (p. ej. `http://localhost:3003/api`).
-- `VITE_OFFLINE_DEMO` — (boolean) fuerza datos demo cuando el backend no esté disponible.
-
 Guarda variables en `.env` (no comitear `.env` en git).
 
 ## Comandos comunes

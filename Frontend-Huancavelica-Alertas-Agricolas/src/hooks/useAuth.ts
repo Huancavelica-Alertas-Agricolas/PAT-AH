@@ -101,11 +101,9 @@ export const useAuth = () => {
         }
       }
     } catch (err: any) {
-      // No bloqueante: si falla la llamada al backend, caer al modo demo
-      console.warn('API login failed, falling back to demo login:', err?.message || err);
+      // No bloqueante: si falla la llamada al backend, registrar y retornar error neutral
+      console.warn('API login failed — server may be unreachable:', err?.message || err);
     }
-
-    // Demo fallback removed for production: do not use local demo credentials.
     setIsLoading(false);
     return { success: false, error: 'Error de autenticación. Verifica tus credenciales e intenta nuevamente.' };
   };

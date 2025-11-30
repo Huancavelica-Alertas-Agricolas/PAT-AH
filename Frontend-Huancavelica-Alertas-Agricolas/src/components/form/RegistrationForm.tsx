@@ -72,10 +72,12 @@ export const RegistrationForm: React.FC = () => {
         }
         setSubmitError(resp?.data?.message || 'Error al registrar en el servidor');
       } catch (err: any) {
-        console.warn('Registro API falló:', err?.message || err);
-        // Si explicitamente activamos modo demo offline (VITE_OFFLINE_DEMO=true), guardamos en localStorage.
+        console.warn('Registro API falló — servidor inaccesible:', err?.message || err);
         if (OFFLINE_DEMO) {
-          setSubmitError('Error al conectar con el servidor. Si necesitas modo demo habilita VITE_OFFLINE_DEMO en entorno de desarrollo.');
+          setSubmitError('Error al conectar con el servidor. Para pruebas locales, habilita `VITE_OFFLINE_DEMO=true` en tu archivo `.env.local`.');
+        } else {
+          setSubmitError('Error al conectar con el servidor. Intenta nuevamente más tarde.');
+        }
       } finally {
         setSubmitting(false);
       }

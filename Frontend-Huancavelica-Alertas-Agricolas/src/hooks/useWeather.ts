@@ -38,22 +38,28 @@ export const useWeather = () => {
         return;
       }
     } catch (err) {
-      // silent fallback to demo data if API unavailable
-      console.warn('useWeather: failed to fetch weather from API, using demo data', err?.message || err);
+      // If an offline demo mode is explicitly enabled, provide demo data for development/testing.
+      const OFFLINE_DEMO = (import.meta.env.VITE_OFFLINE_DEMO as string) === 'true';
+      console.warn('useWeather: failed to fetch weather from API', err?.message || err);
+      if (OFFLINE_DEMO) {
+        const demo: WeatherData = {
+          temperature: 18.5,
+          humidity: 65,
+          windSpeed: 12,
+          rainfall: 3.2,
+          lastUpdated: new Date(),
+          location: 'Huancavelica Centro'
+        };
+        setWeatherData(demo);
+        setLastUpdated(new Date());
+      } else {
+        // No demo fallback in production - leave weatherData null and let UI handle empty state
+        setWeatherData(null);
+        setLastUpdated(null);
+      }
+      setIsLoading(false);
+      return;
     }
-
-    // Fallback demo data
-    const demo: WeatherData = {
-      temperature: 18.5,
-      humidity: 65,
-      windSpeed: 12,
-      rainfall: 3.2,
-      lastUpdated: new Date(),
-      location: 'Huancavelica Centro'
-    };
-    setWeatherData(demo);
-    setLastUpdated(new Date());
-    setIsLoading(false);
   }, [API_BASE]);
 
   useEffect(() => {

@@ -31,7 +31,7 @@ import { UserManual } from './components/about/UserManual';
 import { useAuth } from './hooks/useAuth';
 import { Alert } from './types';
 
-// DashboardLoader: Ensures demo data and recommendations are loaded instantly
+// DashboardLoader: Ensures recommendations and related data are loaded once
 function DashboardLoader({ children }: { children: React.ReactNode }) {
   const { crops } = useCrops();
   const { activeAlerts } = useAlerts();
