@@ -259,6 +259,22 @@ jobs:
             head -n 200 "$f" || true
           done
 
+      - name: Collect and upload diagnostic logs
+        if: always()
+        run: |
+          echo "Collecting install/test logs into diagnostics folder"
+          mkdir -p diagnostic-logs || true
+          # copy any per-service logs from coverage-artifacts
+          cp -v coverage-artifacts/*-install.log diagnostic-logs/ 2>/dev/null || true
+          cp -v coverage-artifacts/*-test.log diagnostic-logs/ 2>/dev/null || true
+        # upload the logs even if empty
+      - name: Upload CI diagnostic logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-diagnostics
+          path: diagnostic-logs
+
       - name: Run coverage checker (node)
         if: always()
         run: |
