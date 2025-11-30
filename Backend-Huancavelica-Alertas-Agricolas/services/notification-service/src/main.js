@@ -4,26 +4,7 @@ const { NestFactory } = require('@nestjs/core');
 const { Transport } = require('@nestjs/microservices');
 const { AppModule } = require('./app.module');
 const logger = require('./logger');
-
-async function bootstrap() {
-  const app = await NestFactory.createMicroservice(AppModule, {
-    transport: Transport.TCP,
-    options: {
-      host: '0.0.0.0',
-      port: parseInt(process.env.PORT) || 3003,
-    },
-  });
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
-  app.useGlobalFilters(new AllExceptionsFilter(logger));
-  await app.listen();
-  logger.info('📧 Notification Service is listening on port 3003');
-
-  // Start a small HTTP health endpoint (separate port) using Node's http module
-  try {
-    const http = require('http');
-    const net = require('net');
-    // Prometheus metrics (require safely and call collectDefaultMetrics separately so that
-    // a failure in metrics collection doesn't disable the module entirely)
+    // Prometheus metrics (require safely).
     let promClient = null;
     try {
       promClient = require('prom-client');
@@ -36,90 +17,109 @@ async function bootstrap() {
         promClient.collectDefaultMetrics && promClient.collectDefaultMetrics();
       }
       catch (e) {
-        // don't disable promClient if collection fails
         console.warn('prom-client collectDefaultMetrics failed:', e?.message || e);
       }
     }
-    const queueGauge = promClient ? new promClient.Gauge({ name: 'notification_queue_length', help: 'Length of notification queue' }) : null;
-    const healthPort = parseInt(process.env.HEALTH_PORT) || 3004;
-    const parseUrlHostPort = (url) => {
-      try {
-        // Prefer URL parsing for common schemes
-        const u = new URL(url);
-        const defaultPort = u.protocol === 'redis:' ? 6379 : (u.protocol === 'amqp:' || u.protocol === 'amqps:' ? 5672 : 5432);
-        return { host: u.hostname, port: u.port ? parseInt(u.port) : defaultPort };
-      }
-      catch (e) {
-        try {
-          const m = url.match(/@([^:/]+)(?::(\d+))?/);
-          if (m) return { host: m[1], port: parseInt(m[2] || '6379') };
-        }
-        catch (e) { }
-      }
-      return null;
-    };
-    const tryConnect = (host, port, timeout = 1000) => new Promise((resolve) => {
-      if (!host || !port) return resolve(false);
-      const s = new net.Socket();
-      let done = false;
-      s.setTimeout(timeout);
-      s.once('error', () => { if (!done) { done = true; s.destroy(); resolve(false); } });
-      s.once('timeout', () => { if (!done) { done = true; s.destroy(); resolve(false); } });
-      s.connect(port, host, () => { if (!done) { done = true; s.end(); resolve(true); } });
-    });
+    const queueGauge = promClient ? new promClient.Gauge({ name: 'notification_queue_length', help: 'Length of notification queue', labelNames: ['queue'] }) : null;
+    const queueScrapeErrors = promClient ? new promClient.Counter({ name: 'notification_queue_scrape_errors_total', help: 'Total errors while scraping notification queue', labelNames: ['queue'] }) : null;
+    // Metrics server config
+    const METRICS_PORT = parseInt(process.env.METRICS_PORT) || 9400;
+    const METRICS_BIND_ADDR = process.env.METRICS_BIND_ADDR || '127.0.0.1';
+    const METRICS_POLL_INTERVAL = parseInt(process.env.METRICS_POLL_INTERVAL_MS) || 10000;
 
-    const server = http.createServer(async (req, res) => {
-      if (req.url === '/metrics') {
-        if (!promClient) {
-          res.writeHead(404);
-          res.end('metrics not configured');
-          return;
-        }
-        res.writeHead(200, { 'Content-Type': promClient.register.contentType });
-        res.end(await promClient.register.metrics());
-        return;
-      }
-      if (req.url === '/healthz') {
-        const components = { service: 'notification-service' };
-        let ok = true;
-        // DB check if configured — prefer Prisma ping when available
-        try {
-          if (process.env.DATABASE_URL) {
-            let usedPrisma = false;
+    // Poller to update queue length periodically (so metrics are fresh for Prometheus)
+    const updateQueueLength = async () => {
+      if (!queueGauge) return;
+      try {
+        if (process.env.REDIS_URL) {
+          try {
+            const IORedis = require('ioredis');
+            const client = new IORedis(process.env.REDIS_URL, { connectTimeout: 2000 });
+            let len = null;
+            if (process.env.NOTIFICATION_QUEUE_NAME) {
+              len = await client.llen(process.env.NOTIFICATION_QUEUE_NAME).catch(() => null);
+            }
+            await client.quit().catch(() => null);
+            const val = typeof len === 'number' ? len : 0;
+            queueGauge.set({ queue: process.env.NOTIFICATION_QUEUE_NAME || 'default' }, val);
+            return;
+          }
+          catch (e) {
+            // fallback to node-redis if ioredis fails
             try {
-              const { PrismaClient } = require('@prisma/client');
-              const prisma = new PrismaClient();
+              const redis = require('redis');
+              const client = redis.createClient({ url: process.env.REDIS_URL });
+              await client.connect();
+              let len = null;
+              if (process.env.NOTIFICATION_QUEUE_NAME) {
+                len = await client.llen(process.env.NOTIFICATION_QUEUE_NAME).catch(() => null);
+              }
+              await client.disconnect().catch(() => null);
+              const val = typeof len === 'number' ? len : 0;
+              queueGauge.set({ queue: process.env.NOTIFICATION_QUEUE_NAME || 'default' }, val);
+              return;
+            }
+            catch (e2) {
+              // failed to read redis
+              queueScrapeErrors && queueScrapeErrors.inc({ queue: process.env.NOTIFICATION_QUEUE_NAME || 'default' });
+              return;
+            }
+          }
+        }
+        else if (process.env.RABBITMQ_URL) {
+          try {
+            const amqp = require('amqplib');
+            const conn = await amqp.connect(process.env.RABBITMQ_URL, { timeout: 2000 });
+            const ch = await conn.createChannel();
+            if (process.env.NOTIFICATION_QUEUE_NAME) {
               try {
-                await prisma.$queryRaw`SELECT 1`;
-                components.db = 'ok';
-                usedPrisma = true;
+                const info = await ch.checkQueue(process.env.NOTIFICATION_QUEUE_NAME);
+                const val = typeof info?.messageCount === 'number' ? info.messageCount : 0;
+                queueGauge.set({ queue: process.env.NOTIFICATION_QUEUE_NAME || 'default' }, val);
               }
               catch (e) {
-                components.db = 'error';
-                ok = false;
+                queueScrapeErrors && queueScrapeErrors.inc({ queue: process.env.NOTIFICATION_QUEUE_NAME || 'default' });
               }
-              try { await prisma.$disconnect(); } catch (_) { }
             }
-            catch (e) {
-              // Prisma not available — fallback to TCP check
-            }
-
-            if (!components.db) {
-              const db = parseUrlHostPort(process.env.DATABASE_URL);
-              const up = await tryConnect(db?.host, db?.port);
-              components.db = up ? 'ok' : 'error';
-              if (!up) ok = false;
-            }
+            await ch.close().catch(() => null);
+            await conn.close().catch(() => null);
+            return;
           }
-          else {
-            components.db = 'not-configured';
+          catch (e) {
+            queueScrapeErrors && queueScrapeErrors.inc({ queue: process.env.NOTIFICATION_QUEUE_NAME || 'default' });
+            return;
           }
         }
-        catch (e) {
-          components.db = 'error';
-          ok = false;
-        }
+      }
+      catch (e) {
+        queueScrapeErrors && queueScrapeErrors.inc({ queue: process.env.NOTIFICATION_QUEUE_NAME || 'default' });
+      }
+    };
 
+    // Start polling if metrics enabled
+    if (queueGauge) {
+      // initial poll
+      updateQueueLength().catch(() => null);
+      setInterval(() => updateQueueLength().catch(() => null), METRICS_POLL_INTERVAL);
+      // start metrics HTTP server on separate port
+      try {
+        const metricsServer = http.createServer(async (req, res) => {
+          if (req.url === '/metrics') {
+            res.writeHead(200, { 'Content-Type': promClient.register.contentType });
+            res.end(await promClient.register.metrics());
+            return;
+          }
+          res.writeHead(404);
+          res.end();
+        });
+        metricsServer.listen(METRICS_PORT, METRICS_BIND_ADDR, () => {
+          logger.info(`📊 Metrics endpoint listening on ${METRICS_BIND_ADDR}:${METRICS_PORT}`);
+        });
+      }
+      catch (e) {
+        logger.warn('Metrics server not started:', e?.message || e);
+      }
+    }
         // Queue check (Redis or RabbitMQ)
         try {
           // Normalize components.queue to an object when configured
