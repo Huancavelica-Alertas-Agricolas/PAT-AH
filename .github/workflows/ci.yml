@@ -15,6 +15,22 @@ on:
         description: 'Coverage threshold for notification-service (optional)'
         required: false
         default: ''
+      coverage_alert:
+        description: 'Coverage threshold for alert-service (optional)'
+        required: false
+        default: ''
+      coverage_weather:
+        description: 'Coverage threshold for weather-service (optional)'
+        required: false
+        default: ''
+      coverage_ai:
+        description: 'Coverage threshold for ai-service (optional)'
+        required: false
+        default: ''
+      coverage_ingest:
+        description: 'Coverage threshold for ingest-service (optional)'
+        required: false
+        default: ''
       coverage_users:
         description: 'Coverage threshold for users-service (optional)'
         required: false
@@ -183,19 +199,14 @@ jobs:
         if: always()
         run: |
           echo "Running coverage for services that expose test:cov..."
-          SERVICES=(
-            "Backend-Huancavelica-Alertas-Agricolas/services/notification-service"
-            "Backend-Huancavelica-Alertas-Agricolas/services/users-service"
-            "Backend-Huancavelica-Alertas-Agricolas/services/rest-service"
-          )
           mkdir -p coverage-artifacts || true
-          for pkg in "${SERVICES[@]}"; do
+          # discover services under Backend-Huancavelica-Alertas-Agricolas/services/* that declare test:cov
+          for pkg in Backend-Huancavelica-Alertas-Agricolas/services/*; do
             if [ -f "$pkg/package.json" ]; then
-              echo "Checking $pkg for test:cov script"
+              echo "Inspecting $pkg"
               if grep -q '"test:cov"' "$pkg/package.json"; then
                 echo "-> Running coverage for $pkg"
                 npm run test:cov --prefix "$pkg" || true
-                # copy summary if exists
                 if [ -f "$pkg/coverage/coverage-summary.json" ]; then
                   name=$(basename "$pkg")
                   mkdir -p coverage-artifacts/$name
@@ -214,6 +225,10 @@ jobs:
           NOTIFICATION_THRESHOLD: ${{ github.event.inputs.coverage_notification || '' }}
           USERS_THRESHOLD: ${{ github.event.inputs.coverage_users || '' }}
           REST_THRESHOLD: ${{ github.event.inputs.coverage_rest || '' }}
+          ALERT_THRESHOLD: ${{ github.event.inputs.coverage_alert || '' }}
+          WEATHER_THRESHOLD: ${{ github.event.inputs.coverage_weather || '' }}
+          AI_THRESHOLD: ${{ github.event.inputs.coverage_ai || '' }}
+          INGEST_THRESHOLD: ${{ github.event.inputs.coverage_ingest || '' }}
         run: |
           echo "Checking coverage against threshold: $COVERAGE_THRESHOLD% (overrides allowed per-service)"
           python3 - <<'PY'
@@ -223,6 +238,10 @@ jobs:
       'notification-service': int(os.environ['NOTIFICATION_THRESHOLD']) if os.environ.get('NOTIFICATION_THRESHOLD') else None,
       'users-service': int(os.environ['USERS_THRESHOLD']) if os.environ.get('USERS_THRESHOLD') else None,
       'rest-service': int(os.environ['REST_THRESHOLD']) if os.environ.get('REST_THRESHOLD') else None,
+      'alert-service': int(os.environ['ALERT_THRESHOLD']) if os.environ.get('ALERT_THRESHOLD') else None,
+      'weather-service': int(os.environ['WEATHER_THRESHOLD']) if os.environ.get('WEATHER_THRESHOLD') else None,
+      'ai-service': int(os.environ['AI_THRESHOLD']) if os.environ.get('AI_THRESHOLD') else None,
+      'ingest-service': int(os.environ['INGEST_THRESHOLD']) if os.environ.get('INGEST_THRESHOLD') else None,
     }
     failures=[]
     base='coverage-artifacts'
