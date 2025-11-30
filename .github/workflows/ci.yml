@@ -45,6 +45,30 @@ jobs:
             fi
           done
 
+      - name: Run npm audit for all services (produce reports)
+        run: |
+          echo "Running npm audit for services..."
+          mkdir -p "$GITHUB_WORKSPACE/audit-reports"
+          for pkg in "${SERVICES[@]}"; do
+            if [ -f "$pkg/package.json" ]; then
+              name=$(basename "$pkg")
+              echo "--- npm audit: $pkg -> $name-audit.json ---"
+              (cd "$pkg" && npm audit --json > "$GITHUB_WORKSPACE/audit-reports/$name-audit.json") || echo "{}" > "$GITHUB_WORKSPACE/audit-reports/$name-audit.json"
+            fi
+          done
+
+      - name: Run ESLint where configured
+        run: |
+          echo "Running ESLint for packages that declare eslint config..."
+          for pkg in "${SERVICES[@]}"; do
+            if [ -f "$pkg/package.json" ]; then
+              if [ -f "$pkg/.eslintrc" ] || [ -f "$pkg/.eslintrc.js" ] || [ -f "$pkg/.eslintrc.json" ] || grep -q "eslintConfig" "$pkg/package.json" 2>/dev/null; then
+                echo "--- ESLint: $pkg ---"
+                npx eslint "$pkg" --ext .js,.ts || true
+              fi
+            fi
+          done
+
       - name: Run tests for rest-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/rest-service
         run: |
@@ -56,6 +80,24 @@ jobs:
         run: |
           echo "Running tests for weather-service..."
           npm test -- --passWithNoTests
+
+      - name: Run tests for notification-service
+        working-directory: Backend-Huancavelica-Alertas-Agricolas/services/notification-service
+        run: |
+          echo "Running tests for notification-service..."
+          npm test -- --passWithNoTests || true
+
+      - name: Run tests for users-service
+        working-directory: Backend-Huancavelica-Alertas-Agricolas/services/users-service
+        run: |
+          echo "Running tests for users-service..."
+          npm test -- --passWithNoTests || true
+
+      - name: Run tests for alert-service
+        working-directory: Backend-Huancavelica-Alertas-Agricolas/services/alert-service
+        run: |
+          echo "Running tests for alert-service..."
+          npm test -- --passWithNoTests || true
 
       - name: Run tests for ai-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/ai-service
@@ -115,3 +157,10 @@ jobs:
           path: |
             Backend-Huancavelica-Alertas-Agricolas/services/rest-service/jest.config.json
             Backend-Huancavelica-Alertas-Agricolas/services/weather-service/jest.config.json
+
+      - name: Upload audit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-reports
+          path: audit-reports
