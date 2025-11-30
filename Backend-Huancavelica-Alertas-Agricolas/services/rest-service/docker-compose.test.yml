@@ -2,33 +2,55 @@
 version: '3.8'
 
 services:
-  db:
+  postgres:
     image: postgres:15
     environment:
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
       POSTGRES_DB: rest_test
-    # Do NOT expose the DB port to the host in test compose to avoid collisions.
-    # The runner container will access this DB through the internal compose network.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test -d rest_test"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 12
     volumes:
-      - db_test_data:/var/lib/postgresql/data
+      - pgtest:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  rest-service:
+    build: .
+    environment:
+      DATABASE_URL: "postgresql://test:test@postgres:5432/rest_test"
+      REDIS_URL: "redis://redis:6379"
+      NODE_ENV: test
+    ports:
+      - "3003:3003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   runner:
-    image: node:18
-    working_dir: /work
+    image: node:20
+    working_dir: /app
     volumes:
-      - ./:/work:delegated
+      - ./:/app:rw
     depends_on:
-      - db
+      - rest-service
     environment:
-      DATABASE_URL: "postgresql://test:test@db:5432/rest_test?schema=public"
-    # Keep the container running while we exec commands into it via `docker-compose run`.
-    command: ["tail", "-f", "/dev/null"]
+      DATABASE_URL: "postgresql://test:test@postgres:5432/rest_test"
+      REDIS_URL: "redis://redis:6379"
+    entrypoint: ["sh", "-c"]
+    command: |
+      "npm ci --legacy-peer-deps --no-audit || true && npx prisma generate --schema=./prisma/schema.prisma || true && npm test -- --runInBand"
 
 volumes:
-  db_test_data:
+  pgtest: {}
