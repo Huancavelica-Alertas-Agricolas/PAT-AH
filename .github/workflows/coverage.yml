@@ -25,26 +25,30 @@ jobs:
       - name: Run per-service coverage
         run: |
           set -euo pipefail
+          mkdir -p coverage-artifacts
+          # for each service try installing and running coverage; capture logs per-service
           for dir in services/*; do
-            if [ -f "$dir/package.json" ] && grep -q '"test:cov"' "$dir/package.json"; then
-              echo "---- Running coverage for: $dir"
-              pushd "$dir"
-              npm ci --silent --no-audit --no-fund || npm install --no-audit --no-fund
-              # Prefer explicit test:cov if present, fallback to jest invocation that emits json-summary
-              if npm run test:cov --silent --if-present; then
-                echo "test:cov finished for $dir"
-              else
-                echo "Fallback: running jest with json-summary for $dir"
-                npx jest --coverage --coverageReporters=json-summary --runInBand || true
-              fi
-              popd
+            if [ -f "$dir/package.json" ]; then
+              svc=$(basename "$dir")
+              echo "---- Running coverage for: $svc ($dir)"
+              mkdir -p "coverage-artifacts/$svc"
+              # Install and capture install log
+              (cd "$dir" && npm ci --no-audit --no-fund) > "coverage-artifacts/${svc}-install.log" 2>&1 || \
+                (cd "$dir" && npm install --no-audit --no-fund) >> "coverage-artifacts/${svc}-install.log" 2>&1 || true
+
+              # Run test:cov if present, otherwise fallback to jest with json-summary
+              (cd "$dir" && if grep -q '"test:cov"' package.json; then npm run test:cov --if-present; else npx jest --coverage --coverageReporters=json-summary --runInBand || true; fi) > "coverage-artifacts/${svc}-test.log" 2>&1 || true
+
+              # Copy coverage dir if present
               if [ -d "$dir/coverage" ]; then
-                cp -r "$dir/coverage" "coverage-artifacts/$(basename $dir)"
+                cp -r "$dir/coverage" "coverage-artifacts/$svc/"
               else
-                echo "Warning: no coverage produced for $dir"
+                echo "Warning: no coverage produced for $svc" >> "coverage-artifacts/${svc}-test.log"
               fi
             fi
           done
+          echo "Listing coverage-artifacts:"
+          ls -R coverage-artifacts || true
 
       - name: Install root deps (scripts)
         run: npm ci --silent || true
