@@ -915,7 +915,8 @@ jobs:
         run: |
           echo "Running OWASP ZAP baseline scan (fallback) against http://localhost:3003"
           # generate both HTML and JSON reports (-r html, -J json)
-          docker run --rm --network host -v $PWD:/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://localhost:3003 -r zap-report.html -J zap-report.json || true
+          # keep the docker run on a single line to avoid YAML parsing issues
+          docker run --rm --network host -v "$PWD":/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://localhost:3003 -r zap-report.html -J zap-report.json || true
 
       - name: Analyze ZAP JSON and fail on configured severities
         id: analyze
