@@ -31,22 +31,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
 
   // Configurar usuario demo automáticamente (solo una vez)
   useEffect(() => {
-    // Crear datos demo solo si se habilita explícitamente mediante la variable de entorno
-    try {
-      const enableDemo = (import.meta.env.VITE_OFFLINE_DEMO as string) === 'true';
-      if (enableDemo) {
-        const demoUser = localStorage.getItem('demoUser');
-        if (!demoUser) {
-          localStorage.setItem('demoUser', JSON.stringify({
-            telefono: '+51987654321',
-            contraseña: 'password123'
-          }));
-        }
-      }
-    } catch (e) {
-      // import.meta may not be available in some test environments; ignore
-    }
-  }, []); // Array vacío para ejecutar solo una vez
+    // demo setup removed - demo user storage was removed during cleanup
+  }, []);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<AuthFormData> = {};
@@ -253,14 +239,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
                   </p>
                 </div>
               )}
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-800 mb-2">
-                  <strong>Demo:</strong> Usa cualquier número +51 con 9 dígitos y contraseña de 6+ caracteres
-                </p>
-                <p className="text-xs text-blue-600">
-                  Ejemplo: +51987654321 / password123
-                </p>
-              </div>
+              {/* Demo UI removed: demo instructions were removed to keep frontend production-focused. */}
             </div>
           </CardContent>
         </Card>

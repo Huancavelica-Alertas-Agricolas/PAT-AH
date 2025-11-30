@@ -75,42 +75,14 @@ export const RegistrationForm: React.FC = () => {
         console.warn('Registro API falló:', err?.message || err);
         // Si explicitamente activamos modo demo offline (VITE_OFFLINE_DEMO=true), guardamos en localStorage.
         if (OFFLINE_DEMO) {
-          console.warn('OFFLINE_DEMO=true → guardando credenciales temporalmente en localStorage');
-          try {
-            localStorage.setItem('demoUser', JSON.stringify({ telefono: form.telefono, contraseña: form.contraseña }));
-            setSubmitSuccess(true);
-            setTimeout(() => {
-              setSubmitSuccess(false);
-              window.location.href = '/login';
-            }, 2500);
-            return;
-          } catch (e: any) {
-            // fallthrough to show error
-          }
-        }
-        setSubmitError('Error al conectar con el servidor. Intenta nuevamente o contacte al administrador.');
+          setSubmitError('Error al conectar con el servidor. Si necesitas modo demo habilita VITE_OFFLINE_DEMO en entorno de desarrollo.');
       } finally {
         setSubmitting(false);
       }
     } else {
-      // Offline path: only save demo data if OFFLINE_DEMO is enabled
-      if (OFFLINE_DEMO) {
-        try {
-          localStorage.setItem('demoUser', JSON.stringify({ telefono: form.telefono, contraseña: form.contraseña }));
-          setSubmitSuccess(true);
-          setTimeout(() => {
-            setSubmitSuccess(false);
-            window.location.href = '/login';
-          }, 2500);
-        } catch (err: any) {
-          setSubmitError('Error al registrar. Intente nuevamente.');
-        } finally {
-          setSubmitting(false);
-        }
-      } else {
-        setSubmitError('Sin conexión: no se pudo contactar con el servidor. Intente más tarde.');
-        setSubmitting(false);
-      }
+      // Offline path: do not auto-save demo credentials in production builds.
+      setSubmitError('Sin conexión: no se pudo contactar con el servidor. Intente más tarde.');
+      setSubmitting(false);
     }
   };
 

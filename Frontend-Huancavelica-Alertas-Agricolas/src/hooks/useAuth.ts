@@ -105,43 +105,9 @@ export const useAuth = () => {
       console.warn('API login failed, falling back to demo login:', err?.message || err);
     }
 
-    // Validación DEMO: compara con datos guardados en registro
-    const demoUserRaw = localStorage.getItem('demoUser');
-    if (demoUserRaw) {
-      try {
-        const demoUser = JSON.parse(demoUserRaw);
-        if (
-          demoUser.telefono === formData.phone &&
-          demoUser.contraseña === formData.password
-        ) {
-          const newUser: User = {
-            id: 'user_' + Date.now(),
-            phone: formData.phone,
-            name: `Usuario ${formData.phone}`,
-            location: 'Huancavelica Centro',
-            isAuthenticated: true,
-            notifications: {
-              sms: true,
-              telegram: false,
-              email: false
-            }
-          };
-          setUser(newUser);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
-          localStorage.removeItem('climaAlert_token');
-          setIsLoading(false);
-          return { success: true };
-        } else {
-          setIsLoading(false);
-          return { success: false, error: 'Teléfono o contraseña incorrectos.' };
-        }
-      } catch (e) {
-        setIsLoading(false);
-        return { success: false, error: 'Error de datos de usuario demo.' };
-      }
-    }
+    // Demo fallback removed for production: do not use local demo credentials.
     setIsLoading(false);
-    return { success: false, error: 'No existe usuario registrado. Regístrese primero.' };
+    return { success: false, error: 'Error de autenticación. Verifica tus credenciales e intenta nuevamente.' };
   };
 
   const logout = () => {
