@@ -43,19 +43,19 @@ async function bootstrap() {
 
     const server = http.createServer(async (req, res) => {
       if (req.url === '/healthz') {
-        const components = { service: 'weather-service' };
+        const components = { service: 'weather-service', db: { status: 'unknown', msg: null }, queue: { status: 'not-configured', len: null } };
         let ok = true;
         try {
-          if (process.env.DATABASE_URL) {
+                if (process.env.DATABASE_URL) {
             try {
               const { PrismaClient } = require('@prisma/client');
               const prisma = new PrismaClient();
               try {
                 await prisma.$queryRaw`SELECT 1`;
-                components.db = 'ok';
+                      components.db.status = 'ok';
               }
               catch (e) {
-                components.db = 'error';
+                      components.db.status = 'error';
                 ok = false;
               }
               try { await prisma.$disconnect(); } catch (_) { }
@@ -63,12 +63,12 @@ async function bootstrap() {
             catch (e) {
               const db = parseUrlHostPort(process.env.DATABASE_URL);
               const up = await tryConnect(db?.host, db?.port);
-              components.db = up ? 'ok' : 'error';
+                    components.db.status = up ? 'ok' : 'error';
               if (!up) ok = false;
             }
           }
           else {
-            components.db = 'not-configured';
+            components.db.status = 'not-configured';
           }
         }
         catch (e) {

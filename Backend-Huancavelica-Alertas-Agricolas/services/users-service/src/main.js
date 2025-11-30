@@ -28,7 +28,7 @@ async function bootstrap() {
     // Health endpoint for orchestration checks
     try {
         const httpAdapter = app.getHttpAdapter && app.getHttpAdapter();
-        const instance = httpAdapter && httpAdapter.getInstance && httpAdapter.getInstance();
+            const instance = httpAdapter && httpAdapter.getInstance && httpAdapter.getInstance();
         if (instance && instance.get) {
             const net = require('net');
             const parseDbHostPort = (url) => {
@@ -50,7 +50,7 @@ async function bootstrap() {
             });
 
             instance.get('/healthz', async (req, res) => {
-                const components = {};
+                const components = { service: 'users-service', db: { status: 'unknown', msg: null }, queue: { status: 'not-configured', len: null } };
                 let ok = true;
                 try {
                     const dbUrl = process.env.DATABASE_URL;
@@ -61,11 +61,11 @@ async function bootstrap() {
                             const prisma = new PrismaClient();
                             try {
                                 await prisma.$queryRaw`SELECT 1`;
-                                components.db = 'ok';
+                                components.db.status = 'ok';
                                 usedPrisma = true;
                             }
                             catch (e) {
-                                components.db = 'error';
+                                components.db.status = 'error';
                                 ok = false;
                             }
                             try { await prisma.$disconnect(); } catch (_) { }
@@ -77,16 +77,16 @@ async function bootstrap() {
                         if (!components.db) {
                             const db = parseDbHostPort(dbUrl);
                             const up = await tryConnect(db?.host, db?.port);
-                            components.db = up ? 'ok' : 'error';
+                            components.db.status = up ? 'ok' : 'error';
                             if (!up) ok = false;
                         }
                     }
                     else {
-                        components.db = 'not-configured';
+                        components.db.status = 'not-configured';
                     }
                 }
                 catch (e) {
-                    components.db = 'error';
+                    components.db.status = 'error';
                     ok = false;
                 }
                 res.status(ok ? 200 : 503).json({ status: ok ? 'ok' : 'error', components });

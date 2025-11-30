@@ -63,12 +63,12 @@ async function bootstrap() {
                 });
 
                 instance.get('/healthz', async (req, res) => {
-                    const components = {};
+                        const components = { service: 'rest-service', db: { status: 'unknown', msg: null }, queue: { status: 'not-configured', len: null } };
                     let ok = true;
                     // Prefer a Prisma-based ping when available, otherwise fallback to TCP connect
                     try {
                         const dbUrl = process.env.DATABASE_URL;
-                        if (dbUrl) {
+                            if (dbUrl) {
                             let usedPrisma = false;
                             try {
                                 const { PrismaClient } = require('@prisma/client');
@@ -76,11 +76,11 @@ async function bootstrap() {
                                 try {
                                     // lightweight raw query
                                     await prisma.$queryRaw`SELECT 1`;
-                                    components.db = 'ok';
+                                    components.db.status = 'ok';
                                     usedPrisma = true;
                                 }
                                 catch (e) {
-                                    components.db = 'error';
+                                    components.db.status = 'error';
                                     ok = false;
                                 }
                                 try { await prisma.$disconnect(); } catch (_) { }
@@ -92,16 +92,16 @@ async function bootstrap() {
                             if (!components.db) {
                                 const db = parseDbHostPort(dbUrl);
                                 const up = await tryConnect(db?.host, db?.port);
-                                components.db = up ? 'ok' : 'error';
+                                components.db.status = up ? 'ok' : 'error';
                                 if (!up) ok = false;
                             }
                         }
                         else {
-                            components.db = 'not-configured';
+                            components.db.status = 'not-configured';
                         }
                     }
                     catch (e) {
-                        components.db = 'error';
+                        components.db.status = 'error';
                         ok = false;
                     }
                     res.status(ok ? 200 : 503).json({ status: ok ? 'ok' : 'error', components });
