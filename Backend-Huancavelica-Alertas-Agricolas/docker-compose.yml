@@ -23,6 +23,14 @@ services:
     depends_on:
       - db
 
+  redis:
+    image: redis:7
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
   users-service:
     build:
       context: ./services/users-service
@@ -83,6 +91,9 @@ services:
     build:
       context: ./services/notification-service
       dockerfile: Dockerfile
+    environment:
+      REDIS_URL: redis://redis:6379
+      NOTIFICATION_QUEUE_NAME: notifications
     ports:
       - "3008:3003"
       - "3009:3004"
