@@ -65,13 +65,36 @@ async function bootstrap() {
                 instance.get('/healthz', async (req, res) => {
                     const components = {};
                     let ok = true;
+                    // Prefer a Prisma-based ping when available, otherwise fallback to TCP connect
                     try {
                         const dbUrl = process.env.DATABASE_URL;
                         if (dbUrl) {
-                            const db = parseDbHostPort(dbUrl);
-                            const up = await tryConnect(db?.host, db?.port);
-                            components.db = up ? 'ok' : 'error';
-                            if (!up) ok = false;
+                            let usedPrisma = false;
+                            try {
+                                const { PrismaClient } = require('@prisma/client');
+                                const prisma = new PrismaClient();
+                                try {
+                                    // lightweight raw query
+                                    await prisma.$queryRaw`SELECT 1`;
+                                    components.db = 'ok';
+                                    usedPrisma = true;
+                                }
+                                catch (e) {
+                                    components.db = 'error';
+                                    ok = false;
+                                }
+                                try { await prisma.$disconnect(); } catch (_) { }
+                            }
+                            catch (e) {
+                                // Prisma not available or failed to load — fallback to TCP
+                            }
+
+                            if (!components.db) {
+                                const db = parseDbHostPort(dbUrl);
+                                const up = await tryConnect(db?.host, db?.port);
+                                components.db = up ? 'ok' : 'error';
+                                if (!up) ok = false;
+                            }
                         }
                         else {
                             components.db = 'not-configured';

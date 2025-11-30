@@ -45,13 +45,34 @@ async function bootstrap() {
       if (req.url === '/healthz') {
         const components = { service: 'notification-service' };
         let ok = true;
-        // DB check if configured
+        // DB check if configured — prefer Prisma ping when available
         try {
           if (process.env.DATABASE_URL) {
-            const db = parseUrlHostPort(process.env.DATABASE_URL);
-            const up = await tryConnect(db?.host, db?.port);
-            components.db = up ? 'ok' : 'error';
-            if (!up) ok = false;
+            let usedPrisma = false;
+            try {
+              const { PrismaClient } = require('@prisma/client');
+              const prisma = new PrismaClient();
+              try {
+                await prisma.$queryRaw`SELECT 1`;
+                components.db = 'ok';
+                usedPrisma = true;
+              }
+              catch (e) {
+                components.db = 'error';
+                ok = false;
+              }
+              try { await prisma.$disconnect(); } catch (_) { }
+            }
+            catch (e) {
+              // Prisma not available — fallback to TCP check
+            }
+
+            if (!components.db) {
+              const db = parseUrlHostPort(process.env.DATABASE_URL);
+              const up = await tryConnect(db?.host, db?.port);
+              components.db = up ? 'ok' : 'error';
+              if (!up) ok = false;
+            }
           }
           else {
             components.db = 'not-configured';

@@ -33,10 +33,31 @@ async function bootstrap() {
         try {
           const dbUrl = process.env.DATABASE_URL;
           if (dbUrl) {
-            const db = parseDbHostPort(dbUrl);
-            const up = await tryConnect(db?.host, db?.port);
-            components.db = up ? 'ok' : 'error';
-            if (!up) ok = false;
+            let usedPrisma = false;
+            try {
+              const { PrismaClient } = require('@prisma/client');
+              const prisma = new PrismaClient();
+              try {
+                await prisma.$queryRaw`SELECT 1`;
+                components.db = 'ok';
+                usedPrisma = true;
+              }
+              catch (e) {
+                components.db = 'error';
+                ok = false;
+              }
+              try { await prisma.$disconnect(); } catch (_) { }
+            }
+            catch (e) {
+              // Prisma not present — fallback
+            }
+
+            if (!components.db) {
+              const db = parseDbHostPort(dbUrl);
+              const up = await tryConnect(db?.host, db?.port);
+              components.db = up ? 'ok' : 'error';
+              if (!up) ok = false;
+            }
           }
           else {
             components.db = 'not-configured';
