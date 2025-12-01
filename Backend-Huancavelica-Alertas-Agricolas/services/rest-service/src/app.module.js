@@ -8,6 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const graphql_1 = require("@nestjs/graphql");
+const apollo_1 = require("@nestjs/apollo");
 const rest_module_1 = require("./rest/rest.module");
 const shared_module_1 = require("./shared/shared.module");
 let AppModule = class AppModule {
@@ -15,7 +17,17 @@ let AppModule = class AppModule {
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [shared_module_1.SharedModule, rest_module_1.RestModule],
+        imports: [
+                graphql_1.GraphQLModule.forRoot({
+                    driver: apollo_1.ApolloDriver,
+                    autoSchemaFile: true,
+                    path: '/graphql',
+                    playground: true,
+                    sortSchema: true,
+                }),
+                shared_module_1.SharedModule,
+                rest_module_1.RestModule,
+            ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

@@ -8,6 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const graphql_1 = require("@nestjs/graphql");
+const apollo_1 = require("@nestjs/apollo");
 const prisma_service_1 = require("./shared/prisma/prisma.service");
 const ai_module_1 = require("./ai-microservice/ai.module");
 let AppModule = class AppModule {
@@ -15,8 +17,17 @@ let AppModule = class AppModule {
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [ai_module_1.AiModule],
-        providers: [prisma_service_1.PrismaService]
+        imports: [
+                graphql_1.GraphQLModule.forRoot({
+                    driver: apollo_1.ApolloDriver,
+                    autoSchemaFile: true,
+                    path: '/graphql',
+                    playground: true,
+                    sortSchema: true,
+                }),
+                ai_module_1.AiModule,
+            ],
+            providers: [prisma_service_1.PrismaService]
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

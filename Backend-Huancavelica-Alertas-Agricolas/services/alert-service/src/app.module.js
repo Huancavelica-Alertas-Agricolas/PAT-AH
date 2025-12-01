@@ -1,4 +1,6 @@
 const { Module } = require('@nestjs/common');
+const { GraphQLModule } = require('@nestjs/graphql');
+const { ApolloDriver } = require('@nestjs/apollo');
 const { PrometheusModule } = require('@willsoto/nestjs-prometheus');
 const { ClientsModule, Transport } = require('@nestjs/microservices');
 const { ConfigModule } = require('@nestjs/config');
@@ -10,6 +12,13 @@ const { UserAlert } = require('./entities/user-alert.entity');
 
 const moduleConfig = {
   imports: [
+    GraphQLModule.forRoot({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
+      path: '/graphql',
+      playground: true,
+      sortSchema: true,
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
