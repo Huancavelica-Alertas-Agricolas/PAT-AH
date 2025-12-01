@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "prisma": "^5.22.0"
+    "node-fetch": "^3.3.2",
+    "prisma": "^5.22.0",
+    "twilio": "^5.10.6"
   }
 }
