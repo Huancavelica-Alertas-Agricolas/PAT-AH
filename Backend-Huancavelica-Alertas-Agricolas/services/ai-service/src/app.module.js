@@ -18,14 +18,14 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-                graphql_1.GraphQLModule.forRoot({
+                ...(process.env.ENABLE_GRAPHQL === '1' ? [graphql_1.GraphQLModule.forRoot({
                     driver: apollo_1.ApolloDriver,
                     autoSchemaFile: true,
-                    path: '/graphql',
+                    path: '/api/graphql',
                     playground: true,
                     introspection: true,
                     sortSchema: true,
-                }),
+                })] : []),
                 ai_module_1.AiModule,
             ],
             providers: [prisma_service_1.PrismaService]

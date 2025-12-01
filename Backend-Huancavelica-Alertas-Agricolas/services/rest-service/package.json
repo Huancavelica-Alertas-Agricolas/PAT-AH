@@ -35,4 +35,8 @@
     "@nestjs/testing": "^11.1.9"
     ,"node-fetch": "^2.6.7"
   }
+  ,
+  "optionalDependencies": {
+    "@as-integrations/express5": "^1.0.0"
+  }
 }

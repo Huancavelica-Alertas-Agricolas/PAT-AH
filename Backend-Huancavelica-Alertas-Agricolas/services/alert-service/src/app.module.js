@@ -7,6 +7,7 @@ const { ConfigModule } = require('@nestjs/config');
 const { TypeOrmModule } = require('@nestjs/typeorm');
 const { AlertController } = require('./alert.controller');
 const { AlertService } = require('./alert.service');
+const { AlertResolver } = require('./alert.resolver');
 const { Alert } = require('./entities/alert.entity');
 const { UserAlert } = require('./entities/user-alert.entity');
 
@@ -15,7 +16,7 @@ const moduleConfig = {
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       autoSchemaFile: true,
-      path: '/graphql',
+      path: '/api/graphql',
       playground: true,
       introspection: true,
       sortSchema: true,
@@ -62,7 +63,7 @@ const moduleConfig = {
     PrometheusModule.register(),
   ],
   controllers: [AlertController],
-  providers: [AlertService],
+  providers: [AlertService, AlertResolver],
 };
 
 class AppModule {}

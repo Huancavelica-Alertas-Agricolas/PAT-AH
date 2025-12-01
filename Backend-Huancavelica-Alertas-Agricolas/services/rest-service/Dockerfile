@@ -14,7 +14,7 @@ RUN mkdir -p prisma && cp ../shared/prisma/schema.prisma prisma/schema.prisma ||
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma; fi
 
 # Final runtime: use a minimal image that does not include npm or extra OS packages
-FROM node:20-slim
+FROM node:20-bookworm
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
 

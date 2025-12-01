@@ -14,14 +14,14 @@ const { WeatherHistory } = require('./entities/weather-history.entity');
 
 const moduleConfig = {
   imports: [
-    GraphQLModule.forRoot({
+    ...(process.env.ENABLE_GRAPHQL === '1' ? [GraphQLModule.forRoot({
       driver: ApolloDriver,
       autoSchemaFile: true,
       path: '/graphql',
       playground: true,
       introspection: true,
       sortSchema: true,
-    }),
+    })] : []),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',

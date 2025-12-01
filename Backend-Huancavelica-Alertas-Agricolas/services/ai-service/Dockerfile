@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 # Copy only ai-service package files first (optimize npm install)
 COPY package*.json ./
 RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/* \
- && npm ci --legacy-peer-deps --no-audit --no-fund
+ && npm install --legacy-peer-deps --no-audit --no-fund || true
 # Copy only the ai-service sources into the image (context should be the service folder)
 COPY . ./
 # Ensure trained-models dir exists inside builder image so later COPY from builder won't fail

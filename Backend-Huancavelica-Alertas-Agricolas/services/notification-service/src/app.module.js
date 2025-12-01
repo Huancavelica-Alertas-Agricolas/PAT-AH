@@ -9,14 +9,14 @@ const { NotificationService } = require('./notification.service');
 
 const moduleConfig = {
   imports: [
-    GraphQLModule.forRoot({
+    ...(process.env.ENABLE_GRAPHQL === '1' ? [GraphQLModule.forRoot({
       driver: ApolloDriver,
       autoSchemaFile: true,
       path: '/graphql',
       playground: true,
       introspection: true,
       sortSchema: true,
-    }),
+    })] : []),
     ConfigModule.forRoot({ isGlobal: true }),
     MailModule,
     PrometheusModule.register(),
