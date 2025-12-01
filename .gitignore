@@ -89,7 +89,7 @@ Backend-Huancavelica-Alertas-Agricolas/scripts/out/
 *.out
 
 # Docker / compose local data
-**/data/
+# **/data/ - Removed to allow frontend src/data
 
 
 # Ignore terraform artifacts
