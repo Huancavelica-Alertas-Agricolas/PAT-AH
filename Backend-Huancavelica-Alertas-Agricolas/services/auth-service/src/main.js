@@ -12,6 +12,7 @@ async function bootstrap() {
                 'http://127.0.0.1:3000',
                 'http://localhost:5173',
                 'http://127.0.0.1:5173',
+                'http://18.208.193.82:5173',
                 'http://pat-ah-frontend-876253813400-b67b5fbe.s3-website-us-east-1.amazonaws.com',
                 'https://d3juc86eqmpfpd.cloudfront.net'
             ],
