@@ -14,7 +14,7 @@ Este repositorio contiene el frontend (React + Vite + TypeScript) y varios micro
 
 ## Variables de entorno importantes
 - `DATABASE_URL` — conexión a Postgres (p. ej. `postgres://pat:pat@db:5432/pat_ah`).
-- `VITE_API_URL` — URL del gateway REST para el frontend (p. ej. `http://18.208.193.82/api`).
+- `VITE_API_URL` — URL del gateway REST para el frontend (p. ej. `http://18.208.193.82:3003/api`).
 - `WEATHER_HOST`, `WEATHER_PORT` — usados por `rest-service` para alcanzar `weather-service` en docker-compose.
 - `JWT_SECRET` — secreto para tokens.
 
@@ -47,7 +47,7 @@ Recomendado: ejecutar el frontend en modo desarrollo con Vite mientras el backen
       npm run dev
       ```
   - Variables de entorno importantes antes de arrancar:
-    - `VITE_API_URL` (p. ej. `http://18.208.193.82/api`). Crea un archivo `.env` en la carpeta del frontend o exporta la variable localmente.
+    - `VITE_API_URL` (p. ej. `http://18.208.193.82:3003/api`). Crea un archivo `.env` en la carpeta del frontend o exporta la variable localmente.
 
 - Para construir la versión de producción:
   ```bash
@@ -91,7 +91,7 @@ La forma recomendada en desarrollo es levantar los microservicios mediante `dock
 ## Pruebas y llamadas de verificación
 - Llamada HTTP desde PowerShell para verificar gateway:
   ```powershell
-  Invoke-RestMethod -Method Get -Uri 'http://18.208.193.82/api/weather/current' -TimeoutSec 8 | ConvertTo-Json -Depth 5
+  Invoke-RestMethod -Method Get -Uri 'http://18.208.193.82:3003/api/weather/current' -TimeoutSec 8 | ConvertTo-Json -Depth 5
   ```
 
 ## Health endpoints y Redis local
@@ -188,7 +188,7 @@ Hemos integrado un job DAST en el workflow de CI que ejecuta un escaneo básico 
   docker compose -f docker-compose.test.yml up -d
 
   # Ejecutar ZAP desde Docker en la máquina host
-  docker run --rm --network host -v ${PWD}:/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://18.208.193.82 -r zap-report.html -J zap-report.json
+  docker run --rm --network host -v ${PWD}:/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://18.208.193.82:3003 -r zap-report.html -J zap-report.json
 
   # Revisar resultados
   docker compose -f docker-compose.test.yml down -v
