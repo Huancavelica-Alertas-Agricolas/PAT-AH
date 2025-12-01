@@ -214,7 +214,17 @@ jobs:
         working-directory: Frontend-Huancavelica-Alertas-Agricolas
         run: |
           echo "Running frontend build/tests..."
-          npm test -- --passWithNoTests || true
+          # Prefer Vitest when present so coverage/coverage-summary.json is produced
+          if [ -f package.json ] && grep -q "vitest" package.json; then
+            echo "Detected Vitest; running vitest with coverage"
+            npx vitest run --coverage || true
+          elif [ -f package.json ] && grep -q '"test:cov"' package.json; then
+            echo "Detected test:cov script; running npm run test:cov"
+            npm run test:cov || true
+          else
+            echo "Falling back to npm test"
+            npm test -- --passWithNoTests || true
+          fi
           npm run build || echo "Build failed or not configured"
 
       - name: Run integration tests (rest-service) using docker-compose
@@ -249,6 +259,11 @@ jobs:
           docker build -t pat-ah/ai-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/ai-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/ai-service || true
           docker build -t pat-ah/weather-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/weather-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/weather-service || true
           docker build -t pat-ah/frontend:ci -f Frontend-Huancavelica-Alertas-Agricolas/Dockerfile Frontend-Huancavelica-Alertas-Agricolas || true
+          # Also build other backend service images that will be scanned by Trivy
+          docker build -t pat-ah/ingest-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/ingest-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/ingest-service || true
+          docker build -t pat-ah/notification-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/notification-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/notification-service || true
+          docker build -t pat-ah/auth-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/auth-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/auth-service || true
+          docker build -t pat-ah/users-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/users-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/users-service || true
 
       - name: Scan built Docker image with Trivy (rest-service)
         if: always()
