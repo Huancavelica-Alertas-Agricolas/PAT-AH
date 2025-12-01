@@ -58,8 +58,8 @@ services:
       dockerfile: Dockerfile
     container_name: alertas-frontend
     environment:
-      VITE_GRAPHQL_URL: http://localhost:3003/api/graphql
-      VITE_GRAPHQL_WS_URL: ws://localhost:3003/api/graphql
+      VITE_GRAPHQL_URL: http://18.208.193.82/api/graphql
+      VITE_GRAPHQL_WS_URL: ws://18.208.193.82/api/graphql
     ports:
       - "5173:5173"
     depends_on:

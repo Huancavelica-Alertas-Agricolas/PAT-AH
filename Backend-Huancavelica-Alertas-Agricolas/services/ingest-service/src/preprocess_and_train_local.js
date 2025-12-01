@@ -117,7 +117,7 @@ const { execSync } = require('child_process');
   console.log('WROTE', xlsxAbs);
 
   // Use ai-service on port 3003
-  const AI_BASE = process.env.AI_BASE || 'http://localhost:3003/api/ai';
+  const AI_BASE = process.env.AI_BASE || 'http://18.208.193.82/api/ai';
 
   const uploadCmd = `curl.exe -s -X POST ${AI_BASE}/upload-excel -F file=@"${xlsxAbs}"`;
   console.log('Uploading to', AI_BASE + '/upload-excel');
