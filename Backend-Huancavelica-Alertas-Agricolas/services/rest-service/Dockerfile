@@ -14,19 +14,22 @@ RUN mkdir -p prisma && cp ../shared/prisma/schema.prisma prisma/schema.prisma ||
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma; fi
 
 # Final runtime: use a minimal image that does not include npm or extra OS packages
-FROM gcr.io/distroless/nodejs:20
+FROM node:20-slim
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
 
-# Copy CA certificates from builder (distroless images don't contain apt)
+# Copy CA certificates from builder (if any) to ensure TLS works
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
 # Copy the app from the builder stage
 COPY --from=builder /usr/src/app /usr/src/app
 
-# Use a non-root user if the builder created one (optional)
+# Remove dev dependencies to keep runtime slim (if present)
+RUN if [ -f package.json ]; then cd /usr/src/app && npm prune --production || true; fi
+
+# Use non-root user for security
 USER 1000
 
-# Expose port (informational) and run the app
+# Expose application port and run wait-for-db helper before starting the app
 EXPOSE 3003
-CMD ["node","src/main.js"]
+CMD ["node","scripts/wait-for-db.js","db","5432","--","node","src/main.js"]
