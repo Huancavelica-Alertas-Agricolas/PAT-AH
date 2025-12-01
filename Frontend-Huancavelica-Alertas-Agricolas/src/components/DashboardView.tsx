@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `DashboardView` que muestra resumen y widgets.
+// Cómo lo logra: combina métricas, lista de alertas recientes y gráficos en una vista compacta.
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 

@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: pruebas unitarias para `WeatherService`.
+// Breve: mocks HttpService/ConfigService y verifica que el servicio se instancie correctamente.
 const { Test } = require('@nestjs/testing');
 const { WeatherService } = require('./weather.service');
 const { HttpService } = require('@nestjs/axios');

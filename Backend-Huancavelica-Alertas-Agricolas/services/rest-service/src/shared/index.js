@@ -1,4 +1,6 @@
 "use strict";
+// Comentarios añadidos en español: re-export del `PrismaService` desde `shared/prisma`.
+// Cómo lo logra: importa `./prisma/prisma.service` y vuelve a exportar `PrismaService` para uso centralizado.
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 var prisma_service_1 = require("./prisma/prisma.service");

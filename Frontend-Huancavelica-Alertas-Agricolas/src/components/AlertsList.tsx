@@ -1,3 +1,7 @@
+// Comentarios añadidos en español: componente `AlertsList` que muestra la lista de alertas.
+// Cómo lo logra: recibe props con alertas y renderiza filas filtrables y paginables.
+// Comentarios añadidos en español: componente `AlertsList` que muestra la lista de alertas.
+// Cómo lo logra: recibe props con alertas y renderiza filas filtrables y paginables.
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Filter, Plus, MoreVertical } from 'lucide-react';

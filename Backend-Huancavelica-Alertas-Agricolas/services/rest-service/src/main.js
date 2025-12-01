@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: archivo transpilado de arranque para `rest-service`.
+// Inicia Nest, habilita CORS, registra middleware JWT cuando está disponible y expone `/healthz`.
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");

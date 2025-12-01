@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: configuración de DataSource para TypeORM (alert-service).
+// Define la conexión a Postgres y las entidades `Alert` y `AlertCanal`.
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import { Alert } from './entities/alert.entity';

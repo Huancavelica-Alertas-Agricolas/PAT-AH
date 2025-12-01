@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+// Comentarios añadidos en español: componente `NotificationCenter` que muestra notificaciones locales.
+// Cómo lo logra: lista notificaciones, permite marcar leídas y navegar a alertas relacionadas.
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { 

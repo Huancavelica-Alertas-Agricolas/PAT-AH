@@ -1,3 +1,4 @@
+// Comentarios añadidos en español: módulo de correo — breve explicación de configuración.
 const { MailerModule } = require('@nestjs-modules/mailer');
 const { HandlebarsAdapter } = require('@nestjs-modules/mailer/dist/adapters/handlebars.adapter');
 const { Module } = require('@nestjs/common');
@@ -5,6 +6,7 @@ const { ConfigModule, ConfigService } = require('@nestjs/config');
 const { join } = require('path');
 const { MailService } = require('./mail.service');
 
+// `moduleConfig`: configura transporte SMTP y plantillas Handlebars.
 const moduleConfig = {
   imports: [
     MailerModule.forRootAsync({

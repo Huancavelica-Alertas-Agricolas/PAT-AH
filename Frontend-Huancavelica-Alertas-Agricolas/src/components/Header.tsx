@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `Header` que muestra búsqueda, notificaciones y perfil.
+// Cómo lo logra: mantiene `searchQuery`, `unreadCount` y actualiza la hora; expone acciones como `onLogout`.
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 

@@ -1,9 +1,11 @@
 "use strict";
+// Comentarios añadidos en español: bootstrap transpilado para users-service.
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 async function bootstrap() {
+    // Crea la app Nest, configura CORS, endpoint /healthz y puerto.
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     try {
         app.enableCors({

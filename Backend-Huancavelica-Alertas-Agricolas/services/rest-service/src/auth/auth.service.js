@@ -1,4 +1,6 @@
 "use strict";
+// Comentarios añadidos en español: servicio de autenticación (transpilado).
+// Usa: `register(data)` guarda usuario y devuelve `{ token, user }`; `login(phone,password)` devuelve `{ token, user }` si las credenciales son válidas.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);

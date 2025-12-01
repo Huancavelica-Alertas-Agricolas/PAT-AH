@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: pruebas unitarias para `AlertService`.
+// Breve: crea un módulo de test con clientes mock y comprueba la inicialización del servicio.
 const { Test } = require('@nestjs/testing');
 const { AlertService } = require('./alert.service');
 

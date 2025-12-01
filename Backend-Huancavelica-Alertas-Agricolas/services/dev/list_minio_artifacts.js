@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// Lista objetos en MinIO/S3 para un run dado y comprueba la presencia
-// de model.json, weights.bin y <modelId>_files.json bajo el prefijo de run.
-// Requiere Node.js y que el paquete @aws-sdk/client-s3 esté disponible
-// (ejecutar en el workspace donde estén instaladas las dependencias, o instalar localmente).
+// Comentarios añadidos en español: script de ayuda para listar artefactos en MinIO/S3 por runId.
+// Uso: `node list_minio_artifacts.js <runId> [bucket] [prefix]`.
+// Comprueba presencia de `model.json`, `weights.bin`, y `<modelId>_files.json`.
+// Requiere el paquete `@aws-sdk/client-s3` y credenciales/endpoint en variables de entorno.
+// No modifica artefactos; solo lista y verifica existencia.
 
 const { S3Client, ListObjectsV2Command, GetObjectCommand } = require('@aws-sdk/client-s3');
 const process = require('process');

@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: definiciones de tipos globales para Vite y módulos estáticos.
+// Cómo lo logra: declara módulos para imports de assets y tipos necesarios en tiempo de compilación.
 /// <reference types="vite/client" />
 
 declare module '*.css' {

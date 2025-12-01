@@ -1,3 +1,4 @@
+// Filtro global de excepciones. Comentarios en español: captura y registra errores.
 const { ArgumentsHost, Catch, ExceptionFilter, HttpException } = require('@nestjs/common');
 const { RpcException } = require('@nestjs/microservices');
 const logger = require('./logger');
@@ -7,6 +8,8 @@ class AllExceptionsFilter {
     this.log = log;
   }
 
+  // Maneja excepciones en distintos contextos (HTTP, RPC, genéricas).
+  // Parámetros: `exception`, `host` (contexto NestJS).
   catch(exception, host) {
     const ctxType = host.getType();
     let message = '';

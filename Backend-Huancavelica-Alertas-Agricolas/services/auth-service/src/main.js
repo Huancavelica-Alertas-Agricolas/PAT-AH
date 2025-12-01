@@ -1,9 +1,11 @@
 "use strict";
+// Comentarios añadidos en español: archivo de arranque (bootstrap) transpilado.
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 async function bootstrap() {
+    // Crea la aplicación Nest y configura CORS, prefijo global y puerto.
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     try {
         app.enableCors({

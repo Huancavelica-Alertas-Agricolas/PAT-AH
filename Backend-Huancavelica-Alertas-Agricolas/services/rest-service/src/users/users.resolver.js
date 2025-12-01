@@ -1,4 +1,6 @@
 "use strict";
+// Comentarios añadidos en español: resolver GraphQL para `Users` (transpilado).
+// Cómo lo logra: expone queries simples (ej. `helloUsers`) y decide entre `UsersClient` o `UsersService` según `USE_USERS_MICROSERVICE`.
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -9,6 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// Comentarios añadidos en español: resolver GraphQL para `Users` (transpilado).
+// Método: `helloUsers()` devuelve una cadena con el conteo de usuarios; usa microservicio si `USE_USERS_MICROSERVICE=true`.
 exports.UsersResolver = void 0;
 const graphql_1 = require("@nestjs/graphql");
 const users_service_1 = require("./users.service");

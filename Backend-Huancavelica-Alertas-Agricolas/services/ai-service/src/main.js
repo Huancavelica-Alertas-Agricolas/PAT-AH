@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: archivo transpilado de arranque para `ai-service`.
+// Inicia la aplicación Nest, habilita CORS y establece el prefijo `api`.
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");

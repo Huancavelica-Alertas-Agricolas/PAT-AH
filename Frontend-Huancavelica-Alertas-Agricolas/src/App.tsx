@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente raíz `App` que maneja autenticación y navegación.
+// Cómo lo logra: mantiene estados (`isAuthenticated`, `userRole`, `currentUser`) y renderiza `LoginPage` o `Dashboard`.
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Toaster } from 'sonner';

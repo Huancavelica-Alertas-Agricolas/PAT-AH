@@ -1,0 +1,7 @@
+node_modules/
+dist/
+public/
+.cache/
+coverage/
+*.min.js
+**/vendor-*.js

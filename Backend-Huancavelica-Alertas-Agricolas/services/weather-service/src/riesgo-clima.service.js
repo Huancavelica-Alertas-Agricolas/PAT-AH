@@ -1,4 +1,3 @@
-// Wrapper: re-export the compiled TypeScript implementation from `dist`.
-// This keeps runtime require('./riesgo-clima.service') working when the
-// source contains TypeScript syntax that has been compiled into `dist`.
+// Re-export del código compilado (TypeScript -> dist).
+// Wrapper para que `require('./riesgo-clima.service')` funcione en runtime.
 module.exports = require('../dist/riesgo-clima.service.js');

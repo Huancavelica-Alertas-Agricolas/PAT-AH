@@ -1,4 +1,6 @@
 "use strict";
+// Comentarios añadidos en español: Servicio ML que entrena y gestiona modelos (transpilado).
+// Cómo lo logra: expone funciones de entrenamiento, predicción y persistencia usando tfjs-node o implementación JS.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -37,6 +39,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var MachineLearningService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
+// Comentarios añadidos en español: servicio de Machine Learning.
+// Breve: entrena modelos (lineal, multivariante, redes neuronales), guarda/carga modelos, predice y calcula métricas.
+// Métodos públicos: `trainLinearModel`, `trainMultivariateModel`, `trainNeuralNetworkModel`, `predict`, `getModelsInfo`, `deleteModel`.
 exports.MachineLearningService = void 0;
 const common_1 = require("@nestjs/common");
 // Intentar cargar bindings nativas de tfjs-node; si fallan, hacer fallback a tfjs (JS)

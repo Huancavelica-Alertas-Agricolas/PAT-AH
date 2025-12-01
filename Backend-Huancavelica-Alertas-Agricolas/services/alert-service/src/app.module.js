@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: módulo principal de `alert-service`.
+// Declara entidades, módulos y clientes TCP para comunicar con otros microservicios.
 const { Module } = require('@nestjs/common');
 const { GraphQLModule } = require('@nestjs/graphql');
 const { ApolloDriver } = require('@nestjs/apollo');

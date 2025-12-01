@@ -1,3 +1,4 @@
+// Script pequeño para enviar petición de entrenamiento al AI service.
 (async ()=>{
   const fs = require('fs');
   const path = require('path');
@@ -5,6 +6,7 @@
   if(!fs.existsSync(bodyPath)){ console.error('train body not found:', bodyPath); process.exit(1); }
   const body = JSON.parse(fs.readFileSync(bodyPath,'utf8'));
   try{
+    // Envía POST a `http://localhost:4000/ai/train-model` con body preprocesado
     const res = await fetch('http://localhost:4000/ai/train-model', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const text = await res.text();
     console.log('Status', res.status);

@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { FileText, Download, Calendar, Sprout, TrendingDown, TrendingUp, AlertTriangle } from 'lucide-react';
 import Tooltip from './Tooltip';
+// Comentarios añadidos en español: componente `Reports` que muestra reportes y exportes.
+// Cómo lo logra: recopila datos (alerts/reports) y ofrece opciones de export (CSV/PDF) y filtrado.
 import { reportsApi } from '../services';
 import { toast } from 'sonner';
 

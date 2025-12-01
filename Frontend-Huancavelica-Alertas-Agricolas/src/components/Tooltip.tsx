@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `Tooltip` reutilizable para mostrar ayudas contextuales.
+// Cómo lo logra: recibe `content` y posicionamiento, renderiza un popup estilizado al hover/focus.
 import { ReactNode, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 

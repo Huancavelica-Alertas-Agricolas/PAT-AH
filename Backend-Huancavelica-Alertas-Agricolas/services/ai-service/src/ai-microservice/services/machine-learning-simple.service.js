@@ -1,4 +1,6 @@
 "use strict";
+// Comentarios añadidos en español: Implementación ML simple para pruebas y fallback (transpilado).
+// Cómo lo logra: funciones ligeras de entrenamiento/predicción que no requieren `tfjs-node`.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -43,6 +45,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var MachineLearningServiceSimple_1;
 Object.defineProperty(exports, "__esModule", { value: true });
+// Comentarios añadidos en español: implementación ligera de ML para entornos sin dependencias nativas.
+// Breve: modelos simples de regresión (lineal y multivariante), evaluación y predicción.
+// Métodos públicos: `trainLinearModel`, `trainMultivariateModel`, `evaluateModel`, `predict`, `getModelsInfo`, `deleteModel`.
 exports.MachineLearningServiceSimple = void 0;
 const common_1 = require("@nestjs/common");
 const fs = __importStar(require("fs"));

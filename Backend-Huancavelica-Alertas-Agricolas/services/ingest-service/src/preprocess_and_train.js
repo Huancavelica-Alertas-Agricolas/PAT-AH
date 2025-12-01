@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: script para preprocesar datos y entrenar modelo.
+// Explica brevemente cómo se usan los archivos y comandos.
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
@@ -106,7 +108,7 @@ const { execSync } = require('child_process');
   // Save scaler metadata
   fs.writeFileSync(path.join(__dirname,'preprocess_scaler.json'), JSON.stringify(stats, null, 2));
 
-  // Convert CSV -> XLSX using npx xlsx
+  // Convert CSV -> XLSX usando `xlsx` (instala temporalmente si falta)
   const csvAbs = path.join(__dirname, 'huancalpi_field5_preprocessed.csv').replace(/\\/g,'/');
   const xlsxAbs = path.join(__dirname, 'huancalpi_field5_preprocessed.xlsx').replace(/\\/g,'/');
   console.log('Converting CSV to XLSX...');
@@ -126,7 +128,7 @@ const { execSync } = require('child_process');
   XLSX.writeFile(wb, xlsxAbs);
   console.log('WROTE', xlsxAbs);
 
-  // Upload XLSX via curl
+  // Subir archivo XLSX al AI service vía POST a `/ai/upload-excel`.
   const uploadCmd = `curl.exe -s -X POST http://localhost:4000/ai/upload-excel -F file=@"${xlsxAbs}"`;
   console.log('Uploading to /ai/upload-excel...');
   const uploadOut = execSync(uploadCmd, { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
@@ -134,7 +136,7 @@ const { execSync } = require('child_process');
   const uploadJson = JSON.parse(uploadOut);
   const filePath = uploadJson.fileInfo.path;
 
-  // Train model using the uploaded file
+  // Crear body de entrenamiento y llamar al endpoint `/ai/train-model`.
   const trainBody = {
     filePath: filePath,
     targetColumn: 'field5',

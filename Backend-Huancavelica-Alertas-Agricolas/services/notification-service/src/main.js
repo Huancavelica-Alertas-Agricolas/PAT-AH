@@ -1,4 +1,5 @@
-// Simplified, explicit implementation with clear try/catch blocks and no single-line catches.
+// Comentarios añadidos en español: arranque del notification-service, métricas y health endpoints.
+// Inicia microservicio Nest (TCP), expone `/healthz` y `/metrics` según configuración.
 const { ValidationPipe } = require('@nestjs/common');
 const { AllExceptionsFilter } = require('./all-exceptions.filter');
 const { NestFactory } = require('@nestjs/core');

@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: servicios cliente que exponen las APIs del frontend.
+// Cómo lo logra: envuelven llamadas a `apolloClient` y soportan modo `USE_MOCK` para desarrollo.
 import { apolloClient } from '../lib/apollo-client';
 import { Alert, Notification, Zone, User } from '../types';
 import { mockAlerts, mockNotifications, mockZones, mockUsers } from '../data/mockData';

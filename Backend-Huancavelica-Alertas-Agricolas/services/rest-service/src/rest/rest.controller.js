@@ -1,4 +1,6 @@
 "use strict";
+// Comentarios añadidos en español: archivo transpilado del REST controller.
+// Cómo lo logra: expone rutas HTTP (`auth/login`, `me`, `users`, `weather`) y delega en `AuthService`/`UsersClient`/`weatherClient`.
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);

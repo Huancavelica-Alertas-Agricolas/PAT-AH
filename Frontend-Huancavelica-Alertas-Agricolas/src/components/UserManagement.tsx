@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `UserManagement` para administrar usuarios.
+// Cómo lo logra: lista, crea/edita y elimina usuarios, y controla roles y zonas.
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 

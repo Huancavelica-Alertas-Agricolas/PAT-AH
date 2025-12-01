@@ -7,6 +7,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var UsersClient_1;
 Object.defineProperty(exports, "__esModule", { value: true });
+// Comentarios añadidos en español: cliente HTTP para `users-service` (auth-service).
+// Usa `USERS_SERVICE_URL` o `http://backend-users:3002`. Métodos: `create`, `findByPhone`, `findAll`.
 exports.UsersClient = void 0;
 const common_1 = require("@nestjs/common");
 const BASE = process.env.USERS_SERVICE_URL || 'http://backend-users:3002';

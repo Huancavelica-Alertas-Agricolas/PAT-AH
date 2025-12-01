@@ -9,6 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// Comentarios añadidos en español: archivo transpilado del servicio `UsersService`.
+// Métodos públicos: `create(data)` crea usuario; `findByPhone(phone)` busca por teléfono; `findAll()` lista usuarios.
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma.service");
@@ -16,12 +18,18 @@ let UsersService = class UsersService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    // Crea un usuario.
+    // Usa: `data` = objeto con los campos del usuario (nombre, telefono, password, etc.)
     async create(data) {
         return this.prisma.user.create({ data });
     }
+    // Busca un usuario por teléfono.
+    // Usa: `phone` = número en formato almacenado en DB (ej. +51... o sin prefijo según sistema)
     async findByPhone(phone) {
         return this.prisma.user.findUnique({ where: { telefono: phone } });
     }
+    // Devuelve todos los usuarios.
+    // Sin parámetros.
     async findAll() {
         return this.prisma.user.findMany();
     }

@@ -1,13 +1,17 @@
+// Comentarios añadidos en español: breve descripción y uso de parámetros por método.
 const { Controller, Logger } = require('@nestjs/common');
 const { MessagePattern, Payload } = require('@nestjs/microservices');
 const { NotificationService } = require('./notification.service');
 
 class NotificationController {
+  // notificationService: instancia del servicio de notificaciones.
   constructor(notificationService) {
     this.notificationService = notificationService;
     this.logger = new Logger(NotificationController.name);
   }
 
+  // Maneja distintos tipos de envío según `emailData`.
+  // Usa: `to`=destinatario, `subject`=asunto, `template`=plantilla, `context`=datos plantilla, `text`=texto plano, `name`/`reportMessage`=alerta
   async sendEmail(emailData) {
     this.logger.log('Procesando solicitud de envío de email');
     this.logger.log(`Datos recibidos: ${JSON.stringify(emailData)}`);
@@ -48,6 +52,8 @@ class NotificationController {
     };
   }
 
+  // Maneja envío de bienvenida o redirige a alerta si hay `reportMessage`.
+  // Usa: `to`/`email`=destinatario, `name`=nombre
   async sendWelcomeEmail(data) {
     this.logger.log('Procesando solicitud de email de bienvenida');
     this.logger.log(`Datos recibidos en sendWelcomeEmail: ${JSON.stringify(data)}`);
@@ -63,6 +69,8 @@ class NotificationController {
     return await this.notificationService.sendWelcomeEmail(recipient, name);
   }
 
+  // Maneja envío de alerta meteorológica.
+  // Usa: `to`=destinatario, `name`=nombre, `reportMessage`=detalle de la alerta
   async sendWeatherAlert(data) {
     this.logger.log('Procesando solicitud de alerta meteorológica');
     const { to, name, reportMessage } = data;

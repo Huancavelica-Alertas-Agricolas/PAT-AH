@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `ZoneManagement` para administrar zonas agrícolas.
+// Cómo lo logra: muestra lista de zonas, mapa y controles CRUD para agregar/editar áreas.
 import React from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Plus, Edit, Trash2 } from 'lucide-react';

@@ -1,3 +1,4 @@
+// Comentarios añadidos en español: encabezado breve y líneas por método explicando uso de parámetros.
 const axios = require('axios');
 const { Injectable, Inject, Logger } = require('@nestjs/common');
 const { ClientProxy } = require('@nestjs/microservices');
@@ -56,13 +57,15 @@ class AlertService {
     return process.env.N8N_WEBHOOK_SECRET;
   }
 
+  // Publica payload en webhook de n8n. Usa: `payload` = objeto JSON
   async postToN8n(payload) {
     const headers = { 'Content-Type': 'application/json' };
     if (this.webhookSecret) headers['x-n8n-signature'] = this.webhookSecret;
     await axios.post(this.webhookUrl, payload, { headers });
   }
 
-  // Nuevo flujo: procesa una alerta puntual emitida por weather-service
+  // Procesa una alerta puntual.
+  // Usa: `alertData` = { tipo, descripcion, fecha }
   async processClimateAlert(alertData) {
     this.logger.log(`Procesando alerta puntual: ${JSON.stringify(alertData)}`);
     try {
@@ -173,6 +176,7 @@ class AlertService {
     }
   }
 
+  // Genera alerta climática a partir de `alertRequest` ({ email, userName, type }).
   async generateWeatherAlert(alertRequest) {
     this.logger.log(`Generando alerta climática para: ${alertRequest.email}`);
     
@@ -281,6 +285,7 @@ class AlertService {
     }
   }
 
+  // Genera alerta de helada. Usa: `alertRequest` = { email, userName }
   async generateFrostAlert(alertRequest) {
     this.logger.log(`Generando alerta de helada para: ${alertRequest.email}`);
     
@@ -364,11 +369,13 @@ class AlertService {
   }
 
   // Métodos auxiliares para manejo de base de datos
+  // Crea y persiste una alerta. Usa: `alertData` = objeto con campos de alerta
   async createAlert(alertData) {
     const alert = this.alertRepository.create(alertData);
     return await this.alertRepository.save(alert);
   }
 
+  // Asigna una alerta a varios usuarios. Usa: `alertId`, `userIds` = array de IDs
   async assignAlertToUsers(alertId, userIds) {
     const userAlerts = userIds.map(userId => 
       this.userAlertRepository.create({
@@ -380,6 +387,7 @@ class AlertService {
     return await this.userAlertRepository.save(userAlerts);
   }
 
+  // Determina nivel de severidad según tipo de alerta. Usa: `alertType` = string
   determineSeverityLevel(alertType) {
     const severityMap = {
       'helada': 'alto',
@@ -392,6 +400,7 @@ class AlertService {
     return severityMap[alertType] || 'medio';
   }
 
+  // Calcula fecha de expiración según tipo de alerta. Usa: `alertType` = string
   calculateExpirationDate(alertType) {
     const now = new Date();
     const hoursToAdd = alertType === 'helada' ? 12 : 24; // Las heladas expiran más rápido

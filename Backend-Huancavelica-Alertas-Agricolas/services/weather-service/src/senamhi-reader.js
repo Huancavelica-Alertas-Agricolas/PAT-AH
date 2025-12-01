@@ -1,4 +1,3 @@
-// Wrapper: re-export the compiled TypeScript implementation from `dist`.
-// This allows runtime requires of './senamhi-reader' to work while the
-// real implementation is written in TypeScript and compiled to `dist`.
+// Comentarios añadidos en español: wrapper que re-exporta el módulo compilado `dist/senamhi-reader.js`.
+// Propósito: mantener compatibilidad `require('./senamhi-reader')` sin modificar el código compilado.
 module.exports = require('../dist/senamhi-reader.js');

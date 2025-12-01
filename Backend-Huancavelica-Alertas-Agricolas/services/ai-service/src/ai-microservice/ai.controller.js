@@ -1,4 +1,6 @@
 "use strict";
+// Comentarios añadidos en español: Controlador AI para endpoints de subida, entrenamiento y predicción.
+// Cómo lo logra: recibe archivos Excel, delega a `ExcelProcessor` y `MachineLearningService` para procesar y entrenar.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);

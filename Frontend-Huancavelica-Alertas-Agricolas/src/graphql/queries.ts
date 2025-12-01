@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: consultas GraphQL (queries) usadas por Apollo Client.
+// Cómo lo logra: define `gql` queries para alertas, notificaciones, zonas, usuarios y reportes.
 import { gql } from '@apollo/client';
 
 // ==================== ALERTAS ====================

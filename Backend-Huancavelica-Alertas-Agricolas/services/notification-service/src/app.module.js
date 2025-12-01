@@ -1,3 +1,4 @@
+// Comentarios añadidos en español: indica que se añadieron comentarios sin cambios lógicos.
 const { Module } = require('@nestjs/common');
 const { GraphQLModule } = require('@nestjs/graphql');
 const { ApolloDriver } = require('@nestjs/apollo');
@@ -7,6 +8,8 @@ const { MailModule } = require('./mail/mail.module');
 const { NotificationController } = require('./notification.controller');
 const { NotificationService } = require('./notification.service');
 
+// Configuración del módulo principal del servicio de notificaciones.
+// `imports` incluye GraphQL opcional, configuración global, módulo de mail y métricas.
 const moduleConfig = {
   imports: [
     ...(process.env.ENABLE_GRAPHQL === '1' ? [GraphQLModule.forRoot({

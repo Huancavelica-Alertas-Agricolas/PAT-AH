@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: configuración de Vite para el proyecto frontend.
+// Cómo lo logra: define plugins, servidor de desarrollo y opciones de build/optimización.
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 

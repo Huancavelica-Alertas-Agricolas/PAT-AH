@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: configuración de DataSource para TypeORM.
+// Define conexión a Postgres y entidades usadas por el servicio de clima.
 import { DataSource } from 'typeorm';
 import { WeatherForecast } from './entities/weather-forecast.entity';
 import { WeatherHistory } from './entities/weather-history.entity';

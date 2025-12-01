@@ -1,3 +1,4 @@
+// Comentarios añadidos en español: convierte CSV preprocesado a XLSX.
 const XLSX = require('xlsx');
 const fs = require('fs');
 const path = require('path');
@@ -10,6 +11,7 @@ if (!fs.existsSync(csvPath)){
   process.exit(1);
 }
 
+// Lee el CSV y crea un workbook XLSX con una hoja llamada 'Sheet1'.
 const csv = fs.readFileSync(csvPath, 'utf8');
 const aoa = csv.split(/\r?\n/).filter(l=>l!=='').map(l=>l.split(','));
 const wb = XLSX.utils.book_new();

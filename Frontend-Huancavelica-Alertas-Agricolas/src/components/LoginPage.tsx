@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `LoginPage` que muestra formulario de autenticación.
+// Cómo lo logra: mantiene estado del formulario, maneja envío mock y notifica al `onLogin` pasado por props.
 import { useState } from 'react';
 import { Shield, MapPin, Bell, Users, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';

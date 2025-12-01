@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: subscripciones GraphQL en tiempo real.
+// Cómo lo logra: exporta `gql` subscriptions para alertas y notificaciones.
 import { gql } from '@apollo/client';
 
 // ==================== SUSCRIPCIONES EN TIEMPO REAL ====================

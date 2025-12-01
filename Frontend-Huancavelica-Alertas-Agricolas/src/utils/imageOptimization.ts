@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: utilidades para optimización de imágenes (compresión, WebP, thumbnails).
+// Cómo lo logra: usa Canvas API y FileReader para generar Blobs, srcset y tamaños óptimos.
 /**
  * Utilidades para optimización de imágenes
  */

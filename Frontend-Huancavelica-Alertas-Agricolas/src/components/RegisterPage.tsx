@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `RegisterPage` para crear nuevas cuentas.
+// Cómo lo logra: muestra formulario de registro, valida campos y llama a la API de autenticación.
 import { useState } from 'react';
 import { Shield, ArrowLeft, Eye, EyeOff, User, Mail, Phone, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';

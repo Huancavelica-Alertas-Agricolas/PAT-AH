@@ -1,4 +1,5 @@
 "use strict";
+// Comentario breve: re-export del PrismaService desde shared/prisma (auth-service).
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 const prisma_service_1 = require("./shared/prisma/prisma.service");

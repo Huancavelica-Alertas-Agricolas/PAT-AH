@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: mutaciones GraphQL para acciones (login, crear alertas, usuarios, etc.).
+// Cómo lo logra: define `gql` mutations usadas por Apollo Client para modificar datos en el backend.
 import { gql } from '@apollo/client';
 
 // ==================== AUTENTICACIÓN ====================
