@@ -1,4 +1,4 @@
-name: CI
+name: Integración Continua (CI)
 
 on:
   push:
@@ -8,35 +8,35 @@ on:
   workflow_dispatch:
     inputs:
       coverage_threshold:
-        description: 'Coverage threshold percent (integer) to override default in CI'
+        description: 'Porcentaje umbral de cobertura (entero) para sobreescribir el valor por defecto en CI'
         required: false
         default: '70'
       coverage_notification:
-        description: 'Coverage threshold for notification-service (optional)'
+        description: 'Umbral de cobertura para notification-service (opcional)'
         required: false
         default: ''
       coverage_alert:
-        description: 'Coverage threshold for alert-service (optional)'
+        description: 'Umbral de cobertura para alert-service (opcional)'
         required: false
         default: ''
       coverage_weather:
-        description: 'Coverage threshold for weather-service (optional)'
+        description: 'Umbral de cobertura para weather-service (opcional)'
         required: false
         default: ''
       coverage_ai:
-        description: 'Coverage threshold for ai-service (optional)'
+        description: 'Umbral de cobertura para ai-service (opcional)'
         required: false
         default: ''
       coverage_ingest:
-        description: 'Coverage threshold for ingest-service (optional)'
+        description: 'Umbral de cobertura para ingest-service (opcional)'
         required: false
         default: ''
       coverage_users:
-        description: 'Coverage threshold for users-service (optional)'
+        description: 'Umbral de cobertura para users-service (opcional)'
         required: false
         default: ''
       coverage_rest:
-        description: 'Coverage threshold for rest-service (optional)'
+        description: 'Umbral de cobertura para rest-service (opcional)'
         required: false
         default: ''
 
@@ -54,18 +54,18 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
-      - name: Checkout repo
+      - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Usar Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Install dependencies for all services (backend + frontend)
+      - name: Instalar dependencias para todos los servicios (backend + frontend)
         run: |
-          echo "Installing dependencies for all services..."
+          echo "Instalando dependencias para todos los servicios..."
           SERVICES=(
             "Backend-Huancavelica-Alertas-Agricolas/services/auth-service"
             "Backend-Huancavelica-Alertas-Agricolas/services/users-service"
@@ -77,7 +77,7 @@ jobs:
           )
           for pkg in "${SERVICES[@]}"; do
             if [ -f "$pkg/package.json" ]; then
-              echo "--- Installing dependencies for $pkg ---"
+              echo "--- Instalando dependencias para $pkg ---"
               if [ -f "$pkg/package-lock.json" ]; then
                 npm ci --prefix "$pkg" --legacy-peer-deps || npm install --prefix "$pkg" --legacy-peer-deps
               else
@@ -86,9 +86,9 @@ jobs:
             fi
           done
 
-      - name: Run npm audit for all services (produce reports)
+      - name: Ejecutar npm audit para todos los servicios (generar reportes)
         run: |
-          echo "Running npm audit for services..."
+          echo "Ejecutando npm audit para los servicios..."
           mkdir -p "$GITHUB_WORKSPACE/audit-reports"
           for pkg in "${SERVICES[@]}"; do
             if [ -f "$pkg/package.json" ]; then
@@ -98,10 +98,10 @@ jobs:
             fi
           done
 
-      - name: Check npm audit reports for High/Critical vulnerabilities
+      - name: Revisar reportes npm audit en busca de vulnerabilidades High/Critical
         if: always()
         run: |
-          echo "Checking npm audit reports for High/Critical vulnerabilities..."
+          echo "Revisando reportes npm audit por vulnerabilidades High/Critical..."
           set -e
           echo "AUDIT_HAS_FINDINGS=0" >> $GITHUB_ENV
           > audit-findings-summary.txt
@@ -133,7 +133,7 @@ jobs:
             echo "No high/critical npm audit issues found."
           fi
 
-      - name: Create GitHub issue for npm audit findings
+      - name: Crear issue en GitHub para hallazgos de npm audit
         if: env.AUDIT_HAS_FINDINGS == '1'
         uses: actions/github-script@v6
         with:
@@ -152,15 +152,15 @@ jobs:
               body: body
             })
 
-      - name: Fail CI due to high/critical npm audit issues
+      - name: Fallar CI por vulnerabilidades npm audit High/Critical
         if: env.AUDIT_HAS_FINDINGS == '1'
         run: |
-          echo "Failing CI due to high/critical npm audit issues (see created issue and audit-reports artifact)."
+          echo "Falla en CI debido a vulnerabilidades High/Critical encontradas por npm audit (ver issue creado y artifact audit-reports)."
           exit 1
 
-      - name: Run ESLint where configured
+      - name: Ejecutar ESLint donde esté configurado
         run: |
-          echo "Running ESLint for packages that declare eslint config..."
+          echo "Ejecutando ESLint en los paquetes que declaran configuración..."
           for pkg in "${SERVICES[@]}"; do
             if [ -f "$pkg/package.json" ]; then
               if [ -f "$pkg/.eslintrc" ] || [ -f "$pkg/.eslintrc.js" ] || [ -f "$pkg/.eslintrc.json" ] || grep -q "eslintConfig" "$pkg/package.json" 2>/dev/null; then
@@ -170,69 +170,69 @@ jobs:
             fi
           done
 
-      - name: Run tests for rest-service
+      - name: Ejecutar pruebas para rest-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/rest-service
         run: |
-          echo "Running tests for rest-service..."
+          echo "Ejecutando pruebas para rest-service..."
           npm test -- --passWithNoTests
 
-      - name: Run tests for weather-service
+      - name: Ejecutar pruebas para weather-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/weather-service
         run: |
-          echo "Running tests for weather-service..."
+          echo "Ejecutando pruebas para weather-service..."
           npm test -- --passWithNoTests
 
-      - name: Run tests for notification-service
+      - name: Ejecutar pruebas para notification-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/notification-service
         run: |
-          echo "Running tests for notification-service..."
+          echo "Ejecutando pruebas para notification-service..."
           npm test -- --passWithNoTests || true
 
-      - name: Run tests for users-service
+      - name: Ejecutar pruebas para users-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/users-service
         run: |
-          echo "Running tests for users-service..."
+          echo "Ejecutando pruebas para users-service..."
           npm test -- --passWithNoTests || true
 
-      - name: Run tests for alert-service
+      - name: Ejecutar pruebas para alert-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/alert-service
         run: |
-          echo "Running tests for alert-service..."
+          echo "Ejecutando pruebas para alert-service..."
           npm test -- --passWithNoTests || true
 
-      - name: Run tests for ai-service
+      - name: Ejecutar pruebas para ai-service
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/ai-service
         run: |
-          echo "Building ai-service image for integration tests (service context)..."
+          echo "Construyendo imagen de ai-service para pruebas de integración (contexto de servicio)..."
           # Use the service directory as the docker build context so paths like trained-models exist relative to Dockerfile
           docker build -t pat-ah/ai-service:ci -f Dockerfile . || true
-          echo "Running tests for ai-service (unit + container E2E)..."
+          echo "Ejecutando pruebas para ai-service (unit + E2E en contenedor)..."
           npm test -- --passWithNoTests || ( echo "ai-service tests failed" && exit 1 )
         timeout-minutes: 30
 
-      - name: Run tests for frontend
+      - name: Ejecutar build/pruebas del frontend
         working-directory: Frontend-Huancavelica-Alertas-Agricolas
         run: |
-          echo "Running frontend build/tests..."
+          echo "Ejecutando build/pruebas del frontend..."
           # Prefer Vitest when present so coverage/coverage-summary.json is produced
           if [ -f package.json ] && grep -q "vitest" package.json; then
-            echo "Detected Vitest; running vitest with coverage (istanbul provider)"
+            echo "Detectado Vitest; ejecutando vitest con coverage (istanbul)"
             npx vitest run --coverage --coverageProvider=istanbul || true
           elif [ -f package.json ] && grep -q '"test:cov"' package.json; then
-            echo "Detected test:cov script; running npm run test:cov"
+            echo "Detectado script test:cov; ejecutando npm run test:cov"
             npm run test:cov || true
           else
-            echo "Falling back to npm test"
+            echo "Volviendo a npm test como fallback"
             npm test -- --passWithNoTests || true
           fi
-          npm run build || echo "Build failed or not configured"
+          npm run build || echo "Build falló o no está configurado"
 
-      - name: Run integration tests (rest-service) using docker-compose
+      - name: Ejecutar pruebas de integración (rest-service) usando docker-compose
         working-directory: Backend-Huancavelica-Alertas-Agricolas/services/rest-service
         run: |
-          echo "Starting docker-compose test stack..."
-          # Ensure docker compose command is available on ubuntu runners
-          echo "Ensuring docker-compose is installed (plugin + compatibility)..."
+          echo "Iniciando stack de pruebas docker-compose..."
+          # Asegurar que el comando docker-compose esté disponible en runners ubuntu
+          echo "Asegurando docker-compose instalado (plugin + compatibilidad)..."
           sudo apt-get update -y
           sudo apt-get install -y docker-compose-plugin || true
           # Create compatibility symlink if binary available as CLI plugin
@@ -246,14 +246,14 @@ jobs:
             export PATH="$HOME/.local/bin:$PATH"
           fi
           docker-compose -f docker-compose.test.yml up -d
-          echo "Running integration commands inside runner..."
+          echo "Ejecutando comandos de integración dentro del runner..."
           docker-compose -f docker-compose.test.yml run --rm runner sh -c "npm ci --legacy-peer-deps; npx prisma generate; npx prisma db push; npm test -- test/integration/user.integration.spec.js --runInBand"
-          echo "Tearing down docker-compose test stack..."
+          echo "Desmantelando stack de pruebas docker-compose..."
           docker-compose -f docker-compose.test.yml down -v
 
-      - name: Build Docker images (optional)
+      - name: Construir imágenes Docker (opcional)
         run: |
-          echo "Building Docker images for services with Dockerfile"
+          echo "Construyendo imágenes Docker para servicios con Dockerfile"
           docker --version || true
           docker build -t pat-ah/rest-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/rest-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/rest-service || true
           docker build -t pat-ah/ai-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/ai-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/ai-service || true
@@ -265,25 +265,20 @@ jobs:
           docker build -t pat-ah/auth-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/auth-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/auth-service || true
           docker build -t pat-ah/users-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/users-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/users-service || true
 
-      - name: Scan built Docker image with Trivy (rest-service)
+      - name: Escanear imagen Docker construida con Trivy (rest-service)
         if: always()
         run: |
-          echo "Scanning pat-ah/rest-service:ci with Trivy (image)..."
-          echo "Installing Trivy (if missing)..."
+          echo "Escaneando pat-ah/rest-service:ci con Trivy (imagen)..."
+          echo "Instalando Trivy (si falta)..."
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
           trivy image --format json -o trivy-rest-service.json --severity CRITICAL,HIGH pat-ah/rest-service:ci || true
 
-      - name: Upload trivy report (rest-service)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-rest-report
-          path: trivy-rest-service.json
+      # Se eliminó temporalmente el paso de subir artifact trivy-rest-report
 
-      - name: Analyze Trivy findings (rest-service)
+      - name: Analizar hallazgos Trivy (rest-service)
         if: always()
         run: |
-          echo "Analyzing trivy-rest-service.json for CRITICAL/HIGH vulnerabilities..."
+          echo "Analizando trivy-rest-service.json por vulnerabilidades CRITICAL/HIGH..."
           set -e
           echo "TRIVY_HAS_FINDINGS=0" >> $GITHUB_ENV
           if [ ! -f trivy-rest-service.json ]; then
@@ -300,7 +295,7 @@ jobs:
             echo "No CRITICAL/HIGH vulnerabilities found by Trivy for rest-service."
           fi
 
-      - name: Create GitHub issue for Trivy findings (rest-service)
+      - name: Crear issue en GitHub por hallazgos Trivy (rest-service)
         if: env.TRIVY_HAS_FINDINGS == '1'
         uses: actions/github-script@v6
         with:
@@ -319,32 +314,27 @@ jobs:
               body: body
             })
 
-      - name: Fail build on Trivy CRITICAL/HIGH findings (rest-service)
+      - name: Fallar build por hallazgos CRITICAL/HIGH Trivy (rest-service)
         if: env.TRIVY_HAS_FINDINGS == '1'
         run: |
-          echo "Failing build due to Trivy CRITICAL/HIGH vulnerabilities in rest-service (see created issue and trivy artifact)."
+          echo "Falla en build por vulnerabilidades CRITICAL/HIGH detectadas por Trivy en rest-service (ver issue y artifact)."
           exit 1
 
       # --- Trivy scan + analysis for ai-service ---
-      - name: Scan built Docker image with Trivy (ai-service)
+      - name: Escanear imagen Docker con Trivy (ai-service)
         if: always()
         run: |
-          echo "Scanning pat-ah/ai-service:ci with Trivy (image)..."
-          echo "Installing Trivy (if missing)..."
+          echo "Escaneando pat-ah/ai-service:ci con Trivy (imagen)..."
+          echo "Instalando Trivy (si falta)..."
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
           trivy image --format json -o trivy-ai-service.json --severity CRITICAL,HIGH pat-ah/ai-service:ci || true
 
-      - name: Upload trivy report (ai-service)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-ai-report
-          path: trivy-ai-service.json
+      # Se eliminó temporalmente el paso de subir artifact trivy-ai-report
 
-      - name: Analyze Trivy findings (ai-service)
+      - name: Analizar hallazgos Trivy (ai-service)
         if: always()
         run: |
-          echo "Analyzing trivy-ai-service.json for CRITICAL/HIGH vulnerabilities..."
+          echo "Analizando trivy-ai-service.json por vulnerabilidades CRITICAL/HIGH..."
           set -e
           echo "TRIVY_AI_HAS_FINDINGS=0" >> $GITHUB_ENV
           if [ ! -f trivy-ai-service.json ]; then
@@ -361,7 +351,7 @@ jobs:
             echo "No CRITICAL/HIGH vulnerabilities found by Trivy for ai-service."
           fi
 
-      - name: Create GitHub issue for Trivy findings (ai-service)
+      - name: Crear issue en GitHub por hallazgos Trivy (ai-service)
         if: env.TRIVY_AI_HAS_FINDINGS == '1'
         uses: actions/github-script@v6
         with:
@@ -380,10 +370,10 @@ jobs:
               body: body
             })
 
-      - name: Fail build on Trivy CRITICAL/HIGH findings (ai-service)
+      - name: Fallar build por hallazgos CRITICAL/HIGH Trivy (ai-service)
         if: env.TRIVY_AI_HAS_FINDINGS == '1'
         run: |
-          echo "Failing build due to Trivy CRITICAL/HIGH vulnerabilities in ai-service (see created issue and trivy artifact)."
+          echo "Falla en build por vulnerabilidades CRITICAL/HIGH detectadas por Trivy en ai-service (ver issue y artifact)."
           exit 1
 
       # --- Trivy scan + analysis for weather-service ---
@@ -395,12 +385,7 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
           trivy image --format json -o trivy-weather-service.json --severity CRITICAL,HIGH pat-ah/weather-service:ci || true
 
-      - name: Upload trivy report (weather-service)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-weather-report
-          path: trivy-weather-service.json
+      # Se eliminó temporalmente el paso de subir artifact trivy-weather-report
 
       - name: Analyze Trivy findings (weather-service)
         if: always()
@@ -456,12 +441,7 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
           trivy image --format json -o trivy-frontend.json --severity CRITICAL,HIGH pat-ah/frontend:ci || true
 
-      - name: Upload trivy report (frontend)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-frontend-report
-          path: trivy-frontend.json
+      # Se eliminó temporalmente el paso de subir artifact trivy-frontend-report
 
       - name: Analyze Trivy findings (frontend)
         if: always()
@@ -517,12 +497,7 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
           trivy image --format json -o trivy-ingest-service.json --severity CRITICAL,HIGH pat-ah/ingest-service:ci || true
 
-      - name: Upload trivy report (ingest-service)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-ingest-report
-          path: trivy-ingest-service.json
+      # Se eliminó temporalmente el paso de subir artifact trivy-ingest-report
 
       - name: Analyze Trivy findings (ingest-service)
         if: always()
@@ -578,12 +553,7 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
           trivy image --format json -o trivy-notification-service.json --severity CRITICAL,HIGH pat-ah/notification-service:ci || true
 
-      - name: Upload trivy report (notification-service)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-notification-report
-          path: trivy-notification-service.json
+      # Se eliminó temporalmente el paso de subir artifact trivy-notification-report
 
       - name: Analyze Trivy findings (notification-service)
         if: always()
@@ -639,12 +609,7 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
           trivy image --format json -o trivy-auth-service.json --severity CRITICAL,HIGH pat-ah/auth-service:ci || true
 
-      - name: Upload trivy report (auth-service)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-auth-report
-          path: trivy-auth-service.json
+      # Se eliminó temporalmente el paso de subir artifact trivy-auth-report
 
       - name: Analyze Trivy findings (auth-service)
         if: always()
@@ -700,12 +665,7 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
           trivy image --format json -o trivy-users-service.json --severity CRITICAL,HIGH pat-ah/users-service:ci || true
 
-      - name: Upload trivy report (users-service)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-users-report
-          path: trivy-users-service.json
+      # Se eliminó temporalmente el paso de subir artifact trivy-users-report
 
       - name: Analyze Trivy findings (users-service)
         if: always()
@@ -752,14 +712,7 @@ jobs:
           echo "Failing build due to Trivy CRITICAL/HIGH vulnerabilities in users-service (see created issue and trivy artifact)."
           exit 1
 
-      - name: Upload test results (optional)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-logs
-          path: |
-            Backend-Huancavelica-Alertas-Agricolas/services/rest-service/jest.config.json
-            Backend-Huancavelica-Alertas-Agricolas/services/weather-service/jest.config.json
+      # Se eliminó temporalmente el paso de subir resultados de tests (test-logs)
 
       - name: Run per-service coverage and collect artifacts
         if: always()
@@ -808,12 +761,7 @@ jobs:
           echo "Listing coverage-artifacts"
           ls -R coverage-artifacts || true
 
-      - name: Upload coverage artifacts (diagnostic)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-artifacts
-          path: coverage-artifacts
+      # Se eliminó temporalmente el paso de subir coverage-artifacts
 
       - name: Diagnostic - list coverage summaries
         if: always()
@@ -835,12 +783,7 @@ jobs:
           cp -v coverage-artifacts/*-install.log diagnostic-logs/ 2>/dev/null || true
           cp -v coverage-artifacts/*-test.log diagnostic-logs/ 2>/dev/null || true
         # upload the logs even if empty
-      - name: Upload CI diagnostic logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ci-diagnostics
-          path: diagnostic-logs
+      # Se eliminó temporalmente el paso de subir logs de diagnóstico CI (ci-diagnostics)
 
       - name: Run coverage checker (node)
         if: always()
@@ -848,22 +791,17 @@ jobs:
           echo "Running node coverage checker"
           node scripts/check-coverage.js --path coverage-artifacts --config coverage.config.json
 
-      - name: Upload audit reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: audit-reports
-          path: audit-reports
+      # Se eliminó temporalmente el paso de subir audit-reports
 
   dast:
-    name: DAST - OWASP ZAP baseline scan
+    name: DAST - Escaneo OWASP ZAP (baseline)
     runs-on: ubuntu-latest
     needs: test
     env:
       # Comma-separated severities that should make the job fail (case-insensitive)
       ZAP_FAIL_SEVERITIES: "High,Critical"
     steps:
-      - name: Checkout repo
+      - name: Checkout del repositorio
         uses: actions/checkout@v4
 
       - name: Ensure docker-compose and docker available
@@ -875,16 +813,16 @@ jobs:
           fi
           docker --version || true
 
-      - name: Start test stack for DAST
+      - name: Iniciar stack de pruebas para DAST
         run: |
-          echo "Starting docker-compose test stack for DAST..."
+          echo "Iniciando stack de pruebas docker-compose para DAST..."
           docker-compose -f Backend-Huancavelica-Alertas-Agricolas/services/rest-service/docker-compose.test.yml up -d || docker-compose -f docker-compose.test.yml up -d || true
 
-      - name: Wait for target to be healthy
+      - name: Esperar a que el objetivo esté saludable
         run: |
           TARGET_URL=http://localhost:3003/health
           METRICS_URL=http://localhost:9410/metrics || true
-          echo "Waiting for $TARGET_URL to respond (timeout 120s)..."
+          echo "Esperando que $TARGET_URL responda (timeout 120s)..."
           for i in $(seq 1 24); do
             if curl -sSf $TARGET_URL >/dev/null 2>&1; then
               echo "Target healthy"
@@ -972,16 +910,9 @@ jobs:
               sys.exit(0)
             PY
 
-      - name: Upload ZAP report artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-report
-          path: |
-            zap-report.html
-            zap-report.json
+      # Se eliminó temporalmente el paso de subir reportes ZAP (zap-report.html / zap-report.json)
 
-      - name: Create GitHub issue for DAST findings
+      - name: Crear issue en GitHub por hallazgos DAST
         if: steps.analyze.outcome == 'failure'
         uses: actions/github-script@v6
         with:
@@ -1029,31 +960,31 @@ jobs:
           docker-compose -f Backend-Huancavelica-Alertas-Agricolas/services/rest-service/docker-compose.test.yml down -v || docker-compose -f docker-compose.test.yml down -v || true
 
   build-and-deploy:
-    name: Build and Deploy to AWS (ECR/ECS)
+    name: Compilar y Desplegar a AWS (ECR/ECS)
     runs-on: ubuntu-latest
     needs: [test, dast]
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
     steps:
-      - name: Checkout repository
+      - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials (via OIDC role)
+      - name: Configurar credenciales AWS (via rol OIDC)
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::876253813400:role/pat-ah-github-actions-role
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Setup Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Set up Docker Buildx
+      - name: Configurar Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Cache npm registry
+      - name: Cache del registro npm
         uses: actions/cache@v4
         with:
           path: ~/.npm
@@ -1061,13 +992,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-
 
-      - name: Install dependencies for all services
+      - name: Instalar dependencias para servicios
         run: |
           services=(auth-service users-service rest-service ai-service ingest-service)
           for s in "${services[@]}"; do
             pkg="Backend-Huancavelica-Alertas-Agricolas/services/$s"
             if [ -f "$pkg/package.json" ]; then
-              echo "--- Installing dependencies for $s ---"
+              echo "--- Instalando dependencias para $s ---"
               if [ -f "$pkg/package-lock.json" ]; then
                 npm ci --prefix "$pkg" || npm install --prefix "$pkg"
               else
@@ -1076,25 +1007,25 @@ jobs:
             fi
           done
 
-      - name: Run tests per service (if present)
+      - name: Ejecutar pruebas por servicio (si existen)
         run: |
           services=(auth-service users-service rest-service ai-service ingest-service)
           for s in "${services[@]}"; do
             pkg="Backend-Huancavelica-Alertas-Agricolas/services/$s"
             if [ -f "$pkg/package.json" ]; then
-              echo "--- Running tests for $s ---"
+              echo "--- Ejecutando pruebas para $s ---"
               npm run test --prefix "$pkg" --if-present || true
             fi
           done
 
-      - name: Login to ECR
+      - name: Login a ECR
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         run: |
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
-      - name: Build, tag (SHA) and push images
+      - name: Construir, tag (SHA) y push de imágenes
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -1106,7 +1037,7 @@ jobs:
           BACKEND_PATH="$REPO_ROOT/Backend-Huancavelica-Alertas-Agricolas"
           for s in "${SERVICES[@]}"; do
             image=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/pat-ah-$s:${IMAGE_TAG}
-            echo "Building $s -> $image"
+            echo "Construyendo $s -> $image"
             docker build -t "pat-ah-$s:${IMAGE_TAG}" -f "$BACKEND_PATH/services/$s/Dockerfile" "$BACKEND_PATH"
             docker tag "pat-ah-$s:${IMAGE_TAG}" "$image"
             docker push "$image"
@@ -1115,7 +1046,7 @@ jobs:
             docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/pat-ah-$s:latest || true
           done
 
-      - name: Register new task definition revisions and update ECS services
+      - name: Registrar nuevas revisiones de task definition y actualizar servicios ECS
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -1126,23 +1057,23 @@ jobs:
           SERVICES=(auth-service users-service rest-service ai-service ingest-service)
           for s in "${SERVICES[@]}"; do
             svc_name="pat-ah-$s"
-            echo "Processing ECS service: $svc_name"
+            echo "Procesando servicio ECS: $svc_name"
             td_arn=$(aws ecs describe-services --cluster pat-ah-cluster --services $svc_name --query 'services[0].taskDefinition' --output text --region $AWS_REGION)
-            echo "Current task definition: $td_arn"
+            echo "Definición de tarea actual: $td_arn"
             td_json=$(aws ecs describe-task-definition --task-definition $td_arn --region $AWS_REGION --query 'taskDefinition')
             container_name="$s"
             new_image="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/pat-ah-${s}:${IMAGE_TAG}"
-            echo "New image for $container_name -> $new_image"
+            echo "Nueva imagen para $container_name -> $new_image"
             new_td=$(echo "$td_json" | jq --arg cname "$container_name" --arg img "$new_image" '.containerDefinitions |= map(if .name == $cname then .image = $img else . end) | {family: .family, taskRoleArn: .taskRoleArn, executionRoleArn: .executionRoleArn, networkMode: .networkMode, containerDefinitions: .containerDefinitions, volumes: .volumes, placementConstraints: .placementConstraints, requiresCompatibilities: .requiresCompatibilities, cpu: .cpu, memory: .memory, pidMode: .pidMode, ipcMode: .ipcMode}')
             echo "$new_td" > new-taskdef.json
             reg_out=$(aws ecs register-task-definition --cli-input-json file://new-taskdef.json --region $AWS_REGION)
             new_td_arn=$(echo "$reg_out" | jq -r '.taskDefinition.taskDefinitionArn')
-            echo "Registered new task def: $new_td_arn"
+            echo "Registrada nueva task definition: $new_td_arn"
             aws ecs update-service --cluster pat-ah-cluster --service $svc_name --task-definition $new_td_arn --region $AWS_REGION
-            echo "Updated service $svc_name to use $new_td_arn"
+            echo "Servicio $svc_name actualizado para usar $new_td_arn"
           done
 
-      - name: Force ECS redeploy
+      - name: Forzar redeploy en ECS
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -1150,33 +1081,33 @@ jobs:
           SERVICES=(auth-service users-service rest-service ai-service ingest-service)
           for s in "${SERVICES[@]}"; do
             svc_name="pat-ah-$s"
-            echo "Forcing redeploy for $svc_name"
+            echo "Forzando redeploy para $svc_name"
             aws ecs update-service --cluster pat-ah-cluster --service $svc_name --force-new-deployment --region $AWS_REGION
           done
 
-      - name: Done
-        run: echo "CI/CD pipeline finished"
+      - name: Finalizado
+        run: echo "Pipeline CI/CD finalizado"
 
   deploy-frontend:
     needs: build-and-deploy
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev'
     steps:
-      - name: Checkout repository
+      - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials (via OIDC role)
+      - name: Configurar credenciales AWS (via rol OIDC)
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::876253813400:role/pat-ah-github-actions-role
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Setup Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Cache frontend node_modules
+      - name: Cache de node_modules del frontend
         uses: actions/cache@v4
         with:
           path: PAT-AH/Frontend-Huancavelica-Alertas-Agricolas/node_modules
@@ -1184,14 +1115,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-frontend-
 
-      - name: Build frontend (Vite)
+      - name: Construir frontend (Vite)
         run: |
           FRONTEND_DIR="$GITHUB_WORKSPACE/Frontend-Huancavelica-Alertas-Agricolas"
           cd "$FRONTEND_DIR"
           npm ci --legacy-peer-deps || npm install --legacy-peer-deps
           npm run build
 
-      - name: Sync `dist/` to S3
+      - name: Sincronizar `dist/` a S3
         env:
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
         run: |
@@ -1203,7 +1134,7 @@ jobs:
           echo "Syncing $FRONTEND_DIST to s3://$S3_BUCKET"
           aws s3 sync "$FRONTEND_DIST" "s3://$S3_BUCKET" --delete --acl public-read
 
-      - name: Invalidate CloudFront (optional)
+      - name: Invalidar CloudFront (opcional)
         env:
           CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
         run: |
@@ -1223,7 +1154,7 @@ jobs:
           fi
           set -e
 
-      - name: Post-deploy verification (frontend)
+      - name: Verificación post-despliegue (frontend)
         env:
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
