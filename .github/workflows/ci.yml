@@ -216,8 +216,8 @@ jobs:
           echo "Running frontend build/tests..."
           # Prefer Vitest when present so coverage/coverage-summary.json is produced
           if [ -f package.json ] && grep -q "vitest" package.json; then
-            echo "Detected Vitest; running vitest with coverage"
-            npx vitest run --coverage || true
+            echo "Detected Vitest; running vitest with coverage (istanbul provider)"
+            npx vitest run --coverage --coverageProvider=istanbul || true
           elif [ -f package.json ] && grep -q '"test:cov"' package.json; then
             echo "Detected test:cov script; running npm run test:cov"
             npm run test:cov || true
