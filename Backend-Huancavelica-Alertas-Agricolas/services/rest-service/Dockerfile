@@ -17,7 +17,7 @@ WORKDIR /usr/src/app
 ENV NODE_ENV=production
 # Ensure OpenSSL and diagnostic tools are available in runtime for Prisma query engine compatibility and debugging
 RUN apt-get update -y \
- && apt-get install -y --only-upgrade zlib1g libldap-2.5-0 libpam0g libpam-modules libpam-runtime openssl ca-certificates curl iproute2 procps --no-install-recommends \
+ && apt-get install -y --only-upgrade zlib1g libldap-2.4-2 libpam0g libpam-modules libpam-runtime openssl ca-certificates curl iproute2 procps --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 # Copy everything from builder's app dir into runtime (safer if /src is missing in some contexts)
 COPY --from=builder /usr/src/app/. ./
