@@ -12,6 +12,9 @@ const graphql_1 = require("@nestjs/graphql");
 const apollo_1 = require("@nestjs/apollo");
 const rest_module_1 = require("./rest/rest.module");
 const shared_module_1 = require("./shared/shared.module");
+const alert_module_1 = require("./alerts/alert.module");
+const zone_module_1 = require("./zones/zone.module");
+const notification_module_1 = require("./notifications/notification.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -25,9 +28,17 @@ exports.AppModule = AppModule = __decorate([
                     playground: true,
                     introspection: true,
                     sortSchema: true,
+                    subscriptions: {
+                        'graphql-ws': true,
+                        'subscriptions-transport-ws': true,
+                    },
                 }),
                 shared_module_1.SharedModule,
                 rest_module_1.RestModule,
+                // TODO: Descomentar cuando se arreglen los decoradores
+                // alert_module_1.AlertModule,
+                // zone_module_1.ZoneModule,
+                // notification_module_1.NotificationModule,
             ],
     })
 ], AppModule);

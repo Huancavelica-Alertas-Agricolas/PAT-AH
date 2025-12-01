@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: alertas-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: alertas_agricolas
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - alertas-network
+
+  # Backend NestJS con GraphQL
+  backend:
+    build:
+      context: ./Backend-Huancavelica-Alertas-Agricolas
+      dockerfile: Dockerfile
+    container_name: alertas-backend
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/alertas_agricolas
+      JWT_SECRET: super-secret-jwt-key-change-in-production-32-chars
+      PORT: 3003
+      NODE_ENV: development
+      # Twilio (opcional - modo mock si no se configura)
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER:-}
+      # OpenWeatherMap (opcional)
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-}
+    ports:
+      - "3003:3003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./Backend-Huancavelica-Alertas-Agricolas:/app
+      - /app/node_modules
+      - /app/services/rest-service/node_modules
+    networks:
+      - alertas-network
+    command: sh /app/start-backend.sh
+
+  # Frontend React
+  frontend:
+    build:
+      context: ./Frontend-Huancavelica-Alertas-Agricolas
+      dockerfile: Dockerfile
+    container_name: alertas-frontend
+    environment:
+      VITE_GRAPHQL_URL: http://localhost:3003/api/graphql
+      VITE_GRAPHQL_WS_URL: ws://localhost:3003/api/graphql
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./Frontend-Huancavelica-Alertas-Agricolas:/app
+      - /app/node_modules
+    networks:
+      - alertas-network
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  alertas-network:
+    driver: bridge

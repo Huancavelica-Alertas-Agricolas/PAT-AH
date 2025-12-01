@@ -12,12 +12,14 @@ const { ClientsModule, Transport } = require('@nestjs/microservices');
 const auth_service_1 = require("./auth.service");
 const auth_resolver_1 = require("./auth.resolver");
 const users_module_1 = require("../users/users.module");
+const shared_module_1 = require("../shared/shared.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            shared_module_1.SharedModule,
             users_module_1.UsersModule,
             // Cliente TCP para comunicación con notification-service (welcome emails / sms)
             ClientsModule.register([

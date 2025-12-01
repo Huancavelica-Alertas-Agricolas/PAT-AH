@@ -1,77 +1,111 @@
-// Tipos para la plataforma de alertas climáticas
+// Tipos del sistema de AlertaSegura
+export type ViewType = 
+  | 'dashboard' 
+  | 'alerts' 
+  | 'zones' 
+  | 'analytics' 
+  | 'reports'
+  | 'users' 
+  | 'roles' 
+  | 'notifications' 
+  | 'settings';
 
-export type SeverityLevel = 'alto' | 'medio' | 'bajo';
+export type UserRole = 'administrador' | 'autoridad' | 'usuario';
 
-export type AlertType = 'lluvia_intensa' | 'helada' | 'sequia' | 'granizo' | 'viento_fuerte';
+export type AlertStatus = 'activa' | 'en-proceso' | 'resuelta';
 
-export type CropType = 'papa' | 'maiz' | 'quinua' | 'cebada' | 'habas' | 'otro';
+export type AlertPriority = 'alta' | 'media' | 'baja';
 
-export interface User {
-  id: string;
-  phone: string;
-  name: string;
-  location: string;
-  isAuthenticated: boolean;
-  notifications: {
-    sms: boolean;
-    telegram: boolean;
-    email: boolean;
-  };
-}
-
-export interface WeatherData {
-  temperature: number;
-  humidity: number;
-  windSpeed: number;
-  rainfall: number;
-  lastUpdated: Date;
-  location: string;
-}
-
-export interface Alert {
-  id: string;
-  type: AlertType;
-  severity: SeverityLevel;
-  title: string;
-  description: string;
-  recommendations: string[];
-  isActive: boolean;
-  createdAt: Date;
-  validUntil: Date;
-  affectedAreas: string[];
-  weatherData: {
-    temperature?: number;
-    windSpeed?: number;
-    rainfall?: number;
-  };
-}
-
-export interface Report {
-  id: string;
-  cropType: CropType;
-  dateRange: {
-    start: Date;
-    end: Date;
-  };
-  temperatureData: {
-    date: Date;
-    temperature: number;
-    hasAlert: boolean;
-  }[];
-  alertsCount: {
-    alto: number;
-    medio: number;
-    bajo: number;
-  };
-}
-
-export interface AuthFormData {
+export interface LoginForm {
   phone: string;
   password: string;
 }
 
-export interface ConsentData {
-  sms: boolean;
-  telegram: boolean;
-  email: boolean;
+// Mantener la interfaz antigua para compatibilidad
+export interface OldLoginForm {
+  email: string;
+  password: string;
+  remember: boolean;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: UserRole;
+  zone: string;
+  status: 'activo' | 'inactivo';
+  alertsReported: number;
+  createdAt: string;
+  avatar?: string;
+}
+
+export interface Alert {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  severity: string;
+  status: AlertStatus;
+  priority: AlertPriority;
+  location: string;
+  coordinates: [number, number];
+  reportedBy: string;
+  reportedAt: string;
+  time: string;
+  zone: string;
+  resolvedAt?: string;
+  resolvedBy?: string;
+  responseTime?: number;
+}
+
+export interface Zone {
+  id: string;
+  name: string;
+  coordinates: string;
+  area: number; // en km²
+  population: number;
+  activeAlerts: number;
+  status: 'alta-actividad' | 'media-actividad' | 'baja-actividad';
+  mapPosition: [number, number];
+}
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'alerta' | 'exito' | 'advertencia' | 'informacion';
+  priority: AlertPriority;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface DashboardStats {
+  activeAlerts: number;
+  resolvedToday: number;
+  inProcess: number;
+  activeUsers: number;
+  alertsTrend: number;
+  resolvedTrend: number;
+  processTrend: number;
+  usersTrend: number;
+}
+
+export interface LoginForm {
+  email: string;
+  password: string;
+  remember: boolean;
+}
+
+// Permisos del sistema
+export interface Permission {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface RolePermissions {
+  role: UserRole;
+  permissions: string[];
 }
