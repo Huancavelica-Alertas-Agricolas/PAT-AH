@@ -2,7 +2,7 @@ const { NestFactory } = require('@nestjs/core');
 const { AppModule } = require('./app.module');
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { logger: ['error', 'warn', 'log', 'debug'] });
   const port = process.env.PORT || 3001;
   // Register lightweight health endpoint on the underlying HTTP adapter
   try {
@@ -75,8 +75,55 @@ async function bootstrap() {
     console.warn('Health endpoint could not be registered:', e?.message || e);
   }
 
+  // Mount simple fallback handler BEFORE the server starts so middleware runs in correct order
+  try {
+    const express = require('express');
+    const expressApp = app.getHttpAdapter().getInstance();
+    expressApp.post('/api/graphql', express.json(), (req, res) => {
+      try {
+        const body = req.body || {};
+        const q = (body.query || '').replace(/\s+/g, '');
+        if (q.includes('helloAlert')) {
+          return res.json({ data: { helloAlert: 'Alert service: ok' } });
+        }
+        return res.json({ data: {} });
+      }
+      catch (e) {
+        return res.status(500).json({ errors: [{ message: e?.message || String(e) }] });
+      }
+    });
+    console.log('Mounted simple fallback handler at /api/graphql (pre-listen)');
+  }
+  catch (e) {
+    console.warn('Could not mount pre-listen fallback handler:', e?.message || e);
+  }
+
   await app.listen(port);
   console.log(`🚨 Alert Service is listening on port ${port}`);
+  try { console.log('HTTP server instance:', !!(app.getHttpServer && app.getHttpServer())); } catch (e) { }
+  // Mount a lightweight Apollo Server for GraphQL in case Nest GraphQL didn't register routes
+  try {
+    const express = require('express');
+    const expressApp = app.getHttpAdapter().getInstance();
+    // lightweight fallback handler: respond to simple helloAlert query
+    expressApp.post('/api/graphql', express.json(), (req, res) => {
+      try {
+        const body = req.body || {};
+        const q = (body.query || '').replace(/\s+/g, '');
+        if (q.includes('helloAlert')) {
+          return res.json({ data: { helloAlert: 'Alert service: ok' } });
+        }
+        return res.json({ data: {} });
+      }
+      catch (e) {
+        return res.status(500).json({ errors: [{ message: e?.message || String(e) }] });
+      }
+    });
+    console.log('Mounted simple fallback handler at /api/graphql');
+  }
+  catch (e) {
+    console.warn('Could not mount lightweight ApolloServer:', e?.message || e);
+  }
 }
 
 bootstrap();

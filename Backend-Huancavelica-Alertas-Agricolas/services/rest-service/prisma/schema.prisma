@@ -1,7 +1,8 @@
 generator client {
   provider      = "prisma-client-js"
-  // Ensure Prisma generates a query engine compatible with linux-musl (used in alpine images)
-  binaryTargets = ["native", "linux-musl"]
+  // Ensure Prisma generates query engines compatible with common Linux runtimes
+  // Include linux-musl (alpine) and Debian/OpenSSL variants used by slim images
+  binaryTargets = ["native", "linux-musl", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
 }
 
 datasource db {

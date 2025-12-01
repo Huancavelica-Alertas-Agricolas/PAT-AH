@@ -1,0 +1,5 @@
+weather-service-1  | [32m[Nest] 8  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+weather-service-1  | [32m[Nest] 8  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +7ms[39m
+weather-service-1  | [32m[Nest] 8  - [39m12/01/2025, 3:42:33 AM [32m    LOG[39m [38;5;3m[NestMicroservice] [39m[32mNest microservice successfully started[39m[38;5;3m +649ms[39m
+weather-service-1  | {"level":"info","message":"🌤️ Weather Service is listening on port 3002","service":"weather-service","timestamp":"2025-12-01T03:42:33.385Z"}
+weather-service-1  | {"level":"info","message":"🩺 Weather health endpoint listening on 3005","service":"weather-service","timestamp":"2025-12-01T03:42:33.386Z"}

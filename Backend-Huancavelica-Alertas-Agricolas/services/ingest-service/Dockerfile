@@ -4,7 +4,7 @@ FROM node:20 AS builder
 WORKDIR /usr/src/app
 # Copy package files from service context
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps --no-audit --no-fund || true
+RUN npm install --legacy-peer-deps --no-audit --no-fund || true
 # Copy service sources into image (context = service folder)
 COPY . ./
 # Copy shared Prisma schema from sibling ../shared if present

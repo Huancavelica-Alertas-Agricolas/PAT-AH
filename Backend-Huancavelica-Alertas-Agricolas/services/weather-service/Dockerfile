@@ -3,7 +3,7 @@ WORKDIR /usr/src/app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps --no-audit --no-fund
+RUN npm install --legacy-peer-deps --no-audit --no-fund
 
 # Copy source and prepare reports dir (context is repo root)
 COPY . ./

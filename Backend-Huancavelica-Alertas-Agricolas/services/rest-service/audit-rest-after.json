@@ -1,0 +1,96 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@nestjs/apollo": {
+      "name": "@nestjs/apollo",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@nestjs/graphql"
+      ],
+      "effects": [],
+      "range": "10.0.3 - 12.0.0",
+      "nodes": [
+        "node_modules/@nestjs/apollo"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/apollo",
+        "version": "13.2.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/graphql": {
+      "name": "@nestjs/graphql",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "ws"
+      ],
+      "effects": [
+        "@nestjs/apollo"
+      ],
+      "range": "9.0.0-next.1 - 12.1.1",
+      "nodes": [
+        "node_modules/@nestjs/graphql"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/graphql",
+        "version": "13.2.0",
+        "isSemVerMajor": true
+      }
+    },
+    "ws": {
+      "name": "ws",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1098392,
+          "name": "ws",
+          "dependency": "ws",
+          "title": "ws affected by a DoS when handling a request with many HTTP headers",
+          "url": "https://github.com/advisories/GHSA-3h5v-q93c-6h6q",
+          "severity": "high",
+          "cwe": [
+            "CWE-476"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=8.0.0 <8.17.1"
+        }
+      ],
+      "effects": [
+        "@nestjs/graphql"
+      ],
+      "range": "8.0.0 - 8.17.0",
+      "nodes": [
+        "node_modules/ws"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/graphql",
+        "version": "13.2.0",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 3,
+      "critical": 0,
+      "total": 3
+    },
+    "dependencies": {
+      "prod": 282,
+      "dev": 268,
+      "optional": 1,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 550
+    }
+  }
+}
