@@ -23,6 +23,7 @@ exports.AppModule = AppModule = __decorate([
                     autoSchemaFile: true,
                     path: '/graphql',
                     playground: true,
+                    introspection: true,
                     sortSchema: true,
                 }),
                 ai_module_1.AiModule,

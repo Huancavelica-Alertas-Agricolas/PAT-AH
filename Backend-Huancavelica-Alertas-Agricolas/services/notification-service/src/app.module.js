@@ -14,6 +14,7 @@ const moduleConfig = {
       autoSchemaFile: true,
       path: '/graphql',
       playground: true,
+      introspection: true,
       sortSchema: true,
     }),
     ConfigModule.forRoot({ isGlobal: true }),
