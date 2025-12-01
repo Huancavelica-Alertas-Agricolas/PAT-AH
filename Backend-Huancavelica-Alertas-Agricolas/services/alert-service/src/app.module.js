@@ -1,15 +1,26 @@
 const { Module } = require('@nestjs/common');
+const { GraphQLModule } = require('@nestjs/graphql');
+const { ApolloDriver } = require('@nestjs/apollo');
 const { PrometheusModule } = require('@willsoto/nestjs-prometheus');
 const { ClientsModule, Transport } = require('@nestjs/microservices');
 const { ConfigModule } = require('@nestjs/config');
 const { TypeOrmModule } = require('@nestjs/typeorm');
 const { AlertController } = require('./alert.controller');
 const { AlertService } = require('./alert.service');
+const { AlertResolver } = require('./alert.resolver');
 const { Alert } = require('./entities/alert.entity');
 const { UserAlert } = require('./entities/user-alert.entity');
 
 const moduleConfig = {
   imports: [
+    GraphQLModule.forRoot({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
+      path: '/api/graphql',
+      playground: true,
+      introspection: true,
+      sortSchema: true,
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -52,7 +63,7 @@ const moduleConfig = {
     PrometheusModule.register(),
   ],
   controllers: [AlertController],
-  providers: [AlertService],
+  providers: [AlertService, AlertResolver],
 };
 
 class AppModule {}

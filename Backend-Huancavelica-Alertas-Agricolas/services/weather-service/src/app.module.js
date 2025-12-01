@@ -1,4 +1,6 @@
 const { Module } = require('@nestjs/common');
+const { GraphQLModule } = require('@nestjs/graphql');
+const { ApolloDriver } = require('@nestjs/apollo');
 const { PrometheusModule } = require('@willsoto/nestjs-prometheus');
 const { ConfigModule } = require('@nestjs/config');
 const { HttpModule } = require('@nestjs/axios');
@@ -12,6 +14,14 @@ const { WeatherHistory } = require('./entities/weather-history.entity');
 
 const moduleConfig = {
   imports: [
+    ...(process.env.ENABLE_GRAPHQL === '1' ? [GraphQLModule.forRoot({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
+      path: '/graphql',
+      playground: true,
+      introspection: true,
+      sortSchema: true,
+    })] : []),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',

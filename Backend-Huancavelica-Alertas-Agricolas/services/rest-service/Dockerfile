@@ -1,24 +1,35 @@
 # Builder stage uses repo root as context; copy only service files
-FROM node:20 AS builder
+FROM node:20-bookworm AS builder
 WORKDIR /usr/src/app
-# Copy package files from service context
+# Install build-time deps and certs, then install node deps
 COPY package*.json ./
-RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+RUN apt-get update -y \
+ && apt-get install -y openssl ca-certificates --no-install-recommends \
+ && rm -rf /var/lib/apt/lists/* \
  && npm install --legacy-peer-deps --no-audit --no-fund
-# Copy service sources (expecting build context to be the service folder)
+
+# Copy sources and generate Prisma client if present
 COPY . ./
-# Copy shared Prisma schema from sibling `../shared` when present
 RUN mkdir -p prisma && cp ../shared/prisma/schema.prisma prisma/schema.prisma || true
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma; fi
-# No build step required; runtime uses JS in src/
 
-FROM node:20-slim
+# Final runtime: use a minimal image that does not include npm or extra OS packages
+FROM node:20-bookworm
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
-# Ensure OpenSSL and diagnostic tools are available in runtime for Prisma query engine compatibility and debugging
-RUN apt-get update -y && apt-get install -y openssl ca-certificates curl iproute2 procps --no-install-recommends && rm -rf /var/lib/apt/lists/*
-# Copy everything from builder's app dir into runtime (safer if /src is missing in some contexts)
-COPY --from=builder /usr/src/app/. ./
+
+# Copy CA certificates from builder (if any) to ensure TLS works
+COPY --from=builder /etc/ssl/certs /etc/ssl/certs
+
+# Copy the app from the builder stage
+COPY --from=builder /usr/src/app /usr/src/app
+
+# Remove dev dependencies to keep runtime slim (if present)
+RUN if [ -f package.json ]; then cd /usr/src/app && npm prune --production || true; fi
+
+# Use non-root user for security
+USER 1000
+
+# Expose application port and run wait-for-db helper before starting the app
 EXPOSE 3003
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s CMD curl -f http://localhost:3003/healthz || exit 1
-CMD ["node","src/main.js"]
+CMD ["node","scripts/wait-for-db.js","db","5432","--","node","src/main.js"]

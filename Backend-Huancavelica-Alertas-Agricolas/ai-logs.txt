@@ -1,0 +1,20 @@
+ai-service-1  | Could not load @tensorflow/tfjs-node native bindings. Falling back to @tensorflow/tfjs (JS). Performance may be slower.
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[MachineLearningService] [39m[32mCargados 1 modelos desde disco[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMulterModule dependencies initialized[39m[38;5;3m +0ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAiModule dependencies initialized[39m[38;5;3m +0ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAiController {/api/ai}:[39m[38;5;3m +4ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/upload-excel, POST} route[39m[38;5;3m +3ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/train-model, POST} route[39m[38;5;3m +0ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/predict, POST} route[39m[38;5;3m +0ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/predict-with-weather, POST} route[39m[38;5;3m +1ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/models, GET} route[39m[38;5;3m +1ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/models/:id, GET} route[39m[38;5;3m +1ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/models/:id, DELETE} route[39m[38;5;3m +0ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/weather/current, GET} route[39m[38;5;3m +0ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/weather/forecast, GET} route[39m[38;5;3m +1ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/weather/status, GET} route[39m[38;5;3m +1ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/analyze-complete, POST} route[39m[38;5;3m +0ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/ai/health, GET} route[39m[38;5;3m +0ms[39m
+ai-service-1  | [32m[Nest] 1  - [39m12/01/2025, 3:42:32 AM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +3ms[39m

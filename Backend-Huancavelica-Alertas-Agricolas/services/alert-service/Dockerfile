@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 # Copy only package files first to take advantage of layer caching
 COPY package*.json ./
 RUN apt-get update -y && apt-get install -y ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/* \
- && npm ci --legacy-peer-deps --no-audit --no-fund
+ && npm install --legacy-peer-deps --no-audit --no-fund
 
 # Copy service sources into the builder (context is the service folder)
 COPY . ./

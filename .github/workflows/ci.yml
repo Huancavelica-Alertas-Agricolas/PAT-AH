@@ -43,6 +43,10 @@ on:
 env:
   COVERAGE_THRESHOLD: 70
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -93,6 +97,66 @@ jobs:
               (cd "$pkg" && npm audit --json > "$GITHUB_WORKSPACE/audit-reports/$name-audit.json") || echo "{}" > "$GITHUB_WORKSPACE/audit-reports/$name-audit.json"
             fi
           done
+
+      - name: Check npm audit reports for High/Critical vulnerabilities
+        if: always()
+        run: |
+          echo "Checking npm audit reports for High/Critical vulnerabilities..."
+          set -e
+          echo "AUDIT_HAS_FINDINGS=0" >> $GITHUB_ENV
+          > audit-findings-summary.txt
+          for f in "$GITHUB_WORKSPACE"/audit-reports/*.json; do
+            if [ -f "$f" ]; then
+              echo "Inspecting $f"
+              high_count=0
+              crit_count=0
+              # Try metadata.vulnerabilities first (npm v7+), fallback to advisories
+              if jq -e '.metadata.vulnerabilities // empty' "$f" >/dev/null 2>&1; then
+                high_count=$(jq '.metadata.vulnerabilities.high // 0' "$f") || true
+                crit_count=$(jq '.metadata.vulnerabilities.critical // 0' "$f") || true
+              else
+                cnt=$(jq '[.advisories[]? | select(.severity=="high" or .severity=="critical")] | length' "$f" 2>/dev/null || echo 0)
+                high_count=$cnt
+                crit_count=0
+              fi
+              total=$((high_count + crit_count)) || true
+              if [ "$total" -gt 0 ]; then
+                echo "Found $total high/critical vulnerabilities in $f"
+                echo "$f: $total" >> audit-findings-summary.txt
+                echo "AUDIT_HAS_FINDINGS=1" >> $GITHUB_ENV
+              fi
+            fi
+          done
+          if [ -s audit-findings-summary.txt ]; then
+            echo "Summary of audit findings:" && cat audit-findings-summary.txt
+          else
+            echo "No high/critical npm audit issues found."
+          fi
+
+      - name: Create GitHub issue for npm audit findings
+        if: env.AUDIT_HAS_FINDINGS == '1'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs')
+            const path = 'audit-findings-summary.txt'
+            let body = `Automated report: npm audit found High/Critical vulnerabilities in this run (${process.env.GITHUB_RUN_ID}).\n\n()`
+            if (fs.existsSync(path)) {
+              body += 'Summary:\n\n' + fs.readFileSync(path, 'utf8') + '\n\n'
+            }
+            body += `Artifacts: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Security: npm audit High/Critical findings - run ${process.env.GITHUB_RUN_ID}`,
+              body: body
+            })
+
+      - name: Fail CI due to high/critical npm audit issues
+        if: env.AUDIT_HAS_FINDINGS == '1'
+        run: |
+          echo "Failing CI due to high/critical npm audit issues (see created issue and audit-reports artifact)."
+          exit 1
 
       - name: Run ESLint where configured
         run: |
@@ -150,7 +214,17 @@ jobs:
         working-directory: Frontend-Huancavelica-Alertas-Agricolas
         run: |
           echo "Running frontend build/tests..."
-          npm test -- --passWithNoTests || true
+          # Prefer Vitest when present so coverage/coverage-summary.json is produced
+          if [ -f package.json ] && grep -q "vitest" package.json; then
+            echo "Detected Vitest; running vitest with coverage (istanbul provider)"
+            npx vitest run --coverage --coverageProvider=istanbul || true
+          elif [ -f package.json ] && grep -q '"test:cov"' package.json; then
+            echo "Detected test:cov script; running npm run test:cov"
+            npm run test:cov || true
+          else
+            echo "Falling back to npm test"
+            npm test -- --passWithNoTests || true
+          fi
           npm run build || echo "Build failed or not configured"
 
       - name: Run integration tests (rest-service) using docker-compose
@@ -185,6 +259,498 @@ jobs:
           docker build -t pat-ah/ai-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/ai-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/ai-service || true
           docker build -t pat-ah/weather-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/weather-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/weather-service || true
           docker build -t pat-ah/frontend:ci -f Frontend-Huancavelica-Alertas-Agricolas/Dockerfile Frontend-Huancavelica-Alertas-Agricolas || true
+          # Also build other backend service images that will be scanned by Trivy
+          docker build -t pat-ah/ingest-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/ingest-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/ingest-service || true
+          docker build -t pat-ah/notification-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/notification-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/notification-service || true
+          docker build -t pat-ah/auth-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/auth-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/auth-service || true
+          docker build -t pat-ah/users-service:ci -f Backend-Huancavelica-Alertas-Agricolas/services/users-service/Dockerfile Backend-Huancavelica-Alertas-Agricolas/services/users-service || true
+
+      - name: Scan built Docker image with Trivy (rest-service)
+        if: always()
+        run: |
+          echo "Scanning pat-ah/rest-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-rest-service.json --severity CRITICAL,HIGH pat-ah/rest-service:ci || true
+
+      - name: Upload trivy report (rest-service)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-rest-report
+          path: trivy-rest-service.json
+
+      - name: Analyze Trivy findings (rest-service)
+        if: always()
+        run: |
+          echo "Analyzing trivy-rest-service.json for CRITICAL/HIGH vulnerabilities..."
+          set -e
+          echo "TRIVY_HAS_FINDINGS=0" >> $GITHUB_ENV
+          if [ ! -f trivy-rest-service.json ]; then
+            echo "trivy-rest-service.json not found; skipping trivy analysis";
+            exit 0
+          fi
+          cnt=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH")] | length' trivy-rest-service.json 2>/dev/null || echo 0)
+          if [ "$cnt" -gt 0 ]; then
+            echo "Found $cnt CRITICAL/HIGH vulnerabilities in trivy-rest-service.json"
+            echo "TRIVY_HAS_FINDINGS=1" >> $GITHUB_ENV
+            jq '[.Results[].Vulnerabilities[]? | {PkgName:.PkgName, InstalledVersion:.InstalledVersion, Severity:.Severity, Title:.Title, VulnerabilityID:.VulnerabilityID}]' trivy-rest-service.json > trivy-rest-summary.json || true
+            echo "Wrote trivy-rest-summary.json"
+          else
+            echo "No CRITICAL/HIGH vulnerabilities found by Trivy for rest-service."
+          fi
+
+      - name: Create GitHub issue for Trivy findings (rest-service)
+        if: env.TRIVY_HAS_FINDINGS == '1'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs')
+            const path = 'trivy-rest-summary.json'
+            let body = `Automated report: Trivy found CRITICAL/HIGH vulnerabilities in the rest-service image for run ${process.env.GITHUB_RUN_ID}.\n\n`;
+            if (fs.existsSync(path)) {
+              body += 'Summary (first entries):\n\n' + fs.readFileSync(path, 'utf8').slice(0, 8000) + '\n\n'
+            }
+            body += `Artifacts: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Security: Trivy CRITICAL/HIGH findings (rest-service) - run ${process.env.GITHUB_RUN_ID}`,
+              body: body
+            })
+
+      - name: Fail build on Trivy CRITICAL/HIGH findings (rest-service)
+        if: env.TRIVY_HAS_FINDINGS == '1'
+        run: |
+          echo "Failing build due to Trivy CRITICAL/HIGH vulnerabilities in rest-service (see created issue and trivy artifact)."
+          exit 1
+
+      # --- Trivy scan + analysis for ai-service ---
+      - name: Scan built Docker image with Trivy (ai-service)
+        if: always()
+        run: |
+          echo "Scanning pat-ah/ai-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-ai-service.json --severity CRITICAL,HIGH pat-ah/ai-service:ci || true
+
+      - name: Upload trivy report (ai-service)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-ai-report
+          path: trivy-ai-service.json
+
+      - name: Analyze Trivy findings (ai-service)
+        if: always()
+        run: |
+          echo "Analyzing trivy-ai-service.json for CRITICAL/HIGH vulnerabilities..."
+          set -e
+          echo "TRIVY_AI_HAS_FINDINGS=0" >> $GITHUB_ENV
+          if [ ! -f trivy-ai-service.json ]; then
+            echo "trivy-ai-service.json not found; skipping trivy analysis for ai-service";
+            exit 0
+          fi
+          cnt=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH")] | length' trivy-ai-service.json 2>/dev/null || echo 0)
+          if [ "$cnt" -gt 0 ]; then
+            echo "Found $cnt CRITICAL/HIGH vulnerabilities in trivy-ai-service.json"
+            echo "TRIVY_AI_HAS_FINDINGS=1" >> $GITHUB_ENV
+            jq '[.Results[].Vulnerabilities[]? | {PkgName:.PkgName, InstalledVersion:.InstalledVersion, Severity:.Severity, Title:.Title, VulnerabilityID:.VulnerabilityID}]' trivy-ai-service.json > trivy-ai-summary.json || true
+            echo "Wrote trivy-ai-summary.json"
+          else
+            echo "No CRITICAL/HIGH vulnerabilities found by Trivy for ai-service."
+          fi
+
+      - name: Create GitHub issue for Trivy findings (ai-service)
+        if: env.TRIVY_AI_HAS_FINDINGS == '1'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs')
+            const path = 'trivy-ai-summary.json'
+            let body = `Automated report: Trivy found CRITICAL/HIGH vulnerabilities in the ai-service image for run ${process.env.GITHUB_RUN_ID}.\n\n`;
+            if (fs.existsSync(path)) {
+              body += 'Summary (first entries):\n\n' + fs.readFileSync(path, 'utf8').slice(0, 8000) + '\n\n'
+            }
+            body += `Artifacts: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Security: Trivy CRITICAL/HIGH findings (ai-service) - run ${process.env.GITHUB_RUN_ID}`,
+              body: body
+            })
+
+      - name: Fail build on Trivy CRITICAL/HIGH findings (ai-service)
+        if: env.TRIVY_AI_HAS_FINDINGS == '1'
+        run: |
+          echo "Failing build due to Trivy CRITICAL/HIGH vulnerabilities in ai-service (see created issue and trivy artifact)."
+          exit 1
+
+      # --- Trivy scan + analysis for weather-service ---
+      - name: Scan built Docker image with Trivy (weather-service)
+        if: always()
+        run: |
+          echo "Scanning pat-ah/weather-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-weather-service.json --severity CRITICAL,HIGH pat-ah/weather-service:ci || true
+
+      - name: Upload trivy report (weather-service)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-weather-report
+          path: trivy-weather-service.json
+
+      - name: Analyze Trivy findings (weather-service)
+        if: always()
+        run: |
+          echo "Analyzing trivy-weather-service.json for CRITICAL/HIGH vulnerabilities..."
+          set -e
+          echo "TRIVY_WEATHER_HAS_FINDINGS=0" >> $GITHUB_ENV
+          if [ ! -f trivy-weather-service.json ]; then
+            echo "trivy-weather-service.json not found; skipping trivy analysis for weather-service";
+            exit 0
+          fi
+          cnt=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH")] | length' trivy-weather-service.json 2>/dev/null || echo 0)
+          if [ "$cnt" -gt 0 ]; then
+            echo "Found $cnt CRITICAL/HIGH vulnerabilities in trivy-weather-service.json"
+            echo "TRIVY_WEATHER_HAS_FINDINGS=1" >> $GITHUB_ENV
+            jq '[.Results[].Vulnerabilities[]? | {PkgName:.PkgName, InstalledVersion:.InstalledVersion, Severity:.Severity, Title:.Title, VulnerabilityID:.VulnerabilityID}]' trivy-weather-service.json > trivy-weather-summary.json || true
+            echo "Wrote trivy-weather-summary.json"
+          else
+            echo "No CRITICAL/HIGH vulnerabilities found by Trivy for weather-service."
+          fi
+
+      - name: Create GitHub issue for Trivy findings (weather-service)
+        if: env.TRIVY_WEATHER_HAS_FINDINGS == '1'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs')
+            const path = 'trivy-weather-summary.json'
+            let body = `Automated report: Trivy found CRITICAL/HIGH vulnerabilities in the weather-service image for run ${process.env.GITHUB_RUN_ID}.\n\n`;
+            if (fs.existsSync(path)) {
+              body += 'Summary (first entries):\n\n' + fs.readFileSync(path, 'utf8').slice(0, 8000) + '\n\n'
+            }
+            body += `Artifacts: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Security: Trivy CRITICAL/HIGH findings (weather-service) - run ${process.env.GITHUB_RUN_ID}`,
+              body: body
+            })
+
+      - name: Fail build on Trivy CRITICAL/HIGH findings (weather-service)
+        if: env.TRIVY_WEATHER_HAS_FINDINGS == '1'
+        run: |
+          echo "Failing build due to Trivy CRITICAL/HIGH vulnerabilities in weather-service (see created issue and trivy artifact)."
+          exit 1
+
+      # --- Trivy scan + analysis for frontend ---
+      - name: Scan built Docker image with Trivy (frontend)
+        if: always()
+        run: |
+          echo "Scanning pat-ah/frontend:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-frontend.json --severity CRITICAL,HIGH pat-ah/frontend:ci || true
+
+      - name: Upload trivy report (frontend)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-frontend-report
+          path: trivy-frontend.json
+
+      - name: Analyze Trivy findings (frontend)
+        if: always()
+        run: |
+          echo "Analyzing trivy-frontend.json for CRITICAL/HIGH vulnerabilities..."
+          set -e
+          echo "TRIVY_FRONTEND_HAS_FINDINGS=0" >> $GITHUB_ENV
+          if [ ! -f trivy-frontend.json ]; then
+            echo "trivy-frontend.json not found; skipping trivy analysis for frontend";
+            exit 0
+          fi
+          cnt=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH")] | length' trivy-frontend.json 2>/dev/null || echo 0)
+          if [ "$cnt" -gt 0 ]; then
+            echo "Found $cnt CRITICAL/HIGH vulnerabilities in trivy-frontend.json"
+            echo "TRIVY_FRONTEND_HAS_FINDINGS=1" >> $GITHUB_ENV
+            jq '[.Results[].Vulnerabilities[]? | {PkgName:.PkgName, InstalledVersion:.InstalledVersion, Severity:.Severity, Title:.Title, VulnerabilityID:.VulnerabilityID}]' trivy-frontend.json > trivy-frontend-summary.json || true
+            echo "Wrote trivy-frontend-summary.json"
+          else
+            echo "No CRITICAL/HIGH vulnerabilities found by Trivy for frontend."
+          fi
+
+      - name: Create GitHub issue for Trivy findings (frontend)
+        if: env.TRIVY_FRONTEND_HAS_FINDINGS == '1'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs')
+            const path = 'trivy-frontend-summary.json'
+            let body = `Automated report: Trivy found CRITICAL/HIGH vulnerabilities in the frontend image for run ${process.env.GITHUB_RUN_ID}.\n\n`;
+            if (fs.existsSync(path)) {
+              body += 'Summary (first entries):\n\n' + fs.readFileSync(path, 'utf8').slice(0, 8000) + '\n\n'
+            }
+            body += `Artifacts: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Security: Trivy CRITICAL/HIGH findings (frontend) - run ${process.env.GITHUB_RUN_ID}`,
+              body: body
+            })
+
+      - name: Fail build on Trivy CRITICAL/HIGH findings (frontend)
+        if: env.TRIVY_FRONTEND_HAS_FINDINGS == '1'
+        run: |
+          echo "Failing build due to Trivy CRITICAL/HIGH vulnerabilities in frontend (see created issue and trivy artifact)."
+          exit 1
+
+      # --- Trivy scan + analysis for ingest-service ---
+      - name: Scan built Docker image with Trivy (ingest-service)
+        if: always()
+        run: |
+          echo "Scanning pat-ah/ingest-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-ingest-service.json --severity CRITICAL,HIGH pat-ah/ingest-service:ci || true
+
+      - name: Upload trivy report (ingest-service)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-ingest-report
+          path: trivy-ingest-service.json
+
+      - name: Analyze Trivy findings (ingest-service)
+        if: always()
+        run: |
+          echo "Analyzing trivy-ingest-service.json for CRITICAL/HIGH vulnerabilities..."
+          set -e
+          echo "TRIVY_INGEST_HAS_FINDINGS=0" >> $GITHUB_ENV
+          if [ ! -f trivy-ingest-service.json ]; then
+            echo "trivy-ingest-service.json not found; skipping trivy analysis for ingest-service";
+            exit 0
+          fi
+          cnt=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH")] | length' trivy-ingest-service.json 2>/dev/null || echo 0)
+          if [ "$cnt" -gt 0 ]; then
+            echo "Found $cnt CRITICAL/HIGH vulnerabilities in trivy-ingest-service.json"
+            echo "TRIVY_INGEST_HAS_FINDINGS=1" >> $GITHUB_ENV
+            jq '[.Results[].Vulnerabilities[]? | {PkgName:.PkgName, InstalledVersion:.InstalledVersion, Severity:.Severity, Title:.Title, VulnerabilityID:.VulnerabilityID}]' trivy-ingest-service.json > trivy-ingest-summary.json || true
+            echo "Wrote trivy-ingest-summary.json"
+          else
+            echo "No CRITICAL/HIGH vulnerabilities found by Trivy for ingest-service."
+          fi
+
+      - name: Create GitHub issue for Trivy findings (ingest-service)
+        if: env.TRIVY_INGEST_HAS_FINDINGS == '1'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs')
+            const path = 'trivy-ingest-summary.json'
+            let body = `Automated report: Trivy found CRITICAL/HIGH vulnerabilities in the ingest-service image for run ${process.env.GITHUB_RUN_ID}.\n\n`;
+            if (fs.existsSync(path)) {
+              body += 'Summary (first entries):\n\n' + fs.readFileSync(path, 'utf8').slice(0, 8000) + '\n\n'
+            }
+            body += `Artifacts: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Security: Trivy CRITICAL/HIGH findings (ingest-service) - run ${process.env.GITHUB_RUN_ID}`,
+              body: body
+            })
+
+      - name: Fail build on Trivy CRITICAL/HIGH findings (ingest-service)
+        if: env.TRIVY_INGEST_HAS_FINDINGS == '1'
+        run: |
+          echo "Failing build due to Trivy CRITICAL/HIGH vulnerabilities in ingest-service (see created issue and trivy artifact)."
+          exit 1
+
+      # --- Trivy scan + analysis for notification-service ---
+      - name: Scan built Docker image with Trivy (notification-service)
+        if: always()
+        run: |
+          echo "Scanning pat-ah/notification-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-notification-service.json --severity CRITICAL,HIGH pat-ah/notification-service:ci || true
+
+      - name: Upload trivy report (notification-service)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-notification-report
+          path: trivy-notification-service.json
+
+      - name: Analyze Trivy findings (notification-service)
+        if: always()
+        run: |
+          echo "Analyzing trivy-notification-service.json for CRITICAL/HIGH vulnerabilities..."
+          set -e
+          echo "TRIVY_NOTIFICATION_HAS_FINDINGS=0" >> $GITHUB_ENV
+          if [ ! -f trivy-notification-service.json ]; then
+            echo "trivy-notification-service.json not found; skipping trivy analysis for notification-service";
+            exit 0
+          fi
+          cnt=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH")] | length' trivy-notification-service.json 2>/dev/null || echo 0)
+          if [ "$cnt" -gt 0 ]; then
+            echo "Found $cnt CRITICAL/HIGH vulnerabilities in trivy-notification-service.json"
+            echo "TRIVY_NOTIFICATION_HAS_FINDINGS=1" >> $GITHUB_ENV
+            jq '[.Results[].Vulnerabilities[]? | {PkgName:.PkgName, InstalledVersion:.InstalledVersion, Severity:.Severity, Title:.Title, VulnerabilityID:.VulnerabilityID}]' trivy-notification-service.json > trivy-notification-summary.json || true
+            echo "Wrote trivy-notification-summary.json"
+          else
+            echo "No CRITICAL/HIGH vulnerabilities found by Trivy for notification-service."
+          fi
+
+      - name: Create GitHub issue for Trivy findings (notification-service)
+        if: env.TRIVY_NOTIFICATION_HAS_FINDINGS == '1'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs')
+            const path = 'trivy-notification-summary.json'
+            let body = `Automated report: Trivy found CRITICAL/HIGH vulnerabilities in the notification-service image for run ${process.env.GITHUB_RUN_ID}.\n\n`;
+            if (fs.existsSync(path)) {
+              body += 'Summary (first entries):\n\n' + fs.readFileSync(path, 'utf8').slice(0, 8000) + '\n\n'
+            }
+            body += `Artifacts: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Security: Trivy CRITICAL/HIGH findings (notification-service) - run ${process.env.GITHUB_RUN_ID}`,
+              body: body
+            })
+
+      - name: Fail build on Trivy CRITICAL/HIGH findings (notification-service)
+        if: env.TRIVY_NOTIFICATION_HAS_FINDINGS == '1'
+        run: |
+          echo "Failing build due to Trivy CRITICAL/HIGH vulnerabilities in notification-service (see created issue and trivy artifact)."
+          exit 1
+
+      # --- Trivy scan + analysis for auth-service ---
+      - name: Scan built Docker image with Trivy (auth-service)
+        if: always()
+        run: |
+          echo "Scanning pat-ah/auth-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-auth-service.json --severity CRITICAL,HIGH pat-ah/auth-service:ci || true
+
+      - name: Upload trivy report (auth-service)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-auth-report
+          path: trivy-auth-service.json
+
+      - name: Analyze Trivy findings (auth-service)
+        if: always()
+        run: |
+          echo "Analyzing trivy-auth-service.json for CRITICAL/HIGH vulnerabilities..."
+          set -e
+          echo "TRIVY_AUTH_HAS_FINDINGS=0" >> $GITHUB_ENV
+          if [ ! -f trivy-auth-service.json ]; then
+            echo "trivy-auth-service.json not found; skipping trivy analysis for auth-service";
+            exit 0
+          fi
+          cnt=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH")] | length' trivy-auth-service.json 2>/dev/null || echo 0)
+          if [ "$cnt" -gt 0 ]; then
+            echo "Found $cnt CRITICAL/HIGH vulnerabilities in trivy-auth-service.json"
+            echo "TRIVY_AUTH_HAS_FINDINGS=1" >> $GITHUB_ENV
+            jq '[.Results[].Vulnerabilities[]? | {PkgName:.PkgName, InstalledVersion:.InstalledVersion, Severity:.Severity, Title:.Title, VulnerabilityID:.VulnerabilityID}]' trivy-auth-service.json > trivy-auth-summary.json || true
+            echo "Wrote trivy-auth-summary.json"
+          else
+            echo "No CRITICAL/HIGH vulnerabilities found by Trivy for auth-service."
+          fi
+
+      - name: Create GitHub issue for Trivy findings (auth-service)
+        if: env.TRIVY_AUTH_HAS_FINDINGS == '1'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs')
+            const path = 'trivy-auth-summary.json'
+            let body = `Automated report: Trivy found CRITICAL/HIGH vulnerabilities in the auth-service image for run ${process.env.GITHUB_RUN_ID}.\n\n`;
+            if (fs.existsSync(path)) {
+              body += 'Summary (first entries):\n\n' + fs.readFileSync(path, 'utf8').slice(0, 8000) + '\n\n'
+            }
+            body += `Artifacts: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Security: Trivy CRITICAL/HIGH findings (auth-service) - run ${process.env.GITHUB_RUN_ID}`,
+              body: body
+            })
+
+      - name: Fail build on Trivy CRITICAL/HIGH findings (auth-service)
+        if: env.TRIVY_AUTH_HAS_FINDINGS == '1'
+        run: |
+          echo "Failing build due to Trivy CRITICAL/HIGH vulnerabilities in auth-service (see created issue and trivy artifact)."
+          exit 1
+
+      # --- Trivy scan + analysis for users-service ---
+      - name: Scan built Docker image with Trivy (users-service)
+        if: always()
+        run: |
+          echo "Scanning pat-ah/users-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-users-service.json --severity CRITICAL,HIGH pat-ah/users-service:ci || true
+
+      - name: Upload trivy report (users-service)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-users-report
+          path: trivy-users-service.json
+
+      - name: Analyze Trivy findings (users-service)
+        if: always()
+        run: |
+          echo "Analyzing trivy-users-service.json for CRITICAL/HIGH vulnerabilities..."
+          set -e
+          echo "TRIVY_USERS_HAS_FINDINGS=0" >> $GITHUB_ENV
+          if [ ! -f trivy-users-service.json ]; then
+            echo "trivy-users-service.json not found; skipping trivy analysis for users-service";
+            exit 0
+          fi
+          cnt=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH")] | length' trivy-users-service.json 2>/dev/null || echo 0)
+          if [ "$cnt" -gt 0 ]; then
+            echo "Found $cnt CRITICAL/HIGH vulnerabilities in trivy-users-service.json"
+            echo "TRIVY_USERS_HAS_FINDINGS=1" >> $GITHUB_ENV
+            jq '[.Results[].Vulnerabilities[]? | {PkgName:.PkgName, InstalledVersion:.InstalledVersion, Severity:.Severity, Title:.Title, VulnerabilityID:.VulnerabilityID}]' trivy-users-service.json > trivy-users-summary.json || true
+            echo "Wrote trivy-users-summary.json"
+          else
+            echo "No CRITICAL/HIGH vulnerabilities found by Trivy for users-service."
+          fi
+
+      - name: Create GitHub issue for Trivy findings (users-service)
+        if: env.TRIVY_USERS_HAS_FINDINGS == '1'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs')
+            const path = 'trivy-users-summary.json'
+            let body = `Automated report: Trivy found CRITICAL/HIGH vulnerabilities in the users-service image for run ${process.env.GITHUB_RUN_ID}.\n\n`;
+            if (fs.existsSync(path)) {
+              body += 'Summary (first entries):\n\n' + fs.readFileSync(path, 'utf8').slice(0, 8000) + '\n\n'
+            }
+            body += `Artifacts: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Security: Trivy CRITICAL/HIGH findings (users-service) - run ${process.env.GITHUB_RUN_ID}`,
+              body: body
+            })
+
+      - name: Fail build on Trivy CRITICAL/HIGH findings (users-service)
+        if: env.TRIVY_USERS_HAS_FINDINGS == '1'
+        run: |
+          echo "Failing build due to Trivy CRITICAL/HIGH vulnerabilities in users-service (see created issue and trivy artifact)."
+          exit 1
 
       - name: Upload test results (optional)
         if: always()
@@ -219,11 +785,12 @@ jobs:
               (cd "$pkg" && npm ci --no-audit --no-fund) > "coverage-artifacts/${name}-install.log" 2>&1 || \
                 (cd "$pkg" && npm install --no-audit --no-fund) >> "coverage-artifacts/${name}-install.log" 2>&1 || true
 
-              # Run coverage script if declared, otherwise fallback to jest json-summary
+              # Run coverage script if declared, otherwise run package test with coverage flags
               if grep -q '"test:cov"' "$pkg/package.json"; then
                 (cd "$pkg" && npm run test:cov --if-present) > "coverage-artifacts/${name}-test.log" 2>&1 || true
               else
-                (cd "$pkg" && npx jest --coverage --coverageReporters=json-summary --runInBand) > "coverage-artifacts/${name}-test.log" 2>&1 || true
+                # Prefer `npm test -- --coverage` so projects using Vitest or Jest both get coverage
+                (cd "$pkg" && npm test -- --coverage --coverageReporters=json-summary --runInBand) > "coverage-artifacts/${name}-test.log" 2>&1 || true
               fi
 
               # Copy coverage dir if exists
@@ -315,16 +882,26 @@ jobs:
 
       - name: Wait for target to be healthy
         run: |
-          TARGET_URL=http://localhost:3003/healthz
+          TARGET_URL=http://localhost:3003/health
+          METRICS_URL=http://localhost:9410/metrics || true
           echo "Waiting for $TARGET_URL to respond (timeout 120s)..."
           for i in $(seq 1 24); do
             if curl -sSf $TARGET_URL >/dev/null 2>&1; then
               echo "Target healthy"
-              exit 0
+              break
             fi
             sleep 5
           done
-          echo "Target did not become healthy" && exit 1
+          # final check
+          if ! curl -sSf $TARGET_URL >/dev/null 2>&1; then
+            echo "Target did not become healthy" && exit 1
+          fi
+          # optional: check metrics endpoint presence
+          if curl -sSf $METRICS_URL >/dev/null 2>&1; then
+            echo "Metrics endpoint available at $METRICS_URL"
+          else
+            echo "Metrics endpoint not available at $METRICS_URL (ok if not configured)"
+          fi
 
       - name: Try Action-based OWASP ZAP baseline (portable)
         id: zap_action
@@ -333,12 +910,13 @@ jobs:
           target: 'http://localhost:3003'
         continue-on-error: true
 
-      - name: Fallback: Run OWASP ZAP baseline scan (container, host network)
+      - name: "Fallback: Run OWASP ZAP baseline scan (container, host network)"
         if: steps.zap_action.outcome != 'success'
         run: |
           echo "Running OWASP ZAP baseline scan (fallback) against http://localhost:3003"
           # generate both HTML and JSON reports (-r html, -J json)
-          docker run --rm --network host -v $PWD:/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://localhost:3003 -r zap-report.html -J zap-report.json || true
+          # keep the docker run on a single line to avoid YAML parsing issues
+          docker run --rm --network host -v "$PWD":/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://localhost:3003 -r zap-report.html -J zap-report.json || true
 
       - name: Analyze ZAP JSON and fail on configured severities
         id: analyze
@@ -346,53 +924,53 @@ jobs:
         continue-on-error: true
         run: |
           echo "Inspecting zap-report.json for severities in $ZAP_FAIL_SEVERITIES..."
-          python3 - <<'PY'
-import json,sys,os
-path='zap-report.json'
-if not os.path.exists(path):
-    print('zap-report.json not found, skipping fail-on-alerts check')
-    sys.exit(0)
-with open(path,'r',encoding='utf-8') as f:
-    try:
-        j=json.load(f)
-    except Exception as e:
-        print('Failed to parse zap-report.json:',e)
-        sys.exit(0)
+            python3 - <<'PY'
+            import json,sys,os
+            path='zap-report.json'
+            if not os.path.exists(path):
+              print('zap-report.json not found, skipping fail-on-alerts check')
+              sys.exit(0)
+            with open(path,'r',encoding='utf-8') as f:
+              try:
+                j=json.load(f)
+              except Exception as e:
+                print('Failed to parse zap-report.json:',e)
+                sys.exit(0)
 
-severities_env = os.environ.get('ZAP_FAIL_SEVERITIES','High,Critical')
-severities = set([s.strip().lower() for s in severities_env.split(',') if s.strip()])
-print('Configured fail severities:', severities)
+            severities_env = os.environ.get('ZAP_FAIL_SEVERITIES','High,Critical')
+            severities = set([s.strip().lower() for s in severities_env.split(',') if s.strip()])
+            print('Configured fail severities:', severities)
 
-def scan(obj):
-    # Prefer explicit 'risk' fields typical in ZAP JSON
-    if isinstance(obj, dict):
-        if 'risk' in obj and isinstance(obj['risk'], str):
-            if obj['risk'].strip().lower() in severities:
-                return True, ('risk', obj['risk'], obj)
-        for v in obj.values():
-            found = scan(v)
+            def scan(obj):
+              # Prefer explicit 'risk' fields typical in ZAP JSON
+              if isinstance(obj, dict):
+                if 'risk' in obj and isinstance(obj['risk'], str):
+                  if obj['risk'].strip().lower() in severities:
+                    return True, ('risk', obj['risk'], obj)
+                for v in obj.values():
+                  found = scan(v)
+                  if found[0]:
+                    return found
+              elif isinstance(obj, list):
+                for item in obj:
+                  found = scan(item)
+                  if found[0]:
+                    return found
+              elif isinstance(obj, str):
+                low = obj.lower()
+                for sev in severities:
+                  if sev in low:
+                    return True, (None, obj, obj)
+              return (False, None)
+
+            found = scan(j)
             if found[0]:
-                return found
-    elif isinstance(obj, list):
-        for item in obj:
-            found = scan(item)
-            if found[0]:
-                return found
-    elif isinstance(obj, str):
-        low = obj.lower()
-        for sev in severities:
-            if sev in low:
-                return True, (None, obj, obj)
-    return (False, None)
-
-found = scan(j)
-if found[0]:
-    print('Failing build due to alert:', found[1])
-    sys.exit(1)
-else:
-    print('No configured-severity alerts found in zap-report.json')
-    sys.exit(0)
-PY
+              print('Failing build due to alert:', found[1])
+              sys.exit(1)
+            else:
+              print('No configured-severity alerts found in zap-report.json')
+              sys.exit(0)
+            PY
 
       - name: Upload ZAP report artifacts
         if: always()
