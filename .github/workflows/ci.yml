@@ -253,8 +253,10 @@ jobs:
       - name: Scan built Docker image with Trivy (rest-service)
         if: always()
         run: |
-          echo "Scanning pat-ah/rest-service:ci with Trivy (docker image)..."
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-rest-service.json --severity CRITICAL,HIGH pat-ah/rest-service:ci || true
+          echo "Scanning pat-ah/rest-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-rest-service.json --severity CRITICAL,HIGH pat-ah/rest-service:ci || true
 
       - name: Upload trivy report (rest-service)
         if: always()
@@ -312,8 +314,10 @@ jobs:
       - name: Scan built Docker image with Trivy (ai-service)
         if: always()
         run: |
-          echo "Scanning pat-ah/ai-service:ci with Trivy (docker image)..."
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-ai-service.json --severity CRITICAL,HIGH pat-ah/ai-service:ci || true
+          echo "Scanning pat-ah/ai-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-ai-service.json --severity CRITICAL,HIGH pat-ah/ai-service:ci || true
 
       - name: Upload trivy report (ai-service)
         if: always()
@@ -371,8 +375,10 @@ jobs:
       - name: Scan built Docker image with Trivy (weather-service)
         if: always()
         run: |
-          echo "Scanning pat-ah/weather-service:ci with Trivy (docker image)..."
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-weather-service.json --severity CRITICAL,HIGH pat-ah/weather-service:ci || true
+          echo "Scanning pat-ah/weather-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-weather-service.json --severity CRITICAL,HIGH pat-ah/weather-service:ci || true
 
       - name: Upload trivy report (weather-service)
         if: always()
@@ -430,8 +436,10 @@ jobs:
       - name: Scan built Docker image with Trivy (frontend)
         if: always()
         run: |
-          echo "Scanning pat-ah/frontend:ci with Trivy (docker image)..."
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-frontend.json --severity CRITICAL,HIGH pat-ah/frontend:ci || true
+          echo "Scanning pat-ah/frontend:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-frontend.json --severity CRITICAL,HIGH pat-ah/frontend:ci || true
 
       - name: Upload trivy report (frontend)
         if: always()
@@ -489,8 +497,10 @@ jobs:
       - name: Scan built Docker image with Trivy (ingest-service)
         if: always()
         run: |
-          echo "Scanning pat-ah/ingest-service:ci with Trivy (docker image)..."
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-ingest-service.json --severity CRITICAL,HIGH pat-ah/ingest-service:ci || true
+          echo "Scanning pat-ah/ingest-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-ingest-service.json --severity CRITICAL,HIGH pat-ah/ingest-service:ci || true
 
       - name: Upload trivy report (ingest-service)
         if: always()
@@ -548,8 +558,10 @@ jobs:
       - name: Scan built Docker image with Trivy (notification-service)
         if: always()
         run: |
-          echo "Scanning pat-ah/notification-service:ci with Trivy (docker image)..."
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-notification-service.json --severity CRITICAL,HIGH pat-ah/notification-service:ci || true
+          echo "Scanning pat-ah/notification-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-notification-service.json --severity CRITICAL,HIGH pat-ah/notification-service:ci || true
 
       - name: Upload trivy report (notification-service)
         if: always()
@@ -607,8 +619,10 @@ jobs:
       - name: Scan built Docker image with Trivy (auth-service)
         if: always()
         run: |
-          echo "Scanning pat-ah/auth-service:ci with Trivy (docker image)..."
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-auth-service.json --severity CRITICAL,HIGH pat-ah/auth-service:ci || true
+          echo "Scanning pat-ah/auth-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-auth-service.json --severity CRITICAL,HIGH pat-ah/auth-service:ci || true
 
       - name: Upload trivy report (auth-service)
         if: always()
@@ -666,8 +680,10 @@ jobs:
       - name: Scan built Docker image with Trivy (users-service)
         if: always()
         run: |
-          echo "Scanning pat-ah/users-service:ci with Trivy (docker image)..."
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/work aquasecurity/trivy:latest image --format json -o /work/trivy-users-service.json --severity CRITICAL,HIGH pat-ah/users-service:ci || true
+          echo "Scanning pat-ah/users-service:ci with Trivy (image)..."
+          echo "Installing Trivy (if missing)..."
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.39.0 || true
+          trivy image --format json -o trivy-users-service.json --severity CRITICAL,HIGH pat-ah/users-service:ci || true
 
       - name: Upload trivy report (users-service)
         if: always()
@@ -754,11 +770,12 @@ jobs:
               (cd "$pkg" && npm ci --no-audit --no-fund) > "coverage-artifacts/${name}-install.log" 2>&1 || \
                 (cd "$pkg" && npm install --no-audit --no-fund) >> "coverage-artifacts/${name}-install.log" 2>&1 || true
 
-              # Run coverage script if declared, otherwise fallback to jest json-summary
+              # Run coverage script if declared, otherwise run package test with coverage flags
               if grep -q '"test:cov"' "$pkg/package.json"; then
                 (cd "$pkg" && npm run test:cov --if-present) > "coverage-artifacts/${name}-test.log" 2>&1 || true
               else
-                (cd "$pkg" && npx jest --coverage --coverageReporters=json-summary --runInBand) > "coverage-artifacts/${name}-test.log" 2>&1 || true
+                # Prefer `npm test -- --coverage` so projects using Vitest or Jest both get coverage
+                (cd "$pkg" && npm test -- --coverage --coverageReporters=json-summary --runInBand) > "coverage-artifacts/${name}-test.log" 2>&1 || true
               fi
 
               # Copy coverage dir if exists
