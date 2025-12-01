@@ -35,4 +35,10 @@
     "@nestjs/testing": "^11.1.9"
     ,"node-fetch": "^2.6.7"
   }
+  ,
+  "overrides": {
+    "ws": "^8.14.0",
+    "glob": "^10.4.3",
+    "cross-spawn": "^7.0.4"
+  }
 }
