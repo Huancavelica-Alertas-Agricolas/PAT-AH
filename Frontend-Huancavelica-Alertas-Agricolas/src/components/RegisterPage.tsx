@@ -61,7 +61,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onBack, onSuccess }) => {
             email: formData.email,
             telefono: formData.telefono,
             password: formData.password,
-            zona: formData.zona, // Usar 'zona' que es lo que espera el esquema de Prisma
+            // Remover ciudad/zona temporalmente para debug
           },
         },
       });
