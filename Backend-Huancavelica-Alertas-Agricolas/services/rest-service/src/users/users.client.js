@@ -1,4 +1,6 @@
 "use strict";
+// Comentarios añadidos en español: cliente HTTP para `users-service`.
+// Cómo lo logra: construye URLs usando `USERS_SERVICE_URL` (o `backend-users:3002`) y usa `fetch` para `create`, `findByPhone`, `findAll`.
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -7,6 +9,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var UsersClient_1;
 Object.defineProperty(exports, "__esModule", { value: true });
+// Comentarios añadidos en español: cliente HTTP para `users-service`.
+// Métodos: `create(data)`, `findByPhone(phone)`, `findAll()`; usa `USERS_SERVICE_URL` o `backend-users:3002`.
 exports.UsersClient = void 0;
 const common_1 = require("@nestjs/common");
 const BASE = process.env.USERS_SERVICE_URL || 'http://backend-users:3002';

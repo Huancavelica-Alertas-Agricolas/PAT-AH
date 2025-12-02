@@ -1,4 +1,6 @@
 "use strict";
+// Comentarios añadidos en español: middleware JWT que decodifica el `Authorization: Bearer <token>`.
+// Cómo lo logra: verifica el token con `JWT_SECRET` y, si es válido, adjunta el payload en `req.user`; ignora errores para no bloquear peticiones.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);

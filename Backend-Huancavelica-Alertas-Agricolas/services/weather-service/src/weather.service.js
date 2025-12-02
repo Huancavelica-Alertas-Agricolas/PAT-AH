@@ -1,3 +1,4 @@
+// Comentarios añadidos en español: encabezado breve y líneas por método explicando uso de parámetros.
 const { Injectable, Logger } = require('@nestjs/common');
 const { HttpService } = require('@nestjs/axios');
 const { ConfigService } = require('@nestjs/config');
@@ -41,6 +42,7 @@ class WeatherService {
   }
 
   async generateAndSaveWeatherReport() {
+    // Genera y guarda reporte de pronóstico. No requiere parámetros.
     this.logger.log('Iniciando la generación del reporte de clima...');
     
     try {
@@ -77,6 +79,7 @@ class WeatherService {
   }
 
   async getCurrentWeatherData() {
+    // Obtiene datos meteorológicos actuales. No requiere parámetros.
     this.logger.log('Obteniendo datos meteorológicos actuales...');
     
     try {
@@ -122,6 +125,7 @@ class WeatherService {
   }
 
   async fetchWeatherForecastData() {
+    // Obtiene datos de pronóstico desde la API externa usando API_KEY en config.
     const apiKey = this.configService.get('API_KEY');
     const lat = -12.7861;
     const lon = -74.9723;
@@ -160,6 +164,8 @@ class WeatherService {
   }
 
   async saveForecastsToDatabase(forecasts) {
+    // Guarda una lista de pronósticos en la base de datos.
+    // Usa: `forecasts` = array de WeatherForecast
     try {
       return await this.forecastRepository.save(forecasts);
     } catch (error) {
@@ -183,6 +189,7 @@ class WeatherService {
 
   // Método para guardar datos históricos desde archivo SENAMHI
   async saveHistoricalDataFromSenamhi() {
+    // Guarda datos históricos a partir de archivo SENAMHI. No requiere parámetros.
     this.logger.log('Guardando datos históricos de SENAMHI...');
     
     try {

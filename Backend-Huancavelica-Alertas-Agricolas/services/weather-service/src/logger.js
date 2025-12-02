@@ -1,3 +1,4 @@
+// Logger configurado con winston para el weather-service. Comentarios en español.
 const { createLogger, format, transports } = require('winston');
 
 const logger = createLogger({

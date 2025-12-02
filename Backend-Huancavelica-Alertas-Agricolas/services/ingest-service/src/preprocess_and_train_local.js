@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: versión local de preprocesamiento y entrenamiento.
+// Genera CSV/XLSX preprocesado y llama al AI service local.
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
@@ -121,6 +123,7 @@ const { execSync } = require('child_process');
   const AI_BASE = process.env.AI_BASE || 'http://18.208.193.82:3003/api/ai';
 
   const uploadCmd = `curl.exe -s -X POST ${AI_BASE}/upload-excel -F file=@"${xlsxAbs}"`;
+  // Sube el XLSX al AI service y obtiene `fileInfo.path` en la respuesta.
   console.log('Uploading to', AI_BASE + '/upload-excel');
   const uploadOut = execSync(uploadCmd, { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
   console.log('Upload response:', uploadOut);
@@ -143,6 +146,7 @@ const { execSync } = require('child_process');
   fs.writeFileSync(trainBodyPath, JSON.stringify(trainBody, null, 2));
 
   const trainCmd = `curl.exe -v -X POST "${AI_BASE}/train-model" -H "Content-Type: application/json" --data-binary @"${trainBodyPath}"`;
+  // Llama al endpoint de entrenamiento con el body guardado en disco.
   console.log('Calling', AI_BASE + '/train-model');
   const trainOut = execSync(trainCmd, { encoding: 'utf8', stdio: 'pipe', maxBuffer: 20 * 1024 * 1024 });
   console.log('Train response:', trainOut);

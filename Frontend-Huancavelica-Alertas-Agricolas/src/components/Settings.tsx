@@ -1,3 +1,6 @@
+// Comentarios añadidos en español: componente `Settings` para configuración de la aplicación.
+// Cómo lo logra: expone opciones de preferencias, notificaciones, y ajustes de cuenta.
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 

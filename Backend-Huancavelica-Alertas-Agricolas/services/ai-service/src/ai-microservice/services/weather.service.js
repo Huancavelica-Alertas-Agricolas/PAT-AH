@@ -10,6 +10,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var WeatherService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
+// Comentarios añadidos en español: servicio que consulta APIs meteorológicas para el módulo AI.
+// Breve: obtiene `getCurrentWeather`, `getForecast`, `getWeatherByCity`, `getHistoricalWeather` y prepara features para ML con `processWeatherForML`.
 exports.WeatherService = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = __importDefault(require("axios"));

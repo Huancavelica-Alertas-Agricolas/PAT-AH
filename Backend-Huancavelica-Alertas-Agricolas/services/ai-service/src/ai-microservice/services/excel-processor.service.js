@@ -1,4 +1,6 @@
 "use strict";
+// Comentarios añadidos en español: Procesador de Excel que limpia y prepara datasets (transpilado).
+// Cómo lo logra: lee archivos XLSX/CSV, sanitiza encabezados, rellena/filtra valores y genera splits train/val/test.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -42,6 +44,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// Comentarios añadidos en español: servicio para procesar archivos Excel y preparar datasets.
+// Métodos clave: `processExcelFile(filePath)` -> extrae columnas y filas; `prepareTrainingData(...)` -> valida y crea splits; `validateDataQuality(...)` -> retorna warnings/recomendaciones.
 exports.ExcelProcessorService = void 0;
 const common_1 = require("@nestjs/common");
 const XLSX = __importStar(require("xlsx"));

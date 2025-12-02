@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `AlertFilters` que ofrece controles para filtrar alertas.
+// Cómo lo logra: expone selects y toggles para filtrar por tipo, fecha y zona y emite callbacks.
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Filter, X, Calendar, MapPin, AlertTriangle } from 'lucide-react';

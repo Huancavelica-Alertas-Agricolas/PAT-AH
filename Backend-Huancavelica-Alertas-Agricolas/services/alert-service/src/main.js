@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: script de arranque del `alert-service`.
+// Crea la app Nest, registra health endpoint ligero y handlers de fallback para GraphQL.
 const { NestFactory } = require('@nestjs/core');
 const { AppModule } = require('./app.module');
 

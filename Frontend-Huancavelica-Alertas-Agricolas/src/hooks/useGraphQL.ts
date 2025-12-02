@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: hooks personalizados para GraphQL (queries, mutations, subscriptions).
+// Cómo lo logra: envuelven `useQuery`, `useMutation` y `useSubscription` añadiendo manejo de errores y flags.
 import { useQuery, useMutation, useSubscription } from '@apollo/client/react';
 import type { OperationVariables } from '@apollo/client';
 import { DocumentNode } from 'graphql';

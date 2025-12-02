@@ -1,6 +1,7 @@
 /**
- * Weather Service using OpenWeatherMap API
- * Consulta datos climáticos y detecta condiciones adversas
+ * Comentarios añadidos en español: servicio meteorológico compartido.
+ * Breve: consulta OpenWeatherMap y detecta condiciones adversas (helada, lluvia, viento, sequía).
+ * Nota: mantiene lógica original; se agregan líneas que describen parámetros por método.
  */
 
 const fetch = require('node-fetch');
@@ -15,7 +16,8 @@ class WeatherService {
   }
 
   /**
-   * Obtiene datos climáticos actuales
+   * Obtiene datos climáticos actuales.
+   * Usa: `lat` = latitud (opcional), `lon` = longitud (opcional). Devuelve objeto con temperatura, humedad, precipitacion, velocidadViento, descripcion.
    * @param {number} lat - Latitud
    * @param {number} lon - Longitud
    * @returns {Promise<Object>}
@@ -43,7 +45,7 @@ class WeatherService {
   }
 
   /**
-   * Parsea los datos de la API
+   * Parsea los datos de la API a la forma usada internamente.
    * @private
    */
   _parseWeatherData(data) {
@@ -57,7 +59,8 @@ class WeatherService {
   }
 
   /**
-   * Detecta condiciones adversas que requieren alerta
+   * Detecta condiciones adversas que requieren alerta.
+   * Usa: `weatherData` = objeto retornado por `getCurrentWeather` o similar. Devuelve array de alertas con `tipo`, `severidad`, `titulo`, `descripcion`.
    * @param {Object} weatherData - Datos climáticos
    * @returns {Array<Object>} Array de alertas detectadas
    */
@@ -108,7 +111,7 @@ class WeatherService {
   }
 
   /**
-   * Datos mock para desarrollo
+   * Datos mock para desarrollo.
    * @private
    */
   _getMockWeatherData() {

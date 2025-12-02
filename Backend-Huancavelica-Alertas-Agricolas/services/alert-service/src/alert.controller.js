@@ -1,27 +1,33 @@
+// Comentarios añadidos en español: encabezado breve y uso de parámetros por método.
 const { Logger } = require('@nestjs/common');
 
 class AlertController {
+  // alertService: instancia del servicio que maneja la lógica de alertas.
   constructor(alertService) {
     this.logger = new Logger(AlertController.name);
     this.alertService = alertService;
   }
 
+  // Genera alerta climatológica. Usa: `alertRequest` = { email, userName, type }
   async generateWeatherAlert(alertRequest) {
     this.logger.log('Procesando solicitud de alerta meteorológica:', alertRequest);
     // Redirigimos este patrón al nuevo flujo que procesa una alerta ya detectada
     return await this.alertService.processClimateAlert(alertRequest);
   }
 
+  // Genera alerta de helada. Usa: `alertRequest` = { email, userName }
   async generateFrostAlert(alertRequest) {
     this.logger.log('Procesando solicitud de alerta de helada:', alertRequest);
     return await this.alertService.generateFrostAlert(alertRequest);
   }
 
+  // Procesa alerta enviada desde el servicio de clima. Usa: `alertData` = { tipo, descripcion, fecha }
   async processClimateAlert(alertData) {
     this.logger.log('Procesando alerta climática desde weather-service:', alertData);
     return await this.alertService.processClimateAlert(alertData);
   }
 
+  // Obtiene alertas activas. No requiere parámetros.
   async getActiveAlerts() {
     this.logger.log('Obteniendo alertas activas');
     try {
@@ -41,6 +47,7 @@ class AlertController {
     }
   }
 
+  // Obtiene alertas de un usuario. Usa: `data.userId` = ID del usuario
   async getUserAlerts(data) {
     this.logger.log(`Obteniendo alertas del usuario: ${data.userId}`);
     try {
@@ -60,6 +67,7 @@ class AlertController {
     }
   }
 
+  // Marca alerta como leída. Usa: `data.userAlertId` = ID del registro user_alert
   async markAlertAsRead(data) {
     this.logger.log(`Marcando alerta como leída: ${data.userAlertId}`);
     try {

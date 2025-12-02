@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: definiciones de tipos e interfaces usados por el frontend.
+// Cómo lo logra: exporta `User`, `Alert`, `Zone`, permisos y tipos para tipado estático.
 // Tipos del sistema de AlertaSegura
 export type ViewType = 
   | 'dashboard' 
@@ -16,7 +18,7 @@ export type AlertStatus = 'activa' | 'en-proceso' | 'resuelta';
 
 export type AlertPriority = 'alta' | 'media' | 'baja';
 
-export interface LoginForm {
+export interface LoginFormPhone {
   phone: string;
   password: string;
 }

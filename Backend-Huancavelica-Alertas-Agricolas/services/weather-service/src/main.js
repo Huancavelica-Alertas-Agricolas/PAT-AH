@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: script de arranque del weather-service.
+// Crea microservicio Nest, registra pipes y un endpoint ligero /healthz.
 const { ValidationPipe } = require('@nestjs/common');
 const { AllExceptionsFilter } = require('./all-exceptions.filter');
 const { NestFactory } = require('@nestjs/core');

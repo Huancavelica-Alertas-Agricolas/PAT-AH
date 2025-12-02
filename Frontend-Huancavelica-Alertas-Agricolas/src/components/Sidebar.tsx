@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `Sidebar` que contiene la navegación principal.
+// Cómo lo logra: renderiza enlaces y controla colapsado/expansión, usando `currentView` para destacar.
 import React from 'react';
 import { motion } from 'framer-motion';
 import {

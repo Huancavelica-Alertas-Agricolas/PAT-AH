@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+// Comentarios añadidos en español: componente `AlertDetail` que muestra información completa de una alerta.
+// Cómo lo logra: carga datos por `alertId` y presenta detalles, mapa y meta-información.
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,

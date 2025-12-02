@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `RolePermissions` que gestiona permisos por rol.
+// Cómo lo logra: muestra matrices de permisionado y permite asignar permisos a roles predefinidos.
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Check, X, Info } from 'lucide-react';

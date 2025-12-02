@@ -1,5 +1,7 @@
+// Comentarios añadidos en español: servicio de mail — breve descripción y uso de parámetros por método.
 const nodemailer = require('nodemailer');
 
+// Logger simple usado por este módulo (no tocar lógica).
 class Logger {
   constructor(context) {
     this.context = context;
@@ -16,12 +18,15 @@ class Logger {
 }
 
 class MailService {
+  // constructor: `mailerService` = instancia del Mailer configurado (plantillas, transporter)
   constructor(mailerService) {
     this.mailerService = mailerService;
     this.logger = new Logger('MailService');
   }
 
   async sendMail(to, subject, template, context) {
+    // Envía correo con plantilla.
+    // Usa: `to`=destinatario, `subject`=asunto, `template`=identificador plantilla, `context`=datos para plantilla
     try {
       this.logger.log(`Enviando email a: ${to} con template: ${template}`);
       await this.mailerService.sendMail({
@@ -38,6 +43,8 @@ class MailService {
   }
 
   async sendPlainTextMail(to, subject, text) {
+    // Envía correo de texto plano.
+    // Usa: `to`=destinatario, `subject`=asunto, `text`=cuerpo en texto plano
     try {
       this.logger.log(`Enviando email de texto plano a: ${to}`);
 
@@ -67,6 +74,8 @@ class MailService {
   }
 
   async sendWelcomeEmail(to, name) {
+    // Envía correo de bienvenida o redirige a alerta si `name` contiene indicador.
+    // Usa: `to`=destinatario, `name`=nombre para personalizar.
     this.logger.log('🎯 EJECUTANDO sendWelcomeEmail - MÉTODO ESPECÍFICO');
 
     // Si el nombre contiene "ALERTA", usar la plantilla de alerta
@@ -86,6 +95,8 @@ class MailService {
   }
 
   async sendWeatherAlert(to, name, reportMessage) {
+    // Envía alerta meteorológica usando plantilla `weather-alert`.
+    // Usa: `to`=destinatario, `name`=nombre, `reportMessage`=detalle de la alerta
     try {
       this.logger.log(`🌦️ Enviando alerta meteorológica a: ${to} usando plantilla weather-alert`);
 

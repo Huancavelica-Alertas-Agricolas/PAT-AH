@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: entrada principal del frontend que monta React y Apollo.
+// Cómo lo logra: importa `apolloClient`, envuelve `App` con `ApolloProvider` y renderiza en `#root`.
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { ApolloProvider } from '@apollo/client/react'

@@ -1,4 +1,6 @@
 const { Module } = require('@nestjs/common');
+// Comentarios añadidos en español: módulo de `zones` que registra el resolver y expone el servicio.
+// Cómo lo logra: declara `ZoneResolver` y `PrismaService` en `providers` y exporta el resolver.
 const { ZoneResolver } = require('./zone.resolver');
 const { PrismaService } = require('../prisma.service');
 

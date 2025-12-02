@@ -1,6 +1,7 @@
 /**
- * Recomendaciones por tipo de alerta agrícola
- * Datos estáticos optimizados para Huancavelica
+ * Comentarios añadidos en español: recomendaciones estáticas por tipo de alerta agrícola.
+ * Breve: contiene listas de acciones recomendadas por `tipo` (helada, granizada, lluvia, sequia, viento).
+ * Uso: importar `getRecommendationsByType(tipo)` para obtener recomendaciones.
  */
 
 const RECOMMENDATIONS = {
@@ -117,7 +118,8 @@ const RECOMMENDATIONS = {
 };
 
 /**
- * Obtiene recomendaciones por tipo de alerta
+ * Obtiene recomendaciones por tipo de alerta.
+ * Usa: `tipoAlerta` = cadena con tipo (ej. 'helada'). Devuelve array de objetos { titulo, descripcion, prioridad }.
  * @param {string} tipoAlerta - Tipo de alerta (helada, granizada, lluvia, sequia, viento)
  * @returns {Array<Object>}
  */

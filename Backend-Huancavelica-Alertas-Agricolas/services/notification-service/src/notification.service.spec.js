@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: pruebas unitarias para `NotificationService`.
+// Breve: contiene tests que verifican que los métodos principales llamen al `mailService` esperado.
 const NotificationService = require('./notification.service');
 
 describe('NotificationService (unit)', () => {

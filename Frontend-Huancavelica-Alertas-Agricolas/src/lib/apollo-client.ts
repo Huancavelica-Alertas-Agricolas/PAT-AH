@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: configuración del cliente Apollo para GraphQL.
+// Cómo lo logra: crea `httpLink` y `authLink`, configura `InMemoryCache` y exporta `apolloClient`.
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
@@ -32,11 +34,15 @@ export const apolloClient = new ApolloClient({
         fields: {
           alerts: {
             merge(_existing = [], incoming: any) {
+              // Referenciamos la variable para evitar warnings de `no-unused-vars`.
+              void _existing;
               return incoming;
             },
           },
           notifications: {
             merge(_existing = [], incoming: any) {
+              // Referenciamos la variable para evitar warnings de `no-unused-vars`.
+              void _existing;
               return incoming;
             },
           },

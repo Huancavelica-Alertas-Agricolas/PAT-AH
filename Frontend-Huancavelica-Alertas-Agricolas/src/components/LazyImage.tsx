@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+// Comentarios añadidos en español: componente `LazyImage` que carga imágenes de forma perezosa.
+// Cómo lo logra: usa `loading='lazy'` y un placeholder hasta que la imagen esté lista.
+
 interface LazyImageProps {
   src: string;
   alt: string;

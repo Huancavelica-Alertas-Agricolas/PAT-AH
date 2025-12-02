@@ -9,6 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// Comentarios añadidos en español: resolver GraphQL para `Users` (auth-service, transpilado).
+// Método: `helloUsers()` devuelve el conteo de usuarios y puede usar microservicio si `USE_USERS_MICROSERVICE=true`.
 exports.UsersResolver = void 0;
 const graphql_1 = require("@nestjs/graphql");
 const users_service_1 = require("./users.service");

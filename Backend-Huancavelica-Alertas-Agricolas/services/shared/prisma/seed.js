@@ -1,3 +1,6 @@
+// Comentarios añadidos en español: script de seeds para la base de datos usando Prisma.
+// Breve: conecta con `PrismaClient`, borra datos existentes y crea zonas, usuarios, alertas,
+// notificaciones, datos climáticos y recomendaciones de ejemplo. Ejecutar con `node seed.js`.
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 

@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: hook `useSubscriptions` para suscripciones GraphQL en tiempo real.
+// Cómo lo logra: instala listeners a `subscriptions` y actualiza cache/estado cuando llegan eventos.
 import { useEffect } from 'react';
 import { useSubscription } from '@apollo/client/react';
 import { ALERT_SUBSCRIPTION, NOTIFICATION_SUBSCRIPTION } from '../graphql/subscriptions';
@@ -36,7 +38,7 @@ interface NotificationSubscriptionData {
  */
 export function useAlertSubscription(
   zone?: string,
-  onAlertReceived?: (alert: Alert) => void
+  onAlertReceived?: (_alert: Alert) => void
 ) {
   const { data, loading, error } = useSubscription<AlertSubscriptionData>(ALERT_SUBSCRIPTION, {
     variables: { zone },
@@ -45,15 +47,15 @@ export function useAlertSubscription(
 
   useEffect(() => {
     if (data?.onNewAlert) {
-      const alert = data.onNewAlert;
+      const _alert = data.onNewAlert;
 
       // Mostrar notificación del navegador
       if ('Notification' in window && Notification.permission === 'granted') {
-        const notification = new Notification(`⚠️ ${alert.title}`, {
-          body: alert.description,
-          icon: `/icons/${alert.type}.png`,
-          tag: alert.id,
-          requireInteraction: alert.severity === 'alta',
+        const notification = new Notification(`⚠️ ${_alert.title}`, {
+          body: _alert.description,
+          icon: `/icons/${_alert.type}.png`,
+          tag: _alert.id,
+          requireInteraction: _alert.severity === 'alta',
         });
 
         notification.onclick = () => {
@@ -68,20 +70,20 @@ export function useAlertSubscription(
       }
 
       // Reproducir sonido según severidad
-      if (alert.severity === 'alta' || alert.severity === 'crítica') {
+      if (_alert.severity === 'alta' || _alert.severity === 'crítica') {
         const audio = new Audio('/sounds/alert-high.mp3');
         audio.play().catch(console.error);
       }
 
       // Toast notification
-      toast.error(`Nueva alerta: ${alert.title}`, {
-        description: alert.description,
+      toast.error(`Nueva alerta: ${_alert.title}`, {
+        description: _alert.description,
         duration: 10000,
       });
 
       // Callback personalizado
       if (onAlertReceived) {
-        onAlertReceived(alert);
+        onAlertReceived(_alert);
       }
     }
   }, [data, onAlertReceived]);
@@ -100,7 +102,7 @@ export function useAlertSubscription(
  */
 export function useNotificationSubscription(
   userId: string,
-  onNotificationReceived?: (notification: Notification) => void
+  onNotificationReceived?: (_notification: Notification) => void
 ) {
   const { data, loading, error } = useSubscription<NotificationSubscriptionData>(NOTIFICATION_SUBSCRIPTION, {
     variables: { userId },
@@ -109,14 +111,14 @@ export function useNotificationSubscription(
 
   useEffect(() => {
     if (data?.onNotification) {
-      const notification = data.onNotification;
+      const _notification = data.onNotification;
 
       // Mostrar notificación del navegador
       if ('Notification' in window && Notification.permission === 'granted') {
-        const browserNotif = new Notification(notification.title, {
-          body: notification.message,
+        const browserNotif = new Notification(_notification.title, {
+          body: _notification.message,
           icon: '/icons/notification.png',
-          tag: notification.id,
+          tag: _notification.id,
           badge: '/icons/badge.png',
         });
 
@@ -128,20 +130,20 @@ export function useNotificationSubscription(
 
       // Toast notification
       const toastType =
-        notification.priority === 'alta'
+        _notification.priority === 'alta'
           ? toast.error
-          : notification.priority === 'media'
+          : _notification.priority === 'media'
           ? toast.warning
           : toast.info;
 
-      toastType(notification.title, {
-        description: notification.message,
+      toastType(_notification.title, {
+        description: _notification.message,
         duration: 5000,
       });
 
       // Callback personalizado
       if (onNotificationReceived) {
-        onNotificationReceived(notification);
+        onNotificationReceived(_notification);
       }
     }
   }, [data, onNotificationReceived]);

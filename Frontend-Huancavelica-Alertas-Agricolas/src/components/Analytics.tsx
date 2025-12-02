@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `Analytics` que muestra métricas y gráficos.
+// Cómo lo logra: agrega visualizaciones (recharts) para alertas, temperatura y encargos por zona.
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';

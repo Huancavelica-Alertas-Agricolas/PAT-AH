@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `PasswordRecovery` para recuperar contraseñas.
+// Cómo lo logra: muestra formulario de recuperación y llama a la API para restablecer la contraseña.
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Mail, Smartphone, Lock, CheckCircle, AlertCircle } from 'lucide-react';

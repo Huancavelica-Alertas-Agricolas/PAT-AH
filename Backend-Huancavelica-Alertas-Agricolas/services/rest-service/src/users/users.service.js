@@ -9,6 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// Comentarios añadidos en español: `UsersService` (transpilado) — normaliza teléfonos y gestiona usuarios.
+// Métodos públicos: `create(data)`, `findByPhone(phone)`, `findAll()` (sin parámetros).
 exports.UsersService = void 0;
 // Helper: normalize phone numbers to digits-only and prefer local 9-digit format
 function normalizePhone(input) {
@@ -32,6 +34,7 @@ let UsersService = class UsersService {
     
     
     
+    // Crea un usuario. Usa: `data` = { nombre, telefono, password, ... }; normaliza `telefono` antes de guardar.
     async create(data) {
         // Normalize telefono before creating (store consistent format)
         if (data && data.telefono) {
@@ -39,10 +42,12 @@ let UsersService = class UsersService {
         }
         return this.prisma.user.create({ data });
     }
+    // Busca usuario por teléfono. Usa: `phone` = número a buscar (se normaliza internamente).
     async findByPhone(phone) {
         const p = normalizePhone(phone || '');
         return this.prisma.user.findUnique({ where: { telefono: p } });
     }
+    // Devuelve todos los usuarios. Sin parámetros.
     async findAll() {
         return this.prisma.user.findMany();
     }

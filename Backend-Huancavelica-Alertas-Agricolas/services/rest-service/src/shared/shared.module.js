@@ -1,4 +1,6 @@
 "use strict";
+// Comentarios añadidos en español: módulo compartido que provee `PrismaService` (transpilado).
+// Cómo lo logra: declara `PrismaService` en `providers` y lo expone en `exports` para otros módulos.
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);

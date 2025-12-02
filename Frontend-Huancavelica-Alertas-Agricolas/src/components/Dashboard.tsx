@@ -1,3 +1,5 @@
+// Comentarios añadidos en español: componente `Dashboard` que orquesta las vistas principales.
+// Cómo lo logra: mantiene `currentView` y renderiza componentes como `AlertsList`, `Analytics` o `UserManagement`.
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './Sidebar';

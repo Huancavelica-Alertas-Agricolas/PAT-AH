@@ -1,0 +1,2 @@
+Comentarios añadidos en español: `package.json` del frontend que declara dependencias y scripts.
+Cómo lo logra: lista `dependencies` y `devDependencies`, y define scripts como `dev`, `build`, `lint` y pruebas; no se modifica el JSON original.

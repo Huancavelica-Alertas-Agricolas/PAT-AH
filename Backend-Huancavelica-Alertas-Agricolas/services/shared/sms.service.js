@@ -1,3 +1,6 @@
+// Comentarios añadidos en español: servicio SMS compartido.
+// Envía códigos de verificación y alertas por SMS usando Twilio (si está configurado).
+
 /**
  * SMS Service using Twilio
  * Envía códigos de verificación y notificaciones por SMS

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+// Comentarios añadidos en español: componente `NotificationCenter` que muestra notificaciones locales.
+// Cómo lo logra: lista notificaciones, permite marcar leídas y navegar a alertas relacionadas.
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { 
@@ -15,18 +17,16 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { UserRole, Notification } from '../types';
-import { mockNotifications } from '../data/mockData';
 
 interface NotificationCenterProps {
   userRole: UserRole;
 }
 
 const NotificationCenter: React.FC<NotificationCenterProps> = ({ userRole: _userRole }) => {
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<'all' | 'alerta' | 'exito' | 'advertencia' | 'informacion'>('all');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [pushEnabled, setPushEnabled] = useState(true);
-
   // Simular notificaciones en tiempo real
   useEffect(() => {
     const interval = setInterval(() => {
