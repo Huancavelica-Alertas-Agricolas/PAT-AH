@@ -61,8 +61,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onBack, onSuccess }) => {
             email: formData.email,
             telefono: formData.telefono,
             password: formData.password,
-            zona: formData.zona,
-            roles: ['usuario'], // Por defecto usuario regular
+            ciudad: formData.zona, // Cambiar 'zona' por 'ciudad' que es lo que espera el backend
           },
         },
       });
