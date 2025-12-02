@@ -61,7 +61,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onBack, onSuccess }) => {
             email: formData.email,
             telefono: formData.telefono,
             password: formData.password,
-            // Remover ciudad/zona temporalmente para debug
+            zona: formData.zona, // Ahora debería funcionar con zona
           },
         },
       });
