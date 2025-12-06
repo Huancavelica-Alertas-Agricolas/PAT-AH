@@ -80,17 +80,3 @@ services:
         fromDatabase:
           name: pat-ah-db
           property: connectionString
-
-jobs:
-  - type: job
-    name: pat-ah-prisma-migrate
-    runtime: docker
-    branch: main
-    dockerfilePath: Backend-Huancavelica-Alertas-Agricolas/services/auth-service/Dockerfile
-    plan: free
-    command: npx prisma migrate deploy --schema=services/shared/prisma/schema.prisma
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: pat-ah-db
-          property: connectionString
