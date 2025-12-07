@@ -1,0 +1,12 @@
+HTTP/1.1 400 Bad Request
+X-Powered-By: Express
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Content-Type: application/json; charset=utf-8
+Content-Length: 104
+ETag: W/"68-kblBtzy0JtU08iKv8fj8BDlAe2g"
+Date: Tue, 02 Dec 2025 00:26:54 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Expected property name or '}' in JSON at position 1","error":"Bad Request","statusCode":400}

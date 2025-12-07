@@ -33,7 +33,7 @@ __decorate([
 __decorate([
     (0, graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
-], RegisterInput.prototype, "ciudad", void 0);
+], RegisterInput.prototype, "zona", void 0);
 exports.RegisterInput = RegisterInput = __decorate([
     (0, graphql_1.InputType)()
 ], RegisterInput);

@@ -61,8 +61,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onBack, onSuccess }) => {
             email: formData.email,
             telefono: formData.telefono,
             password: formData.password,
-            zona: formData.zona,
-            roles: ['usuario'], // Por defecto usuario regular
+            zona: formData.zona, // Ahora debería funcionar con zona
           },
         },
       });
