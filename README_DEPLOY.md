@@ -16,9 +16,9 @@ Esta guía explica cómo desplegar los microservicios del backend y el frontend 
 - Dockerfile Path: `Backend-Huancavelica-Alertas-Agricolas/services/[service-name]/Dockerfile` (ej. para auth: `Backend-Huancavelica-Alertas-Agricolas/services/auth-service/Dockerfile`)
 - Root Directory: **Deja vacío** (el Dockerfile asume contexto del repo root)
 - Environment Variables:
-  - `NODE_ENV=production`
-  - `DATABASE_URL=postgresql://bd_pat_ah_user:d2zf7ADO3LIBeH6HHE0WnkuyNoIHp01A@dpg-d4q9m7q4i8rc73flvhjg-a.virginia-postgres.render.com:5432/bd_pat_ah?sslmode=require`
-  - `JWT_SECRET=c3f9c6b7d5b448606e1cb73057ae240a`
+  NODE_ENV=production
+  DATABASE_URL=postgresql://bd_pat_ah_user:d2zf7ADO3LIBeH6HHE0WnkuyNoIHp01A@dpg-d4q9m7q4i8rc73flvhjg-a.virginia-postgres.render.com:5432/bd_pat_ah?sslmode=require
+  JWT_SECRET=c3f9c6b7d5b448606e1cb73057ae240a
 - Health Check Path: `/healthz`
 - Plan: Starter (o Standard para ai-service)
 
