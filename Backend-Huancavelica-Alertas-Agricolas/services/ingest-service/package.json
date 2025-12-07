@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "xlsx": "^0.18.5",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "prisma": "^5.22.0",
+    "@prisma/client": "^5.22.0"
   }
 }
