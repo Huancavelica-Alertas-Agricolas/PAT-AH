@@ -13,7 +13,7 @@
     "test:integration:docker:sh": "bash test/setup/run_tests_with_postgres.sh"
   },
   "dependencies": {
-    "@apollo/server": "^4.12.2",
+    "@apollo/server": "^5.0.0",
     "@nestjs/apollo": "^13.2.1",
     "@nestjs/common": "^11.1.9",
     "@nestjs/core": "^11.1.9",
