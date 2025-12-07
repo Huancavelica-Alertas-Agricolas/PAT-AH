@@ -8,7 +8,7 @@ RUN npm install --legacy-peer-deps --no-audit --no-fund || true
 # Copy service sources into image (context = service folder)
 COPY . ./
 # Copy shared Prisma schema from sibling ../shared if present
-RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.prisma || true
+RUN mkdir -p prisma && cp Backend-Huancavelica-Alertas-Agricolas/services/shared/prisma/schema.prisma prisma/schema.prisma || true
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma || true; fi
 # Skip build; runtime uses JS in src/
 FROM node:20-slim

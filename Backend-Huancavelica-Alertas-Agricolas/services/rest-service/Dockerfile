@@ -10,7 +10,7 @@ RUN apt-get update -y \
 
 # Copy sources and generate Prisma client if present
 COPY . ./
-RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.prisma || true
+RUN mkdir -p prisma && cp Backend-Huancavelica-Alertas-Agricolas/services/shared/prisma/schema.prisma prisma/schema.prisma || true
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma; fi
 
 # Final runtime: use a minimal image that does not include npm or extra OS packages

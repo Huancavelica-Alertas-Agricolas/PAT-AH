@@ -7,7 +7,7 @@ RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install
 # Copy only the auth-service sources into the build context inside the image
 COPY . ./
 # Copy shared Prisma schema into local prisma dir and generate client
-RUN mkdir -p prisma && cp services/shared/prisma/schema.prisma prisma/schema.prisma || true
+RUN mkdir -p prisma && cp Backend-Huancavelica-Alertas-Agricolas/services/shared/prisma/schema.prisma prisma/schema.prisma || true
 RUN if [ -f "prisma/schema.prisma" ]; then npx prisma generate --schema=prisma/schema.prisma; fi
 # No TypeScript build step required (JS runtime in `src/`)
 
