@@ -17,7 +17,7 @@ exports.AlertResolver = exports.pubSub = void 0;
 const graphql_1 = require('@nestjs/graphql');
 const prisma_service_1 = require('../prisma.service');
 const graphql_subscriptions_1 = require('graphql-subscriptions');
-const recommendations_data_1 = require('../../../shared/recommendations.data');
+const recommendations_data_1 = require('../../shared/recommendations.data');
 
 const pubSub = new graphql_subscriptions_1.PubSub();
 exports.pubSub = pubSub;

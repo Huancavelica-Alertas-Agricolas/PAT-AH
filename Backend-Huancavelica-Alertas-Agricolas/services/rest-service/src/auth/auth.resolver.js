@@ -18,7 +18,7 @@ const auth_service_1 = require("./auth.service");
 const auth_payload_dto_1 = require("./dto/auth-payload.dto");
 const register_input_1 = require("./dto/register.input");
 const prisma_service_1 = require("../prisma.service");
-const sms_service = require("../../../shared/sms.service");
+const sms_service = require("../../shared/sms.service");
 const bcrypt = require('bcryptjs');
 let AuthResolver = class AuthResolver {
     constructor(authService, prisma) {
