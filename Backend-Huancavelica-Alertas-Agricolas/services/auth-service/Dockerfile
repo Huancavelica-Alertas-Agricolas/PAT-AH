@@ -1,7 +1,7 @@
 # Builder stage uses repo root as context; copy only service files
 FROM node:20 AS builder
 WORKDIR /usr/src/app
-COPY package*.json ./
+COPY Backend-Huancavelica-Alertas-Agricolas/services/auth-service/package*.json ./
 RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/* \
  && npm ci --legacy-peer-deps --no-audit --no-fund
 # Copy only the auth-service sources into the build context inside the image
@@ -16,7 +16,7 @@ WORKDIR /usr/src/app
 ENV NODE_ENV=production
  # Ensure OpenSSL is available in runtime for Prisma query engine compatibility
 RUN apt-get update -y && apt-get install -y openssl ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /usr/src/app/src ./src
+COPY --from=builder /usr/src/app/Backend-Huancavelica-Alertas-Agricolas/services/auth-service/src ./src
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 EXPOSE 3001
 CMD ["node","src/main.js"]
