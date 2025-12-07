@@ -1,5 +1,5 @@
 {
-  "name": "Alerta Clima - Agro (Ejemplo)",
+  "name": "Alerta Clima - Agro (Paralelo)",
   "nodes": [
     {
       "parameters": {
@@ -26,6 +26,10 @@
             {
               "name": "descripcion",
               "value": "={{ $json.descripcion }}"
+            },
+            {
+              "name": "tipo",
+              "value": "={{ $json.tipo || 'clima' }}"
             }
           ]
         },
@@ -50,13 +54,13 @@
         "resource": "message",
         "operation": "send",
         "from": "={{ $credentials.twilio.accountSid ? $credentials.twilio.from : '' }}",
-        "to": "={{ $json["recipient"] || $json["to"] || $json["phone"] }}",
+        "to": "={{ $json['recipient'] || $json['to'] || $json['phone'] }}",
         "text": "={{ $json.descripcion || $json.reportMessage || $json.message }}"
       },
       "name": "Twilio",
       "type": "n8n-nodes-base.twilio",
       "typeVersion": 1,
-      "position": [850, 150],
+      "position": [850, 100],
       "credentials": {
         "twilioApi": "twilioApi"
       }
@@ -64,14 +68,14 @@
     {
       "parameters": {
         "fromEmail": "={{ $credentials.smtp.user }}",
-        "toEmail": "={{ $json["recipient"] || $json["to"] || $json["email"] }}",
+        "toEmail": "={{ $json['recipient'] || $json['to'] || $json['email'] }}",
         "subject": "={{ 'Alerta: ' + ($json.tipo || 'Clima') }}",
         "text": "={{ $json.descripcion || $json.reportMessage || $json.message }}"
       },
       "name": "Send Email",
       "type": "n8n-nodes-base.smtp",
       "typeVersion": 1,
-      "position": [850, 300],
+      "position": [850, 250],
       "credentials": {
         "smtp": "smtp"
       }
@@ -84,7 +88,7 @@
       "name": "Telegram",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1,
-      "position": [850, 450],
+      "position": [850, 400],
       "credentials": {
         "telegramApi": "telegramApi"
       }
@@ -94,16 +98,39 @@
         "operation": "insert",
         "schema": "public",
         "table": "n8n_alert_logs",
-        "columns": "tipo, descripcion, recipients, created_at",
+        "columns": "tipo,descripcion,recipients,created_at",
         "values": "={{ [$json.tipo || 'clima', $json.descripcion || $json.reportMessage || $json.message, JSON.stringify($json.recipients || $json.recipient), new Date().toISOString()] }}"
       },
       "name": "Postgres",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
-      "position": [1050, 300],
+      "position": [1050, 250],
       "credentials": {
         "postgres": "postgres"
       }
+    },
+    {
+      "parameters": {
+        "values": {
+          "boolean": [],
+          "number": [],
+          "string": [
+            {
+              "name": "status",
+              "value": "success"
+            },
+            {
+              "name": "message",
+              "value": "Alerta enviada exitosamente por SMS, Email y Telegram, y registrada en BD"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Success",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1250, 250]
     }
   ],
   "connections": {
@@ -136,16 +163,12 @@
             "node": "Twilio",
             "type": "main",
             "index": 0
-          }
-        ],
-        [
+          },
           {
             "node": "Send Email",
             "type": "main",
             "index": 0
-          }
-        ],
-        [
+          },
           {
             "node": "Telegram",
             "type": "main",
@@ -158,7 +181,7 @@
       "main": [
         [
           {
-            "node": "Postgres",
+            "node": "Send Email",
             "type": "main",
             "index": 0
           }
@@ -169,7 +192,7 @@
       "main": [
         [
           {
-            "node": "Postgres",
+            "node": "Telegram",
             "type": "main",
             "index": 0
           }
@@ -181,6 +204,17 @@
         [
           {
             "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Success",
             "type": "main",
             "index": 0
           }
