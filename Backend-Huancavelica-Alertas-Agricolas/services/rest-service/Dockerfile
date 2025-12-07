@@ -24,9 +24,6 @@ COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 # Copy the app from the builder stage
 COPY --from=builder /usr/src/app/Backend-Huancavelica-Alertas-Agricolas/services/rest-service /usr/src/app
 
-# Remove dev dependencies to keep runtime slim (if present)
-RUN if [ -f package.json ]; then cd /usr/src/app && npm prune --production || true; fi
-
 # Use non-root user for security
 USER 1000
 
