@@ -79,7 +79,7 @@ CREATE TABLE "Zone" (
 
 -- Tabla Notification
 CREATE TABLE "Notification" (
-  "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   "tipo" TEXT NOT NULL,
   "titulo" TEXT NOT NULL,
   "mensaje" TEXT NOT NULL,
