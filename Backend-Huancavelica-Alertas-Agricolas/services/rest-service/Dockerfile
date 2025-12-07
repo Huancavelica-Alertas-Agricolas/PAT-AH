@@ -22,7 +22,9 @@ ENV NODE_ENV=production
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
 # Copy the app from the builder stage
-COPY --from=builder /usr/src/app/Backend-Huancavelica-Alertas-Agricolas/services/rest-service /usr/src/app
+COPY --from=builder /usr/src/app/Backend-Huancavelica-Alertas-Agricolas/services/rest-service/src ./src
+COPY --from=builder /usr/src/app/Backend-Huancavelica-Alertas-Agricolas/services/rest-service/prisma ./prisma
+COPY --from=builder /usr/src/app/Backend-Huancavelica-Alertas-Agricolas/services/rest-service/scripts ./scripts
 
 # Use non-root user for security
 USER 1000
