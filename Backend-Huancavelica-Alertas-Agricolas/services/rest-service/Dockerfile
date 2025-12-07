@@ -30,6 +30,6 @@ RUN if [ -f package.json ]; then cd /usr/src/app && npm prune --production || tr
 # Use non-root user for security
 USER 1000
 
-# Expose application port and run wait-for-db helper before starting the app
+# Expose application port
 EXPOSE 3003
-CMD ["node","scripts/wait-for-db.js","db","5432","--","node","src/main.js"]
+CMD ["node","src/main.js"]
