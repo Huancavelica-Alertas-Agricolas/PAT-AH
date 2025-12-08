@@ -5,6 +5,7 @@ import { User } from '../types';
 import { toast } from 'sonner';
 import PasswordRecovery from './PasswordRecovery';
 import RegisterPage from './RegisterPage';
+import { authApi } from '../services/api.service';
 
 interface LoginPageProps {
   onLogin: (user: User) => void;
@@ -25,22 +26,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     setIsLoading(true);
     
     try {
-      // Mock user para desarrollo
-      const mockUser: User = {
-        id: '1',
-        name: 'Usuario Demo',
-        email: 'demo@alerta.com',
-        phone: formData.phone,
-        role: 'usuario',
-        zone: 'Huancavelica',
-        status: 'activo',
-        alertsReported: 0,
-        createdAt: new Date().toISOString(),
-      };
-      
-      await new Promise(resolve => setTimeout(resolve, 800));
+      const user = await authApi.login(formData.phone, formData.password);
       toast.success('¡Bienvenido!');
-      onLogin(mockUser);
+      onLogin(user);
     } catch (error) {
       toast.error('Credenciales inválidas');
     } finally {

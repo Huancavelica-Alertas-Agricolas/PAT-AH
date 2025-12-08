@@ -21,7 +21,7 @@ import {
 } from '../graphql/mutations';
 
 // Flag para activar/desactivar mocks - cambiar a false cuando el backend esté listo
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true' || true;
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
 // Función helper para simular delay de red
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -234,7 +234,18 @@ export const authApi = {
       localStorage.setItem('auth_token', (data as any).login.token);
     }
     
-    return (data as any).login.user;
+    const graphQLUser = (data as any).login.user;
+    return {
+      id: graphQLUser.id,
+      name: graphQLUser.nombre,
+      email: graphQLUser.email,
+      phone: graphQLUser.telefono,
+      role: graphQLUser.roles[0] || 'usuario',
+      zone: 'Huancavelica', // Default or get from backend
+      status: 'activo',
+      alertsReported: 0,
+      createdAt: new Date().toISOString(),
+    };
   },
 
   async recoverPassword(identifier: string, method: 'sms' | 'email'): Promise<void> {
