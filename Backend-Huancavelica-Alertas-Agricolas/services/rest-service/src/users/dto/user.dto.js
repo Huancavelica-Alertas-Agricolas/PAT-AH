@@ -34,6 +34,10 @@ __decorate([
     (0, graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
 ], UserDto.prototype, "ciudad", void 0);
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", String)
+], UserDto.prototype, "roles", void 0);
 exports.UserDto = UserDto = __decorate([
     (0, graphql_1.ObjectType)()
 ], UserDto);
