@@ -56,9 +56,9 @@ Esta guía explica cómo desplegar los microservicios del backend y el frontend 
 - Name: `PAT-AH-frontend`
 - Repo: `Huancavelica-Alertas-Agricolas/PAT-AH`
 - Branch: `main`
-- Root Directory: **Deja vacío**
-- Build Command: `cd Frontend-Huancavelica-Alertas-Agricolas && npm run build`
-- Publish Directory: `Frontend-Huancavelica-Alertas-Agricolas/dist`
+- Root Directory: `Frontend-Huancavelica-Alertas-Agricolas`
+- Build Command: `npm run build` (por defecto)
+- Publish Directory: `dist`
 - Environment Variables (para conectar con backends):
   - VITE_GRAPHQL_URL= https://pat-ah-rest.onrender.com/api/graphql (GraphQL endpoint del rest-service)
   - VITE_AUTH_SERVICE_URL= https://pat-ah-ha95.onrender.com (auth-service)
