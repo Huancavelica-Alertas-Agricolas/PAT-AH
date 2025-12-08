@@ -61,7 +61,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onBack, onSuccess }) => {
             email: formData.email,
             telefono: formData.telefono,
             password: formData.password,
-            ciudad: formData.zona, // Map zona to ciudad for backend
+            zona: formData.zona,
           },
         },
       });

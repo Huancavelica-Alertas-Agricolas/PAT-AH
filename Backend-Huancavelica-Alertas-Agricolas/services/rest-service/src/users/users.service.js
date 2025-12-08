@@ -37,6 +37,11 @@ let UsersService = class UsersService {
         if (data && data.telefono) {
             data.telefono = normalizePhone(data.telefono);
         }
+        // Map zona to ciudad for database compatibility
+        if (data && data.zona) {
+            data.ciudad = data.zona;
+            delete data.zona;
+        }
         return this.prisma.user.create({ data });
     }
     async findByPhone(phone) {
