@@ -56,15 +56,15 @@ Esta guía explica cómo desplegar los microservicios del backend y el frontend 
 - Name: `PAT-AH-frontend`
 - Repo: `Huancavelica-Alertas-Agricolas/PAT-AH`
 - Branch: `main`
-- Root Directory: `Frontend-Huancavelica-Alertas-Agricolas`
-- Build Command: `npm run build`
-- Publish Directory: `dist`
+- Root Directory: **Deja vacío**
+- Build Command: `cd Frontend-Huancavelica-Alertas-Agricolas && npm run build`
+- Publish Directory: `Frontend-Huancavelica-Alertas-Agricolas/dist`
 - Environment Variables (para conectar con backends):
-  - `VITE_GRAPHQL_URL`: `https://pat-ah-rest.onrender.com/api/graphql` (GraphQL endpoint del rest-service)
-  - `VITE_AUTH_SERVICE_URL`: `https://pat-ah-ha95.onrender.com` (auth-service)
-  - `VITE_USERS_SERVICE_URL`: `https://pat-ah-users-service.onrender.com` (users-service)
-  - `VITE_AI_SERVICE_URL`: `https://pat-ah-ai.onrender.com` (ai-service)
-  - `VITE_INGEST_SERVICE_URL`: `https://pat-ah-ingest.onrender.com` (ingest-service)
+  - VITE_GRAPHQL_URL= https://pat-ah-rest.onrender.com/api/graphql (GraphQL endpoint del rest-service)
+  - VITE_AUTH_SERVICE_URL= https://pat-ah-ha95.onrender.com (auth-service)
+  - VITE_USERS_SERVICE_URL= https://pat-ah-users-service.onrender.com (users-service)
+  - VITE_AI_SERVICE_URL= https://pat-ah-ai.onrender.com (ai-service)
+  - VITE_INGEST_SERVICE_URL= https://pat-ah-ingest.onrender.com (ingest-service)
 
 ### URLs de Servicios Desplegados:
 - auth-service: https://pat-ah-ha95.onrender.com
