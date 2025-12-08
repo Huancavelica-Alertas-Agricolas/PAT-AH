@@ -9,7 +9,7 @@ import {
   ChevronDown,
   MessageCircle
 } from 'lucide-react';
-import { UserRole, User } from '../types';
+import { UserRole, User as UserType } from '../types';
 import { mockNotifications } from '../data/mockData';
 import { cn } from '../utils';
 
@@ -17,7 +17,7 @@ interface HeaderProps {
   userRole: UserRole;
   onLogout: () => void;
   onNotificationClick: () => void;
-  currentUser: User;
+  currentUser: UserType;
 }
 
 /**
@@ -52,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({
   /**
    * Obtiene información del usuario basada en el rol
    */
-  const getUserInfo = (role: UserRole, user: User) => {
+  const getUserInfo = (role: UserRole, user: UserType) => {
     const userInfo = {
       administrador: {
         name: user.name,
