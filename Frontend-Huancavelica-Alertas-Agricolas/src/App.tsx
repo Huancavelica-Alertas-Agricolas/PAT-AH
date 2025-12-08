@@ -71,7 +71,7 @@ const App: React.FC = () => {
       {!isAuthenticated || !currentUser ? (
         <LoginPage onLogin={handleLogin} />
       ) : (
-        <Dashboard userRole={userRole} onLogout={handleLogout} />
+        <Dashboard userRole={userRole} onLogout={handleLogout} currentUser={currentUser} />
       )}
     </div>
   );

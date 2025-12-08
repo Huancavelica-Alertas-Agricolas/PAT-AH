@@ -12,18 +12,19 @@ import RolePermissions from './RolePermissions';
 import NotificationCenter from './NotificationCenter';
 import Settings from './Settings';
 import AlertDetail from './AlertDetail';
-import { ViewType, UserRole } from '../types';
+import { ViewType, UserRole, User } from '../types';
 
 interface DashboardProps {
   userRole: UserRole;
   onLogout: () => void;
+  currentUser: User;
 }
 
 /**
  * Componente principal del dashboard
  * Maneja la navegación entre diferentes vistas del sistema
  */
-const Dashboard: React.FC<DashboardProps> = ({ userRole, onLogout }) => {
+const Dashboard: React.FC<DashboardProps> = ({ userRole, onLogout, currentUser }) => {
   const [currentView, setCurrentView] = useState<ViewType>('dashboard');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [selectedAlertId, setSelectedAlertId] = useState<string | null>(null);
@@ -76,6 +77,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole, onLogout }) => {
           userRole={userRole}
           onLogout={onLogout}
           onNotificationClick={() => setCurrentView('notifications')}
+          currentUser={currentUser}
         />
 
         {/* Main Content */}

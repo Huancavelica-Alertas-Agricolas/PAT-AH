@@ -9,7 +9,7 @@ import {
   ChevronDown,
   MessageCircle
 } from 'lucide-react';
-import { UserRole } from '../types';
+import { UserRole, User } from '../types';
 import { mockNotifications } from '../data/mockData';
 import { cn } from '../utils';
 
@@ -17,6 +17,7 @@ interface HeaderProps {
   userRole: UserRole;
   onLogout: () => void;
   onNotificationClick: () => void;
+  currentUser: User;
 }
 
 /**
@@ -25,7 +26,8 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ 
   userRole, 
   onLogout, 
-  onNotificationClick 
+  onNotificationClick,
+  currentUser
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -50,23 +52,23 @@ const Header: React.FC<HeaderProps> = ({
   /**
    * Obtiene información del usuario basada en el rol
    */
-  const getUserInfo = (role: UserRole) => {
+  const getUserInfo = (role: UserRole, user: User) => {
     const userInfo = {
       administrador: {
-        name: 'Admin SENAMHI',
-        email: 'admin@senamhi.gob.pe',
+        name: user.name,
+        email: user.email,
         avatar: 'A',
         color: 'from-purple-500 to-purple-600'
       },
       autoridad: {
-        name: 'Ing. Agrícola',
-        email: 'ingeniero@agraria.gob.pe', 
+        name: user.name,
+        email: user.email,
         avatar: 'I',
         color: 'from-blue-500 to-blue-600'
       },
       usuario: {
-        name: 'Agricultor Demo',
-        email: 'agricultor@huancavelica.pe',
+        name: user.name,
+        email: user.email,
         avatar: 'A',
         color: 'from-green-500 to-green-600'
       }
@@ -74,9 +76,7 @@ const Header: React.FC<HeaderProps> = ({
     return userInfo[role];
   };
 
-  const userInfo = getUserInfo(userRole);
-
-  /**
+  const userInfo = getUserInfo(userRole, currentUser);  /**
    * Formatea la fecha y hora actual
    */
   const formatDateTime = (date: Date) => {
