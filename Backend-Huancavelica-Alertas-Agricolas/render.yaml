@@ -50,6 +50,8 @@ services:
         fromDatabase:
           name: pat-ah-db
           property: connectionString
+      - key: N8N_WEBHOOK_URL
+        value: https://climatrack0.app.n8n.cloud/webhook/webhook/clima-alerta
 
   - type: web
     name: PAT-AH-ai
