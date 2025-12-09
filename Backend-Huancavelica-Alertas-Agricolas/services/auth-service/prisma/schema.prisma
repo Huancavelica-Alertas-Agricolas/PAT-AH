@@ -20,6 +20,7 @@ model User {
   preferredChannel String? @default("email")
   prefs     String?
   roles     String   @default("[\"user\"]")
+  alertasReportadas Int @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   alerts    Alert[]
