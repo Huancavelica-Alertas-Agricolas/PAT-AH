@@ -18,6 +18,7 @@ model User {
   password  String
   ciudad    String?
   activo    Boolean  @default(true)
+  preferredChannel String? @default("email")
   prefs     String?
   roles     String   @default("[\"user\"]")
   createdAt DateTime @default(now())
@@ -47,4 +48,12 @@ model Log {
   createdAt DateTime @default(now())
   user User? @relation(fields: [userId], references: [id])
   userId String?
+}
+
+model N8nAlertLog {
+  id String @id @default(uuid())
+  tipo String
+  descripcion String
+  recipients String?
+  createdAt DateTime @default(now())
 }

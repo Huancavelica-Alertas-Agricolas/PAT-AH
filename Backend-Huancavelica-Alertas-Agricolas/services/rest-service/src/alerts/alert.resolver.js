@@ -18,6 +18,7 @@ const graphql_1 = require('@nestjs/graphql');
 const prisma_service_1 = require('../prisma.service');
 const graphql_subscriptions_1 = require('graphql-subscriptions');
 const recommendations_data_1 = require('../../shared/recommendations.data');
+const fetch = require('node-fetch');
 
 const pubSub = new graphql_subscriptions_1.PubSub();
 exports.pubSub = pubSub;
@@ -178,6 +179,27 @@ let AlertResolver = class AlertResolver {
         where: { nombre: alert.zona },
         data: { alertasActivas: { increment: 1 } },
       }).catch(() => {});
+    }
+
+    // Send to n8n webhook for notifications
+    try {
+      const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || 'https://your-n8n-instance.com/webhook/clima-alerta';
+      await fetch(n8nWebhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          descripcion: alert.descripcion,
+          tipo: alert.tipo,
+          severidad: alert.severidad,
+          zona: alert.zona,
+          ubicacion: alert.ubicacion,
+          reportMessage: `Alerta ${alert.tipo} reportada en ${alert.zona}`,
+        }),
+      });
+    } catch (error) {
+      console.error('Error sending to n8n webhook:', error);
     }
 
     return formattedAlert;
