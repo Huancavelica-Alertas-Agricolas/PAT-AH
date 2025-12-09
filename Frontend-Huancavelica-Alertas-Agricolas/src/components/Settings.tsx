@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { UPDATE_USER } from '../graphql/mutations';
 import { 
   Settings as SettingsIcon, 
