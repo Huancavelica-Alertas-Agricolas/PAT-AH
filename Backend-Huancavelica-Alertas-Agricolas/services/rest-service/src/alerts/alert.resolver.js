@@ -184,6 +184,17 @@ let AlertResolver = class AlertResolver {
     // Send to n8n webhook for notifications
     try {
       const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || 'https://your-n8n-instance.com/webhook/clima-alerta';
+      
+      // Get users in the alert zone to notify
+      let recipients = [];
+      if (alert.zona) {
+        const zoneUsers = await this.prisma.user.findMany({
+          where: { ciudad: alert.zona },
+          select: { id: true, nombre: true, email: true, telefono: true, preferredChannel: true }
+        });
+        recipients = zoneUsers;
+      }
+      
       await fetch(n8nWebhookUrl, {
         method: 'POST',
         headers: {
@@ -196,6 +207,7 @@ let AlertResolver = class AlertResolver {
           zona: alert.zona,
           ubicacion: alert.ubicacion,
           reportMessage: `Alerta ${alert.tipo} reportada en ${alert.zona}`,
+          recipients: recipients,
         }),
       });
     } catch (error) {
