@@ -13,7 +13,7 @@ import {
   Clock
 } from 'lucide-react';
 import { UserRole } from '../types';
-import { BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { cn } from '../utils';
 
 interface DashboardViewProps {
