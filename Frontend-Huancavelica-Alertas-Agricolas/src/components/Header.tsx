@@ -52,28 +52,37 @@ const Header: React.FC<HeaderProps> = ({
   /**
    * Obtiene información del usuario basada en el rol
    */
-  const getUserInfo = (role: UserRole, user: UserType) => {
+  const getUserInfo = (role: UserRole, user: UserType | null) => {
+    if (!user) {
+      return {
+        name: 'Usuario',
+        email: 'usuario@alerta.com',
+        avatar: 'U',
+        color: 'from-gray-500 to-gray-600'
+      };
+    }
+    
     const userInfo = {
       administrador: {
-        name: user.name,
-        email: user.email,
+        name: user.name || 'Admin',
+        email: user.email || 'admin@alerta.com',
         avatar: 'A',
         color: 'from-purple-500 to-purple-600'
       },
       autoridad: {
-        name: user.name,
-        email: user.email,
+        name: user.name || 'Autoridad',
+        email: user.email || 'autoridad@alerta.com',
         avatar: 'I',
         color: 'from-blue-500 to-blue-600'
       },
       usuario: {
-        name: user.name,
-        email: user.email,
+        name: user.name || 'Usuario',
+        email: user.email || 'usuario@alerta.com',
         avatar: 'A',
         color: 'from-green-500 to-green-600'
       }
     };
-    return userInfo[role];
+    return userInfo[role] || userInfo.usuario;
   };
 
   const userInfo = getUserInfo(userRole, currentUser);  /**

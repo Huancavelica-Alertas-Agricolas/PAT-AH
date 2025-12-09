@@ -21,7 +21,7 @@ import {
 } from '../graphql/mutations';
 
 // Flag para activar/desactivar mocks - cambiar a false cuando el backend esté listo
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true' || true;
 
 // Función helper para simular delay de red
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -217,14 +217,7 @@ export const usersApi = {
 // ==================== AUTH API ====================
 export const authApi = {
   async login(phone: string, password: string): Promise<User> {
-    if (USE_MOCK) {
-      await delay(800);
-      if (phone === '+51999999999' && password === 'password123') {
-        return mockUsers[0];
-      }
-      throw new Error('Credenciales inválidas');
-    }
-    
+    // Always use real backend for login
     const { data } = await apolloClient.mutate({
       mutation: LOGIN,
       variables: { phone, password },
