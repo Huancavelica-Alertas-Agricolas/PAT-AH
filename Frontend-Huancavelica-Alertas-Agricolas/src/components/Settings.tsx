@@ -75,6 +75,17 @@ const Settings: React.FC<SettingsProps> = ({ userRole }) => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Canal de Notificaciones Preferido
+                </label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option value="email">Correo Electrónico</option>
+                  <option value="sms">SMS</option>
+                  <option value="telegram">Telegram</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Zona Asignada
                 </label>
                 <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
