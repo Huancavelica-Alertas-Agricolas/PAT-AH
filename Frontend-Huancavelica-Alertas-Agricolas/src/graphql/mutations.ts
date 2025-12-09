@@ -148,6 +148,7 @@ export const UPDATE_USER = gql`
       phone
       role
       isActive
+      preferredChannel
     }
   }
 `;

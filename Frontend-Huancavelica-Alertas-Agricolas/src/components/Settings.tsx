@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useMutation } from '@apollo/client';
+import { UPDATE_USER } from '../graphql/mutations';
 import { 
   Settings as SettingsIcon, 
   User, 
@@ -19,11 +21,34 @@ import { UserRole } from '../types';
 
 interface SettingsProps {
   userRole: UserRole;
+  user?: any; // Add user prop
 }
 
-const Settings: React.FC<SettingsProps> = ({ userRole }) => {
+const Settings: React.FC<SettingsProps> = ({ userRole, user }) => {
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'privacy' | 'general'>('profile');
   const [showPassword, setShowPassword] = useState(false);
+  const [preferredChannel, setPreferredChannel] = useState(user?.preferredChannel || 'email');
+
+  const [updateUser, { loading: updating }] = useMutation(UPDATE_USER);
+
+  const handleSaveProfile = async () => {
+    if (!user?.id) return;
+    
+    try {
+      await updateUser({
+        variables: {
+          id: user.id,
+          input: {
+            preferredChannel
+          }
+        }
+      });
+      alert('Perfil actualizado exitosamente');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Error al actualizar el perfil');
+    }
+  };
 
   const tabs = [
     { id: 'profile', label: 'Mi Perfil', icon: User },
@@ -77,7 +102,11 @@ const Settings: React.FC<SettingsProps> = ({ userRole }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Canal de Notificaciones Preferido
                 </label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select 
+                  value={preferredChannel}
+                  onChange={(e) => setPreferredChannel(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
                   <option value="email">Correo Electrónico</option>
                   <option value="sms">SMS</option>
                   <option value="telegram">Telegram</option>
@@ -128,8 +157,12 @@ const Settings: React.FC<SettingsProps> = ({ userRole }) => {
               </div>
             </div>
 
-            <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              Actualizar Perfil
+            <button 
+              onClick={handleSaveProfile}
+              disabled={updating}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {updating ? 'Actualizando...' : 'Actualizar Perfil'}
             </button>
           </div>
         );
