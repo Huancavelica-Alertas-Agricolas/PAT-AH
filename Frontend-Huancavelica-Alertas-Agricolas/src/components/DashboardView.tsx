@@ -21,15 +21,15 @@ interface DashboardViewProps {
   onAlertClick?: (alertId: string) => void;
 }
 
-// Datos de pronóstico de precipitación
+// Datos de pronóstico de precipitación (IA vs Weather Service)
 const precipitationData = [
-  { date: '01 Dic', real: 45, forecast: 42 },
-  { date: '02 Dic', real: 52, forecast: 50 },
-  { date: '03 Dic', real: 38, forecast: 35 },
-  { date: '04 Dic', real: 68, forecast: 65 },
-  { date: '05 Dic', real: 78, forecast: 75 },
-  { date: '06 Dic', real: 85, forecast: 82 },
-  { date: '07 Dic', real: 65, forecast: 62 },
+  { date: '01 Dic', real: 45, weatherService: 42, iaPrediction: 47 },
+  { date: '02 Dic', real: 52, weatherService: 50, iaPrediction: 55 },
+  { date: '03 Dic', real: 38, weatherService: 35, iaPrediction: 40 },
+  { date: '04 Dic', real: 68, weatherService: 65, iaPrediction: 70 },
+  { date: '05 Dic', real: 78, weatherService: 75, iaPrediction: 82 },
+  { date: '06 Dic', real: 85, weatherService: 82, iaPrediction: 88 },
+  { date: '07 Dic', real: 65, weatherService: 62, iaPrediction: 67 },
 ];
 
 const DashboardView: React.FC<DashboardViewProps> = ({ userRole: _userRole, onAlertClick: _onAlertClick }) => {
@@ -154,7 +154,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ userRole: _userRole, onAl
             transition={{ delay: 0.3 }}
             className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6"
           >
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Pronóstico de Precipitación - 7 Días</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Comparativa de Pronósticos - Real vs Weather Service vs IA</h2>
             <div className="w-full overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
               <div className="min-w-[500px] sm:min-w-0">
                 <ResponsiveContainer width="100%" height={250}>
@@ -172,7 +172,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({ userRole: _userRole, onAl
                     />
                     <Legend wrapperStyle={{ fontSize: '12px' }} />
                     <Bar dataKey="real" fill="#3b82f6" name="Precipitación Real" radius={[8, 8, 0, 0]} />
-                    <Line type="monotone" dataKey="forecast" stroke="#f59e0b" strokeWidth={2} name="Pronóstico" />
+                    <Bar dataKey="weatherService" fill="#10b981" name="Weather Service" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="iaPrediction" fill="#f59e0b" name="Predicción IA" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
