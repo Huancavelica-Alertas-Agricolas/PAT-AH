@@ -21,7 +21,7 @@ import {
 } from '../graphql/mutations';
 
 // Flag para activar/desactivar mocks - cambiar a false cuando el backend esté listo
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true' || true;
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true' || false;
 
 // Función helper para simular delay de red
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfile
     container_name: alertas-backend
     environment:
-      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/alertas_agricolas
+      DATABASE_URL: postgresql://bd_pat_ah_user:d2zf7ADO3LIBeH6HHE0WnkuyNoIHp01A@dpg-d4q9m7q4i8rc73flvhjg-a.virginia-postgres.render.com:5432/bd_pat_ah?sslmode=require
       JWT_SECRET: super-secret-jwt-key-change-in-production-32-chars
       PORT: 3003
       NODE_ENV: development
@@ -58,10 +58,10 @@ services:
       dockerfile: Dockerfile
     container_name: alertas-frontend
     environment:
-      VITE_GRAPHQL_URL: http://18.208.193.82:3003/api/graphql
-      VITE_GRAPHQL_WS_URL: ws://18.208.193.82:3003/api/graphql
+      VITE_GRAPHQL_URL: https://pat-ah-rest.onrender.com/api/graphql
+      VITE_GRAPHQL_WS_URL: wss://pat-ah-rest.onrender.com/api/graphql
     ports:
-      - "5173:5173"
+      - "5175:5173"
     depends_on:
       - backend
     volumes:
@@ -71,10 +71,14 @@ services:
       - alertas-network
     command: npm run dev -- --host 0.0.0.0
 
-volumes:
-  postgres_data:
-    driver: local
-
-networks:
-  alertas-network:
-    driver: bridge
+  # Adminer - Database management interface
+  adminer:
+    image: adminer:latest
+    container_name: alertas-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - alertas-network

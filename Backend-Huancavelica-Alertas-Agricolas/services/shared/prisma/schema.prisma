@@ -19,6 +19,7 @@ model User {
   ciudad          String?
   zona            String?
   activo          Boolean         @default(true)
+  preferredChannel String?        @default("email")
   prefs           String?
   roles           String          @default("[\"usuario\"]")
   alertasReportadas Int           @default(0)

@@ -2,8 +2,8 @@ import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
 // Determinar las URLs del backend GraphQL
-// Ajuste: incluir puerto 3003 al apuntar a la instancia AWS
-const GRAPHQL_HTTP_ENDPOINT = import.meta.env.VITE_GRAPHQL_URL || 'http://18.208.193.82:3003/api/graphql';
+// Ajuste: usar producción por defecto, localhost como fallback
+const GRAPHQL_HTTP_ENDPOINT = import.meta.env.VITE_GRAPHQL_URL || 'https://pat-ah-rest.onrender.com/api/graphql';
 
 // Crear el HTTP Link
 const httpLink = createHttpLink({

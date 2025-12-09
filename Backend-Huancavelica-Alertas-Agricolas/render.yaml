@@ -96,3 +96,18 @@ jobs:
         fromDatabase:
           name: pat-ah-db
           property: connectionString
+
+  - type: web
+    name: PAT-AH-adminer
+    runtime: image
+    image:
+      url: adminer:latest
+    plan: free
+    region: oregon
+    envVars:
+      - key: ADMINER_DEFAULT_SERVER
+        fromDatabase:
+          name: pat-ah-db
+          property: host
+      - key: ADMINER_DEFAULT_DB
+        value: pat_ah_db
