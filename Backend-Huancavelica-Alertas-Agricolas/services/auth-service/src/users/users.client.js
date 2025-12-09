@@ -48,6 +48,19 @@ let UsersClient = UsersClient_1 = class UsersClient {
             return body.value;
         return body;
     }
+    async update(id, data) {
+        const res = await fetch(this.url(`/users/${id}`), {
+            method: 'PUT',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        if (!res.ok) {
+            const text = await res.text();
+            this.logger.warn(`UsersClient.update failed: ${res.status} ${text}`);
+            throw new Error(`UsersClient update failed: ${res.status}`);
+        }
+        return res.json();
+    }
 };
 exports.UsersClient = UsersClient;
 exports.UsersClient = UsersClient = UsersClient_1 = __decorate([

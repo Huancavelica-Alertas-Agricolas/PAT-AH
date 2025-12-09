@@ -9,36 +9,32 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserDto = void 0;
+exports.UpdateUserInput = void 0;
 const graphql_1 = require("@nestjs/graphql");
-let UserDto = class UserDto {
+let UpdateUserInput = class UpdateUserInput {
 };
-exports.UserDto = UserDto;
-__decorate([
-    (0, graphql_1.Field)(),
-    __metadata("design:type", String)
-], UserDto.prototype, "id", void 0);
+exports.UpdateUserInput = UpdateUserInput;
 __decorate([
     (0, graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
-], UserDto.prototype, "nombre", void 0);
+], UpdateUserInput.prototype, "nombre", void 0);
 __decorate([
     (0, graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
-], UserDto.prototype, "email", void 0);
-__decorate([
-    (0, graphql_1.Field)(),
-    __metadata("design:type", String)
-], UserDto.prototype, "telefono", void 0);
+], UpdateUserInput.prototype, "email", void 0);
 __decorate([
     (0, graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
-], UserDto.prototype, "ciudad", void 0);
+], UpdateUserInput.prototype, "telefono", void 0);
 __decorate([
     (0, graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
-], UserDto.prototype, "preferredChannel", void 0);
-exports.UserDto = UserDto = __decorate([
-    (0, graphql_1.ObjectType)()
-], UserDto);
-//# sourceMappingURL=user.dto.js.map
+], UpdateUserInput.prototype, "ciudad", void 0);
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", String)
+], UpdateUserInput.prototype, "preferredChannel", void 0);
+exports.UpdateUserInput = UpdateUserInput = __decorate([
+    (0, graphql_1.InputType)()
+], UpdateUserInput);
+//# sourceMappingURL=update-user.input.js
