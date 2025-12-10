@@ -233,15 +233,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </motion.button>
 
             {/* Información de acceso */}
-            <div className="mt-6 p-4 bg-blue-50 rounded-xl">
-              <p className="text-sm font-medium text-blue-900 mb-2">Información de acceso:</p>
-              <div className="text-xs text-blue-700 space-y-1">
-                <p><strong>Admin:</strong> admin@alertasegura.pe</p>
-                <p><strong>Autoridad:</strong> autoridad@serenazgo.pe</p>
-                <p><strong>Usuario:</strong> usuario@gmail.com</p>
-                <p className="italic">Cualquier contraseña</p>
-              </div>
-            </div>
+            
           </form>
 
           <div className="mt-8 text-center">

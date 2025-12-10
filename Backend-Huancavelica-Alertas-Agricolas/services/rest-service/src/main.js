@@ -14,6 +14,8 @@ async function bootstrap() {
                 'http://127.0.0.1:3000',
                 'http://localhost:5173',
                 'http://127.0.0.1:5173',
+                'http://localhost:5175',
+                'http://127.0.0.1:5175',
                 'http://18.208.193.82:5173',
                 'http://pat-ah-frontend-876253813400-b67b5fbe.s3-website-us-east-1.amazonaws.com',
                 'https://d3juc86eqmpfpd.cloudfront.net',
@@ -114,7 +116,7 @@ async function bootstrap() {
         console.warn('Health endpoint could not be registered:', e?.message || e);
     }
 
-    await app.listen(process.env.PORT || 3003);
+    await app.listen(process.env.PORT || 3004, '127.0.0.1');
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

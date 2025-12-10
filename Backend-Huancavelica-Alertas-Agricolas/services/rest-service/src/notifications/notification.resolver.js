@@ -17,6 +17,8 @@ exports.NotificationResolver = exports.notificationPubSub = void 0;
 const graphql_1 = require('@nestjs/graphql');
 const prisma_service_1 = require('../prisma.service');
 const graphql_subscriptions_1 = require('graphql-subscriptions');
+const create_notification_input_1 = require('./dto/create-notification.input');
+const notification_type_1 = require('./notification.type');
 
 const notificationPubSub = new graphql_subscriptions_1.PubSub();
 exports.notificationPubSub = notificationPubSub;
@@ -124,7 +126,7 @@ let NotificationResolver = class NotificationResolver {
 };
 
 __decorate([
-  (0, graphql_1.Query)(() => [Object]),
+  (0, graphql_1.Query)(() => [notification_type_1.Notification]),
   __param(0, (0, graphql_1.Args)('userId')),
   __metadata("design:type", Function),
   __metadata("design:paramtypes", [String]),
@@ -156,15 +158,15 @@ __decorate([
 ], NotificationResolver.prototype, "markAllAsRead", null);
 
 __decorate([
-  (0, graphql_1.Mutation)(() => Object),
-  __param(0, (0, graphql_1.Args)('input')),
+  (0, graphql_1.Mutation)(() => notification_type_1.Notification),
+  __param(0, (0, graphql_1.Args)('input', { type: () => create_notification_input_1.CreateNotificationInput })),
   __metadata("design:type", Function),
   __metadata("design:paramtypes", [Object]),
   __metadata("design:returntype", Promise)
 ], NotificationResolver.prototype, "createNotification", null);
 
 __decorate([
-  (0, graphql_1.Subscription)(() => Object, {
+  (0, graphql_1.Subscription)(() => notification_type_1.Notification, {
     filter: (payload, variables) => {
       if (!variables.userId) return true;
       return payload.onNotification.userId === variables.userId;

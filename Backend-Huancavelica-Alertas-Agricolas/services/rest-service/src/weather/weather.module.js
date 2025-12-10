@@ -6,16 +6,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ZoneModule = void 0;
+exports.WeatherModule = void 0;
 const common_1 = require("@nestjs/common");
-const zone_resolver_1 = require("./zone.resolver");
-const prisma_service_1 = require("../prisma.service");
-let ZoneModule = class ZoneModule {
+const weather_resolver_1 = require("./weather.resolver");
+const shared_module_1 = require("../shared/shared.module");
+const prisma_service_1 = require("../shared/prisma/prisma.service");
+let WeatherModule = class WeatherModule {
 };
-exports.ZoneModule = ZoneModule;
-exports.ZoneModule = ZoneModule = __decorate([
+exports.WeatherModule = WeatherModule;
+exports.WeatherModule = WeatherModule = __decorate([
     (0, common_1.Module)({
-        providers: [zone_resolver_1.ZoneResolver, prisma_service_1.PrismaService],
+        imports: [shared_module_1.SharedModule],
+        providers: [weather_resolver_1.WeatherResolver],
     })
-], ZoneModule);
-//# sourceMappingURL=zone.module.js.map
+], WeatherModule);
+//# sourceMappingURL=weather.module.js.map

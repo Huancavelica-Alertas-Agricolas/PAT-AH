@@ -89,3 +89,17 @@ model N8nAlertLog {
   recipients String?
   createdAt DateTime @default(now())
 }
+
+model WeatherData {
+  id            String   @id @default(uuid())
+  zona          String
+  temperatura   Float
+  humedad       Float
+  precipitacion Float
+  velocidadViento Float
+  descripcion   String?
+  fecha         DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  @@index([zona, fecha])
+}

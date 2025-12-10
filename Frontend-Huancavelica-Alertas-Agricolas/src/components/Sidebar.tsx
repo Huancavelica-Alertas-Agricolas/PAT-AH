@@ -75,7 +75,7 @@ const navigationItems: NavItem[] = [
     id: 'users',
     label: 'Usuarios',
     icon: Users,
-    allowedRoles: ['administrador'],
+    allowedRoles: ['administrador', 'autoridad', 'usuario'],
     description: 'Gestión de usuarios'
   },
   {
@@ -163,7 +163,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <Shield className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="font-bold text-gray-900">AlertaSegura</h1>
+                <h1 className="font-bold text-gray-900">Alerta Segura</h1>
                 <p className="text-sm text-gray-500 capitalize">{userRole}</p>
               </div>
             </div>

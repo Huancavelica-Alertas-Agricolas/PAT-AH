@@ -68,6 +68,14 @@ let RestController = class RestController {
             return { error: 'Weather service unavailable' };
         }
     }
+
+    async forgotPassword(body) {
+        const res = await this.authService.forgotPassword(body.telefono || body.email);
+        if (!res.success) {
+            return { success: false, message: res.message };
+        }
+        return { success: true, message: res.message };
+    }
 };
 exports.RestController = RestController;
 __decorate([
@@ -122,6 +130,15 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], RestController.prototype, "getWeatherCurrent", null);
+
+__decorate([
+    (0, common_1.Post)('auth/forgot-password'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], RestController.prototype, "forgotPassword", null);
 exports.RestController = RestController = __decorate([
     (0, common_1.Controller)(),
     __param(2, (0, common_1.Inject)('WEATHER_CLIENT')),

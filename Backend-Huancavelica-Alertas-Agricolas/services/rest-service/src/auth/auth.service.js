@@ -47,11 +47,12 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
 const bcrypt = __importStar(require("bcryptjs"));
 const jwt = __importStar(require("jsonwebtoken"));
-const { firstValueFrom } = require('rxjs');
+const prisma_service_1 = require("../prisma.service");
 let AuthService = class AuthService {
-    constructor(usersService, notificationClient) {
+    constructor(usersService, notificationClient, prisma) {
         this.usersService = usersService;
         this.notificationClient = notificationClient;
+        this.prisma = prisma;
     }
     async register(data) {
         const hashed = await bcrypt.hash(data.password, 10);
@@ -100,11 +101,43 @@ let AuthService = class AuthService {
         const secret = process.env.JWT_SECRET || 'dev_jwt_secret';
         return jwt.sign({ sub: userId }, secret, { expiresIn: '1d' });
     }
+    async forgotPassword(identifier) {
+        try {
+            const user = await this.usersService.findByPhone(identifier);
+            if (!user) {
+                return { success: false, message: 'Usuario no encontrado' };
+            }
+
+            // Importar el servicio SMS aquí para evitar dependencias circulares
+            const sms_service = require('../../../shared/sms.service');
+            
+            const code = sms_service.generateVerificationCode();
+            const expiraEn = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos
+
+            // Guardar el código en la base de datos
+            await this.prisma.verificationCode.create({
+                data: {
+                    codigo: code,
+                    tipo: 'sms',
+                    expiraEn,
+                    userId: user.id,
+                },
+            });
+
+            // Enviar SMS con el código
+            await sms_service.sendVerificationCode(user.telefono, code);
+
+            return { success: true, message: 'Código enviado exitosamente' };
+        } catch (error) {
+            console.error('Error in forgotPassword:', error);
+            return { success: false, message: 'Error interno del servidor' };
+        }
+    }
 };
-exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, common_1.Inject)('NOTIFICATION_SERVICE')),
-    __metadata("design:paramtypes", [users_service_1.UsersService, Object])
+    __param(2, (0, common_1.Inject)(prisma_service_1.PrismaService)),
+    __metadata("design:paramtypes", [users_service_1.UsersService, Object, prisma_service_1.PrismaService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

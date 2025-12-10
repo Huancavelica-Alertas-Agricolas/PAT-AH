@@ -1,0 +1,545 @@
+{
+  "name": "climatrack-functional",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook/clima-alerta",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "1cbce2a4-9670-4e46-9b4c-00b5cdd588b8",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2336,
+        1504
+      ],
+      "webhookId": "8a06a5ab-dc12-4e08-a240-16ed9d022e4c"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "descripcion",
+              "value": "={{ $json.body.descripcion }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "tipo",
+              "value": "={{ $json.body.tipo || 'Clima' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a414ba08-8fe2-49f4-9745-c943d084e60b",
+      "name": "Normalize Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2112,
+        1504
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "rec-1",
+              "name": "recipients",
+              "value": "={{ (() => { const b = $json.body || {}; if (Array.isArray($json.recipients)) return $json.recipients; if (Array.isArray(b.recipients)) return b.recipients; if (b.telefono || b.phone || b.phone_number || b.email) { const r = []; if (b.telefono || b.phone || b.phone_number) r.push({ telefono: b.telefono || b.phone || b.phone_number, email: b.email || null }); else r.push({ email: b.email }); return r; } return []; })() }}",
+              "type": "json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "use-payload-recipients-0001",
+      "name": "Use Payload Recipients",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1960,
+        1504
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "23570df4-7848-4a03-b4f3-091261b72eac",
+      "name": "Loop Over Recipients",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1664,
+        1536
+      ]
+    },
+    {
+      "parameters": {
+        "from": "+18777804236",
+        "to": "={{ $json.phone || $json.phone_number }}",
+        "message": "={{ $('Normalize Payload').first().json.descripcion }}",
+        "options": {}
+      },
+      "id": "809ea014-cdca-4795-aa61-68781d0f7245",
+      "name": "Send SMS",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        1264
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "a2RyTJW3pd2YMZTV",
+          "id": "c42ca2b6-3a91-415e-a1f0-263e3f8ad16c"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "climatrack0@gmail.com",
+        "toEmail": "={{ $json.email }}",
+        "webhookId": "8a06a5ab-dc12-4e08-a240-16ed9d022e4c",
+        "subject": "=Alerta: {{ $('Normalize Payload').first().json.tipo }}",
+        "emailFormat": "text",
+        "text": "={{ $('Normalize Payload').first().json.descripcion }}",
+        "options": {}
+      },
+      "id": "0892d74e-5275-46a7-add5-251c0b663075",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -800,
+        1104
+      ],
+      "webhookId": "13c22c8a-2dc6-4a5f-852d-9e54b93ea72a",
+      "credentials": {
+        "smtp": {
+          "id": "wmXpHmcjUEuYq4c6",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.telegram_chat_id || $json.chat_id }}",
+        "text": "={{ $('Normalize Payload').first().json.descripcion }}",
+        "additionalFields": {}
+      },
+      "id": "63f8d9f1-aa90-4b1b-a333-6f971a93d454",
+      "name": "Send Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -800,
+        1488
+      ],
+      "webhookId": "52ae6c28-107b-4758-a073-b27b6478649c",
+      "credentials": {
+        "telegramApi": {
+          "id": "seJ1gYoznOCc9WCr",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, nombre, email, telefono, \"preferredChannel\" AS preferred_channel, zona, ciudad, activo FROM \"User\" WHERE zona = '{{ $json.body.zona }}' AND activo = true;",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "887c37f2-1f6e-43f0-9ed6-5030a5bd7854",
+      "name": "Get User Preferences",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1888,
+        1504
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "ntpp8LNct2ynLuWY",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.preferred_channel }}",
+                    "rightValue": "sms",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d9080cbc-3dd6-44ff-bc5a-e8b6f951f939"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "SMS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.preferred_channel }}",
+                    "rightValue": "email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0fbd22e3-c237-4c71-99c3-81cbac10ee15"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Email"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.preferred_channel }}",
+                    "rightValue": "telegram",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6fd14bea-6e2c-44e6-a9f7-69f3e24281da"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Telegram"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e7fe6a65-eed4-4615-879b-63de8ed9cfbf",
+                    "leftValue": "={{ $json.telefono }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "number",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "SMS-fallback"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6845c6a8-80ec-478e-b4e4-da35f7cd2e30",
+                    "leftValue": "={{ $json.email }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "number",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Email-fallback"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6744d1e7-21cc-4e07-ac70-e77374b8077f",
+      "name": "Route by Channel Preference",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -1072,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ensure Channel - code node\nconst out = [];\n\nfor (const it of items) {\n  const item = JSON.parse(JSON.stringify(it.json));\n\n  // Normalizar nombres comunes desde DB (por si vienen en español/inglés)\n  // Aseguramos ambos nombres: preferred_channel (snake_case) y preferredChannel (camelCase)\n  const hasPreferred = item.preferred_channel || item.preferredChannel;\n\n  if (!hasPreferred || hasPreferred === '') {\n    if (item.telefono || item.phone || item.phone_number) {\n      item.preferred_channel = 'sms';\n      item.preferredChannel = 'sms';\n    } else if (item.email) {\n      item.preferred_channel = 'email';\n      item.preferredChannel = 'email';\n    } else {\n      // No hay canal — marcamos para log y evitamos ruta de envío\n      item.__skip = true;\n    }\n  } else {\n    // Propagar valor a ambas variantes para compatibilidad\n    item.preferred_channel = item.preferred_channel || item.preferredChannel;\n    item.preferredChannel = item.preferredChannel || item.preferred_channel;\n  }\n\n  // Soporte para forceBoth (genera dos items si aplica)\n  if (item.forceBoth === true) {\n    if (item.telefono || item.phone || item.phone_number) {\n      out.push({ json: { ...item, preferred_channel: 'sms', preferredChannel: 'sms' } });\n    }\n    if (item.email) {\n      out.push({ json: { ...item, preferred_channel: 'email', preferredChannel: 'email' } });\n    }\n  } else {\n    out.push({ json: item });\n  }\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1488,
+        1408
+      ],
+      "id": "a27d0b63-ed89-4324-8ecb-4d20883bf385",
+      "name": "Ensure Channel"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "48193b4b-862f-429b-ab15-4da040e7bf8f",
+              "leftValue": "$json.__skip",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1280,
+        1408
+      ],
+      "id": "24aed90f-5987-4388-ba31-ba005e29cf7b",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Recipients": {
+      "main": [
+        [
+          {
+            "node": "Ensure Channel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Database": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Recipients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Payload": {
+      "main": [
+        [
+          {
+            "node": "Use Payload Recipients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Preferences": {
+      "main": []
+    },
+    "Route by Channel Preference": {
+      "main": [
+        [
+          {
+            "node": "Send SMS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log to Database",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Use Payload Recipients": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Recipients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS": {
+      "main": [
+        [
+          {
+            "node": "Log to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Log to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram": {
+      "main": [
+        [
+          {
+            "node": "Log to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ensure Channel": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Log to Database",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route by Channel Preference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6cfef79b-2afa-4e77-8558-96d150221fe8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "53dcc0b85cae9b069ac0efe32beadc64d91c0671450288ac75782aa24f0c6f24"
+  },
+  "id": "jcTElOww8LIEqaYh",
+  "tags": []
+}

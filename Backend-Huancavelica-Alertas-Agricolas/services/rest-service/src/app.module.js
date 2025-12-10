@@ -15,6 +15,7 @@ const shared_module_1 = require("./shared/shared.module");
 const alert_module_1 = require("./alerts/alert.module");
 const zone_module_1 = require("./zones/zone.module");
 const notification_module_1 = require("./notifications/notification.module");
+const weather_module_1 = require("./weather/weather.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -35,10 +36,10 @@ exports.AppModule = AppModule = __decorate([
                 }),
                 shared_module_1.SharedModule,
                 rest_module_1.RestModule,
-                // TODO: Descomentar cuando se arreglen los decoradores
-                // alert_module_1.AlertModule,
-                // zone_module_1.ZoneModule,
-                // notification_module_1.NotificationModule,
+                alert_module_1.AlertModule,
+                zone_module_1.ZoneModule,
+                notification_module_1.NotificationModule,
+                weather_module_1.WeatherModule,
             ],
     })
 ], AppModule);

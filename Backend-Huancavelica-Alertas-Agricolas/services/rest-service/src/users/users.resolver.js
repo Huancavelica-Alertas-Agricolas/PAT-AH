@@ -13,6 +13,7 @@ exports.UsersResolver = void 0;
 const graphql_1 = require("@nestjs/graphql");
 const users_service_1 = require("./users.service");
 const users_client_1 = require("./users.client");
+const user_type_1 = require("./user.type");
 let UsersResolver = class UsersResolver {
     constructor(usersService, usersClient) {
         this.usersService = usersService;
@@ -25,14 +26,24 @@ let UsersResolver = class UsersResolver {
         const len = Array.isArray(users) ? users.length : ((_a = users === null || users === void 0 ? void 0 : users.length) !== null && _a !== void 0 ? _a : 0);
         return `Users: ${len}`;
     }
+
+    async getUsers() {
+        const users = this.useMicro ? await this.usersClient.findAll() : await this.usersService.findAll();
+        return users;
+    }
 };
-exports.UsersResolver = UsersResolver;
 __decorate([
     (0, graphql_1.Query)(() => String),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UsersResolver.prototype, "helloUsers", null);
+__decorate([
+    (0, graphql_1.Query)(() => [user_type_1.User]),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], UsersResolver.prototype, "getUsers", null);
 exports.UsersResolver = UsersResolver = __decorate([
     (0, graphql_1.Resolver)(),
     __metadata("design:paramtypes", [users_service_1.UsersService, users_client_1.UsersClient])

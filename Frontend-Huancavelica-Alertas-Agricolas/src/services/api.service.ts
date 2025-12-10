@@ -18,6 +18,7 @@ import {
   RESET_PASSWORD,
   MARK_NOTIFICATION_READ,
   GENERATE_REPORT,
+  REGISTER,
 } from '../graphql/mutations';
 
 // Flag para activar/desactivar mocks - cambiar a false cuando el backend esté listo
@@ -216,6 +217,37 @@ export const usersApi = {
 
 // ==================== AUTH API ====================
 export const authApi = {
+  async register(userData: {
+    nombre: string;
+    email: string;
+    telefono: string;
+    zona: string;
+    password: string;
+  }): Promise<User> {
+    // Always use real backend for registration
+    const { data } = await apolloClient.mutate({
+      mutation: REGISTER,
+      variables: { input: userData },
+    });
+    
+    if ((data as any).register.token) {
+      localStorage.setItem('auth_token', (data as any).register.token);
+    }
+    
+    const graphQLUser = (data as any).register.user;
+    return {
+      id: graphQLUser.id,
+      name: graphQLUser.nombre,
+      email: graphQLUser.email,
+      phone: graphQLUser.telefono,
+      role: graphQLUser.roles[0] || 'usuario',
+      zone: userData.zona,
+      status: 'activo',
+      alertsReported: 0,
+      createdAt: new Date().toISOString(),
+    };
+  },
+
   async login(phone: string, password: string): Promise<User> {
     // Always use real backend for login
     const { data } = await apolloClient.mutate({

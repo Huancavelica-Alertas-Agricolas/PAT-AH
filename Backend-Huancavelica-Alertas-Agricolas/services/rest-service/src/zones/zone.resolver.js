@@ -16,6 +16,7 @@ exports.ZoneResolver = void 0;
 
 const graphql_1 = require('@nestjs/graphql');
 const prisma_service_1 = require('../prisma.service');
+const zone_type_1 = require('./zone.type');
 
 let ZoneResolver = class ZoneResolver {
   constructor(prisma) {
@@ -64,14 +65,14 @@ let ZoneResolver = class ZoneResolver {
 };
 
 __decorate([
-  (0, graphql_1.Query)(() => [Object]),
+  (0, graphql_1.Query)(() => [zone_type_1.Zone]),
   __metadata("design:type", Function),
   __metadata("design:paramtypes", []),
   __metadata("design:returntype", Promise)
 ], ZoneResolver.prototype, "getZones", null);
 
 __decorate([
-  (0, graphql_1.Query)(() => Object, { nullable: true }),
+  (0, graphql_1.Query)(() => zone_type_1.Zone, { nullable: true }),
   __param(0, (0, graphql_1.Args)('id')),
   __metadata("design:type", Function),
   __metadata("design:paramtypes", [String]),

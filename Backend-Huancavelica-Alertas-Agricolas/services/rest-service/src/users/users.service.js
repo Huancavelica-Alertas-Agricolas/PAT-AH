@@ -46,7 +46,13 @@ let UsersService = class UsersService {
     }
     async findByPhone(phone) {
         const p = normalizePhone(phone || '');
-        return this.prisma.user.findUnique({ where: { telefono: p } });
+        // Try normalized format first, then try original format
+        let user = await this.prisma.user.findUnique({ where: { telefono: p } });
+        if (!user && phone) {
+            // If not found with normalized, try with original format
+            user = await this.prisma.user.findUnique({ where: { telefono: phone } });
+        }
+        return user;
     }
     async findAll() {
         return this.prisma.user.findMany();

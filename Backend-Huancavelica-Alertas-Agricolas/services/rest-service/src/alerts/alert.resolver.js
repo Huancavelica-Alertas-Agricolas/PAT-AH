@@ -18,6 +18,10 @@ const graphql_1 = require('@nestjs/graphql');
 const prisma_service_1 = require('../prisma.service');
 const graphql_subscriptions_1 = require('graphql-subscriptions');
 const recommendations_data_1 = require('../../../shared/recommendations.data');
+const alert_filter_input_1 = require('./dto/alert-filter.input');
+const create_alert_input_1 = require('./dto/create-alert.input');
+const alert_type_1 = require('./alert.type');
+const recommendation_type_1 = require('./recommendation.type');
 const fetch = require('node-fetch');
 
 const pubSub = new graphql_subscriptions_1.PubSub();
@@ -136,33 +140,35 @@ let AlertResolver = class AlertResolver {
   async createAlert(input, userId) {
     const alert = await this.prisma.alert.create({
       data: {
-        titulo: input.title,
-        descripcion: input.description,
-        tipo: input.type,
-        severidad: input.severity,
-        prioridad: input.priority || 'media',
+        titulo: `${input.tipo} - ${input.zona}`, // Generar titulo basado en tipo y zona
+        descripcion: input.descripcion,
+        tipo: input.tipo,
+        severidad: input.severidad,
+        prioridad: 'media',
         estado: 'activa',
-        ubicacion: input.location,
-        zona: input.zone,
-        reportadoPor: input.reportedBy,
+        ubicacion: input.ubicacion,
+        zona: input.zona,
+        latitud: input.latitud,
+        longitud: input.longitud,
+        reportadoPor: input.reportadoPor,
         userId: userId,
-        fecha: input.time ? new Date(input.time) : new Date(),
+        fecha: new Date(),
       },
     });
 
     const formattedAlert = {
       id: alert.id,
-      title: alert.titulo,
-      description: alert.descripcion,
-      type: alert.tipo,
-      severity: alert.severidad,
-      priority: alert.prioridad,
-      status: alert.estado,
-      time: alert.fecha.toISOString(),
-      location: alert.ubicacion,
-      zone: alert.zona,
-      reportedBy: alert.reportadoPor,
-      reportedAt: alert.createdAt.toISOString(),
+      tipo: alert.tipo,
+      severidad: alert.severidad,
+      zona: alert.zona,
+      estado: alert.estado,
+      descripcion: alert.descripcion,
+      ubicacion: alert.ubicacion,
+      latitud: alert.latitud,
+      longitud: alert.longitud,
+      fecha: alert.fecha.toISOString(),
+      reportadoPor: alert.reportadoPor,
+      createdAt: alert.createdAt.toISOString(),
     };
 
     pubSub.publish('newAlert', { onNewAlert: formattedAlert });
@@ -183,7 +189,7 @@ let AlertResolver = class AlertResolver {
 
     // Send to n8n webhook for notifications
     try {
-      const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || 'https://your-n8n-instance.com/webhook/clima-alerta';
+      const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || 'https://climatrack0.app.n8n.cloud/webhook/webhook/clima-alerta';
       
       // Get users in the alert zone to notify
       let recipients = [];
@@ -192,24 +198,38 @@ let AlertResolver = class AlertResolver {
           where: { ciudad: alert.zona },
           select: { id: true, nombre: true, email: true, telefono: true, preferredChannel: true }
         });
-        recipients = zoneUsers;
+        recipients = zoneUsers.map(user => ({
+          id: user.id,
+          nombre: user.nombre,
+          email: user.email,
+          telefono: user.telefono,
+          preferredChannel: user.preferredChannel || 'email'
+        }));
       }
+
+      const payload = {
+        descripcion: alert.descripcion,
+        tipo: alert.tipo,
+        severidad: alert.severidad,
+        zona: alert.zona,
+        ubicacion: alert.ubicacion,
+        recipients: recipients,
+      };
+
+      console.log('Sending alert to n8n webhook:', JSON.stringify(payload, null, 2));
       
-      await fetch(n8nWebhookUrl, {
+      const response = await fetch(n8nWebhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          descripcion: alert.descripcion,
-          tipo: alert.tipo,
-          severidad: alert.severidad,
-          zona: alert.zona,
-          ubicacion: alert.ubicacion,
-          reportMessage: `Alerta ${alert.tipo} reportada en ${alert.zona}`,
-          recipients: recipients,
-        }),
+        body: JSON.stringify(payload),
       });
+
+      console.log('n8n webhook response status:', response.status);
+      const responseText = await response.text();
+      console.log('n8n webhook response:', responseText);
+      
     } catch (error) {
       console.error('Error sending to n8n webhook:', error);
     }
@@ -250,15 +270,15 @@ let AlertResolver = class AlertResolver {
 };
 
 __decorate([
-  (0, graphql_1.Query)(() => [Object]),
-  __param(0, (0, graphql_1.Args)('filter', { nullable: true })),
+  (0, graphql_1.Query)(() => [alert_type_1.Alert]),
+  __param(0, (0, graphql_1.Args)('filter', { nullable: true, type: () => alert_filter_input_1.AlertFilterInput })),
   __metadata("design:type", Function),
   __metadata("design:paramtypes", [Object]),
   __metadata("design:returntype", Promise)
 ], AlertResolver.prototype, "getAlerts", null);
 
 __decorate([
-  (0, graphql_1.Query)(() => Object, { nullable: true }),
+  (0, graphql_1.Query)(() => alert_type_1.Alert, { nullable: true }),
   __param(0, (0, graphql_1.Args)('id')),
   __metadata("design:type", Function),
   __metadata("design:paramtypes", [String]),
@@ -266,7 +286,7 @@ __decorate([
 ], AlertResolver.prototype, "getAlertById", null);
 
 __decorate([
-  (0, graphql_1.Query)(() => [Object]),
+  (0, graphql_1.Query)(() => [recommendation_type_1.Recommendation]),
   __param(0, (0, graphql_1.Args)('type')),
   __metadata("design:type", Function),
   __metadata("design:paramtypes", [String]),
@@ -274,8 +294,8 @@ __decorate([
 ], AlertResolver.prototype, "getAlertRecommendations", null);
 
 __decorate([
-  (0, graphql_1.Mutation)(() => Object),
-  __param(0, (0, graphql_1.Args)('input')),
+  (0, graphql_1.Mutation)(() => alert_type_1.Alert),
+  __param(0, (0, graphql_1.Args)('input', { type: () => create_alert_input_1.CreateAlertInput })),
   __param(1, (0, graphql_1.Args)('userId', { nullable: true })),
   __metadata("design:type", Function),
   __metadata("design:paramtypes", [Object, String]),
@@ -283,7 +303,7 @@ __decorate([
 ], AlertResolver.prototype, "createAlert", null);
 
 __decorate([
-  (0, graphql_1.Mutation)(() => Object),
+  (0, graphql_1.Mutation)(() => alert_type_1.Alert),
   __param(0, (0, graphql_1.Args)('id')),
   __param(1, (0, graphql_1.Args)('status')),
   __param(2, (0, graphql_1.Args)('responseTime', { nullable: true })),
@@ -293,7 +313,7 @@ __decorate([
 ], AlertResolver.prototype, "updateAlertStatus", null);
 
 __decorate([
-  (0, graphql_1.Subscription)(() => Object, {
+  (0, graphql_1.Subscription)(() => alert_type_1.Alert, {
     filter: (payload, variables) => {
       if (!variables.zone) return true;
       return payload.onNewAlert.zone === variables.zone;

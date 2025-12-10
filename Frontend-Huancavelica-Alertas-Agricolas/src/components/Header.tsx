@@ -85,7 +85,9 @@ const Header: React.FC<HeaderProps> = ({
     return userInfo[role] || userInfo.usuario;
   };
 
-  const userInfo = getUserInfo(userRole, currentUser);  /**
+  const userInfo = getUserInfo(userRole, currentUser);
+  console.log('Current user:', currentUser);
+  console.log('User info:', userInfo);  /**
    * Formatea la fecha y hora actual
    */
   const formatDateTime = (date: Date) => {
@@ -204,7 +206,7 @@ const Header: React.FC<HeaderProps> = ({
                 {userInfo.avatar}
               </div>
               <div className="hidden md:block text-left">
-                <div className="font-medium text-gray-900">{userInfo.name}</div>
+                <div className="font-medium text-gray-900 truncate max-w-32" title={userInfo.name}>{userInfo.name}</div>
                 <div className="text-sm text-gray-500 capitalize">{userRole}</div>
               </div>
               <ChevronDown className={cn(
